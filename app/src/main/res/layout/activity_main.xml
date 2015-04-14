@@ -5,16 +5,11 @@
     android:layout_height="match_parent">
 
     <!-- The main content view -->
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="48dp"/>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -22,7 +17,13 @@
             android:layout_width="match_parent"
             android:background="@color/actionbar_bg"/>
 
-    </RelativeLayout>
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <!-- The navigation drawer -->
     <RelativeLayout
@@ -35,7 +36,7 @@
             android:id="@+id/left_drawer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="104dp"
+            android:layout_marginTop="64dp"
             android:choiceMode="singleChoice"
             android:divider="#20000000"
             android:dividerHeight="2dp"

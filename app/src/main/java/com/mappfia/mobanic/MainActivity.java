@@ -13,8 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +33,18 @@ public class MainActivity extends ActionBarActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        setupNavigationDrawer();
+
+
+        CarsAdapter adapter = new CarsAdapter(this);
+
+        adapter.add(new Car());
+
+        ListView carListView = (ListView) findViewById(android.R.id.list);
+        carListView.setAdapter(adapter);
+    }
+
+    private void setupNavigationDrawer() {
         String[] navItems = getResources().getStringArray(R.array.categories);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -50,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
 
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 float moveFactor = (mDrawerList.getWidth() * slideOffset);
-                RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
+                LinearLayout container = (LinearLayout) findViewById(R.id.container);
                 container.setTranslationX(moveFactor);
             }
         };
