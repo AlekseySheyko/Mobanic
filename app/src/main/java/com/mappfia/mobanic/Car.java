@@ -1,15 +1,14 @@
 package com.mappfia.mobanic;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 public class Car {
 
-    private int mId;
     private String mMake;
     private String mModel;
     private float mPrice;
     private String mImageUrl;
-
-    public Car() {
-    }
 
     public Car(String make, String model, float price, String imageUrl) {
         mMake = make;
@@ -26,8 +25,12 @@ public class Car {
         return mModel;
     }
 
-    public float getPrice() {
-        return mPrice;
+    public String getPrice() {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator(' ');
+        DecimalFormat format = new DecimalFormat("#,###", symbols);
+
+        return "\u00A3" + format.format(mPrice);
     }
 
     public String getImageUrl() {

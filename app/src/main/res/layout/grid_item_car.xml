@@ -1,13 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content">
 
     <com.mappfia.mobanic.RatioImageView
+        android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/car_image_sample"
         android:scaleType="centerCrop"/>
-    
-</RelativeLayout>
+        <!--TODO: Add semi-transparent gradient at the bottom for better legibility of white letters-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:gravity="bottom">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="bottom">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/make"
+                    style="@style/CardTextView"
+                    tools:text="Land Rover"/>
+
+                <TextView
+                    android:id="@+id/model"
+                    style="@style/CardTextView"
+                    tools:text="Range Rover Sport"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="right"
+                style="@style/CardTextView"
+                tools:text="$99,875"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>

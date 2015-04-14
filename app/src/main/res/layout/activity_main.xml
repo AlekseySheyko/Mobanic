@@ -21,7 +21,8 @@
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:divider="@null"/>
 
     </LinearLayout>
 
@@ -37,10 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
-            android:choiceMode="singleChoice"
-            android:divider="#20000000"
             android:dividerHeight="2dp"
-            android:scrollbars="none"/>
+            android:divider="#1c000000"/>
 
     </RelativeLayout>
 
