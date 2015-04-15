@@ -1,280 +1,272 @@
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:fillViewport="true"
     tools:context="com.mappfia.mobanic.DetailActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content">
-
-        <com.mappfia.mobanic.RatioImageView
-            android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:text="@string/specs_header"
-            style="@style/HeaderTextView"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:background="@android:color/white">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.mappfia.mobanic.RatioImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="@string/specs_header"
+                style="@style/HeaderTextView"/>
 
             <LinearLayout
-                style="@style/SpecsContainer">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:background="@android:color/white">
 
-                <TextView
-                    android:text="Make"
-                    style="@style/SpecsKey"/>
+                <LinearLayout
+                    style="@style/SpecsContainer">
 
-                <TextView
-                    android:id="@+id/make"
-                    style="@style/SpecsValue"
-                    android:text="Land Rover"/>
+                    <TextView
+                        android:text="Make"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/make"
+                        style="@style/SpecsValue"
+                        android:text="Land Rover"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Year"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/year"
+                        style="@style/SpecsValue"
+                        android:text="2014"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Mileage"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/mileage"
+                        style="@style/SpecsValue"
+                        android:text="50"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Previous Owners"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/prevOwners"
+                        style="@style/SpecsValue"
+                        android:text="1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Engine"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/engine"
+                        style="@style/SpecsValue"
+                        android:text="3000cc"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Transmission"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/transmission"
+                        style="@style/SpecsValue"
+                        android:text="Automatic"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Fuel Type"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/fuelType"
+                        style="@style/SpecsValue"
+                        android:text="Diesel"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Color"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/color"
+                        style="@style/SpecsValue"
+                        android:text="Paris Grey"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
+                        android:text="Location"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/location"
+                        style="@style/SpecsValue"
+                        android:text="UK"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                style="@style/SpecsContainer">
+            <TextView
+                android:text="@string/gallery_header"
+                style="@style/HeaderTextView"/>
 
-                <TextView
-                    android:text="Model"
-                    style="@style/SpecsKey"/>
+            <ViewFlipper
+                android:id="@+id/flipper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoStart="true"
+                android:flipInterval="3000"
+                android:foreground="?selectableItemBackground">
 
-                <TextView
-                    android:id="@+id/model"
-                    style="@style/SpecsValue"
-                    android:text="Range Rover Sport"/>
+                <com.mappfia.mobanic.RatioImageView
+                    android:id="@+id/image1"
+                    style="@style/DetailsImagePreview"/>
 
-            </LinearLayout>
+                <com.mappfia.mobanic.RatioImageView
+                    android:id="@+id/image2"
+                    style="@style/DetailsImagePreview"/>
 
-            <LinearLayout
-                style="@style/SpecsContainer">
+                <com.mappfia.mobanic.RatioImageView
+                    android:id="@+id/image3"
+                    style="@style/DetailsImagePreview"/>
 
-                <TextView
-                    android:text="Year"
-                    style="@style/SpecsKey"/>
+                <com.mappfia.mobanic.RatioImageView
+                    android:id="@+id/image4"
+                    style="@style/DetailsImagePreview"/>
 
-                <TextView
-                    android:id="@+id/year"
-                    style="@style/SpecsValue"
-                    android:text="2014"/>
+                <com.mappfia.mobanic.RatioImageView
+                    android:id="@+id/image5"
+                    style="@style/DetailsImagePreview"/>
 
-            </LinearLayout>
+            </ViewFlipper>
 
-            <LinearLayout
-                style="@style/SpecsContainer">
-
-                <TextView
-                    android:text="Mileage"
-                    style="@style/SpecsKey"/>
-
-                <TextView
-                    android:id="@+id/mileage"
-                    style="@style/SpecsValue"
-                    android:text="50"/>
-
-            </LinearLayout>
+            <TextView
+                android:text="@string/features_header"
+                style="@style/HeaderTextView"/>
 
             <LinearLayout
-                style="@style/SpecsContainer">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:background="@android:color/white">
 
                 <TextView
-                    android:text="Previous Owners"
-                    style="@style/SpecsKey"/>
+                    android:text="Cornering Brake Control"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:id="@+id/prevOwners"
-                    style="@style/SpecsValue"
-                    android:text="1"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/SpecsContainer">
+                    android:text="Intelligent Stop/Start System"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:text="Engine"
-                    style="@style/SpecsKey"/>
+                    android:text="Park Assist"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:id="@+id/engine"
-                    style="@style/SpecsValue"
-                    android:text="3000cc"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/SpecsContainer">
+                    android:text="Dynamic Stability Control"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:text="Transmission"
-                    style="@style/SpecsKey"/>
+                    android:text="Electric Parking Brake"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:id="@+id/transmission"
-                    style="@style/SpecsValue"
-                    android:text="Automatic"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/SpecsContainer">
+                    android:text="Daytime Running Lights"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:text="Fuel Type"
-                    style="@style/SpecsKey"/>
+                    android:text="Interior Mood Lighting"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:id="@+id/fuelType"
-                    style="@style/SpecsValue"
-                    android:text="Diesel"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/SpecsContainer">
+                    android:text="Heated Windscreen"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:text="Color"
-                    style="@style/SpecsKey"/>
+                    android:text="Roll Stability Control"
+                    style="@style/FeaturesListItem"/>
 
                 <TextView
-                    android:id="@+id/color"
-                    style="@style/SpecsValue"
-                    android:text="Paris Grey"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/SpecsContainer">
-
-                <TextView
-                    android:text="Location"
-                    style="@style/SpecsKey"/>
-
-                <TextView
-                    android:id="@+id/location"
-                    style="@style/SpecsValue"
-                    android:text="UK"/>
+                    android:text="Sliding Panoramic Roof"
+                    style="@style/FeaturesListItem"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <TextView
-            android:text="@string/gallery_header"
-            style="@style/HeaderTextView"/>
+    </ScrollView>
 
-        <ViewFlipper
-            android:id="@+id/flipper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autoStart="true"
-            android:flipInterval="3000">
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_contact"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="bottom|right"
+        fab:fab_colorNormal="#ff4081"
+        fab:fab_colorPressed="#ffd03568"/>
 
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image1"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image2"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image3"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image4"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image5"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image6"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image7"
-                style="@style/DetailsImagePreview"/>
-
-            <com.mappfia.mobanic.RatioImageView
-                android:id="@+id/image8"
-                style="@style/DetailsImagePreview"/>
-
-        </ViewFlipper>
-
-        <TextView
-            android:text="@string/features_header"
-            style="@style/HeaderTextView"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:background="@android:color/white">
-
-            <TextView
-                android:text="Cornering Brake Control"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Intelligent Stop/Start System"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Park Assist"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Dynamic Stability Control"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Electric Parking Brake"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Daytime Running Lights"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Interior Mood Lighting"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Heated Windscreen"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Roll Stability Control"
-                style="@style/FeaturesListItem"/>
-
-            <TextView
-                android:text="Sliding Panoramic Roof"
-                style="@style/FeaturesListItem"/>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-</ScrollView>
+</FrameLayout>

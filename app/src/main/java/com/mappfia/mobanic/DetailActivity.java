@@ -2,6 +2,9 @@ package com.mappfia.mobanic;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.widget.ViewFlipper;
 
 import com.squareup.picasso.Picasso;
 
@@ -16,7 +19,7 @@ public class DetailActivity extends ActionBarActivity {
         setContentView(R.layout.activity_detail);
 
         // TODO: Retrive car make and model from intent
-        getSupportActionBar().setTitle("Land Rover Range Rover Sport");
+        getSupportActionBar().setTitle("Range Rover Sport");
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this)
@@ -30,9 +33,6 @@ public class DetailActivity extends ActionBarActivity {
         RatioImageView imageView3 = (RatioImageView) findViewById(R.id.image3);
         RatioImageView imageView4 = (RatioImageView) findViewById(R.id.image4);
         RatioImageView imageView5 = (RatioImageView) findViewById(R.id.image5);
-        RatioImageView imageView6 = (RatioImageView) findViewById(R.id.image6);
-        RatioImageView imageView7 = (RatioImageView) findViewById(R.id.image7);
-        RatioImageView imageView8 = (RatioImageView) findViewById(R.id.image8);
 
         Picasso.with(this)
                 .load("http://www.themotorreport.com.au/content/image/2/0/2014_range_rover_sport_australia_01_1-1020-mc:819x819.jpg")
@@ -40,40 +40,39 @@ public class DetailActivity extends ActionBarActivity {
                 .centerCrop()
                 .into(imageView1);
         Picasso.with(this)
-                .load("http://o.aolcdn.com/hss/storage/midas/ff10ff0b8023231885fcbd74f6d32ed8/200047427/lead22-2014-lr-range-rover-sport-review.jpg")
+                .load("http://www.landroverusa.com/Images/L494_14_INT_LOC06_oa_2_293-80676_500x330.jpg?v=1")
                 .fit()
                 .centerCrop()
                 .into(imageView2);
         Picasso.with(this)
-                .load("http://lexani.com/media/images/rendered/2014_Land%20Rover_Range%20Rover%20Sport_740_v1.jpg")
+                .load("http://www.landroverusa.com/Images/L494_14_INT_DET27_up_oa_2_293-91007_500x330.jpg?v=1")
                 .fit()
                 .centerCrop()
                 .into(imageView3);
         Picasso.with(this)
-                .load("http://www.themotorreport.com.au/content/image/2/0/2014_range_rover_sport_australia_01_1-1020-mc:819x819.jpg")
+                .load("http://www.landroverusa.com/Images/L494_14_STU_DET09_oa_2_293-80683_500x330.jpg?v=1")
                 .fit()
                 .centerCrop()
                 .into(imageView4);
         Picasso.with(this)
-                .load("http://o.aolcdn.com/hss/storage/midas/ff10ff0b8023231885fcbd74f6d32ed8/200047427/lead22-2014-lr-range-rover-sport-review.jpg")
+                .load("http://www.landroverusa.com/Images/L494_14_EXT_STU07_fh_2_04_293-91143_500x330.jpg?v=1")
                 .fit()
                 .centerCrop()
                 .into(imageView5);
-        Picasso.with(this)
-                .load("http://lexani.com/media/images/rendered/2014_Land%20Rover_Range%20Rover%20Sport_740_v1.jpg")
-                .fit()
-                .centerCrop()
-                .into(imageView6);
-        Picasso.with(this)
-                .load("http://www.themotorreport.com.au/content/image/2/0/2014_range_rover_sport_australia_01_1-1020-mc:819x819.jpg")
-                .fit()
-                .centerCrop()
-                .into(imageView7);
-        Picasso.with(this)
-                .load("http://o.aolcdn.com/hss/storage/midas/ff10ff0b8023231885fcbd74f6d32ed8/200047427/lead22-2014-lr-range-rover-sport-review.jpg")
-                .fit()
-                .centerCrop()
-                .into(imageView8);
+
+        final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
+        flipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_in));
+        flipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_out));
+        flipper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flipper.stopFlipping();
+                flipper.showNext();
+                flipper.startFlipping();
+            }
+        });
 
 
         ArrayList<Spec> specs = new ArrayList<>();
