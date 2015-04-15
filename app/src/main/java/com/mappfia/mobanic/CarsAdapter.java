@@ -21,7 +21,7 @@ public class CarsAdapter extends ArrayAdapter<Car> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-        View rootView = inflater.inflate(R.layout.grid_item_car, parent, false);
+        View rootView = inflater.inflate(R.layout.list_item_car, parent, false);
 
         Car car = getItem(position);
 

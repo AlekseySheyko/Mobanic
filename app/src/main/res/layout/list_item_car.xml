@@ -8,7 +8,6 @@
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/car_image_sample"
         android:scaleType="centerCrop"/>
         <!--TODO: Add semi-transparent gradient at the bottom for better legibility of white letters-->
 

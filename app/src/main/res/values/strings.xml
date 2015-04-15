@@ -7,4 +7,7 @@
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="specs_header">Specification</string>
+    <string name="gallery_header">Gallery</string>
+    <string name="features_header">Features</string>
 </resources>

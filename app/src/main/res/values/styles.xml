@@ -5,6 +5,10 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppTheme.ActionBar" parent="Theme.AppCompat">
+        <item name="android:windowBackground">@color/detail_window_background</item>
+    </style>
+
     <style name="CardTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -13,4 +17,50 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="SpecsKey">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">3</item>
+        <item name="android:fontFamily">bold</item>
+        <item name="android:textColor">#000</item>
+    </style>
+
+    <style name="SpecsValue">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">4</item>
+        <item name="android:textColor">#cb000000</item>
+    </style>
+
+    <style name="SpecsContainer">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="DetailsImagePreview">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="FeaturesListItem" parent="SpecsKey">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="HeaderTextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:textColor">#9c000000</item>
+        <item name="android:background">#F5F5F5</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+
+    <color name="detail_window_background">#9E9E9E</color>
 </resources>

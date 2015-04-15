@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--TODO: Provide separate layout for tablets-->
+
     <!-- The main content view -->
     <LinearLayout
         android:id="@+id/container"
@@ -18,7 +20,7 @@
             android:background="@color/actionbar_bg"/>
 
         <ListView
-            android:id="@android:id/list"
+            android:id="@+id/listview_cars"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

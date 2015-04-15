@@ -1,6 +1,7 @@
 package com.mappfia.mobanic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -42,8 +43,15 @@ public class MainActivity extends ActionBarActivity {
         adapter.add(new Car("Land Rover", "Range Rover Sport", 89475, "http://o.aolcdn.com/hss/storage/midas/ff10ff0b8023231885fcbd74f6d32ed8/200047427/lead22-2014-lr-range-rover-sport-review.jpg"));
         adapter.add(new Car("Land Rover", "Range Rover Sport", 99875, "http://lexani.com/media/images/rendered/2014_Land%20Rover_Range%20Rover%20Sport_740_v1.jpg"));
 
-        ListView carListView = (ListView) findViewById(android.R.id.list);
+        ListView carListView = (ListView) findViewById(R.id.listview_cars);
         carListView.setAdapter(adapter);
+        carListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                // TODO: Pass car id in intent extra to retrieve the details for the current car from database
+                startActivity(new Intent(MainActivity.this, DetailActivity.class));
+            }
+        });
     }
 
     private void setupNavigationDrawer() {
