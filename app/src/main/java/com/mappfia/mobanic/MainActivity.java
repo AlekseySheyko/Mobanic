@@ -65,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
-                if (e == null) {
+                if (e == null && cars != null) {
                     for (ParseObject car : cars) {
                         carsAdapter.add(car);
                         car.pinInBackground();

@@ -55,6 +55,20 @@
                     style="@style/SpecsContainer">
 
                     <TextView
+                        android:text="Model"
+                        style="@style/SpecsKey"/>
+
+                    <TextView
+                        android:id="@+id/model"
+                        style="@style/SpecsValue"
+                        tools:text="Range Rover Sport"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SpecsContainer">
+
+                    <TextView
                         android:text="Year"
                         style="@style/SpecsKey"/>
 
@@ -175,29 +189,7 @@
                 android:layout_height="wrap_content"
                 android:autoStart="true"
                 android:flipInterval="3000"
-                android:foreground="?selectableItemBackground">
-
-                <com.mappfia.mobanic.RatioImageView
-                    android:id="@+id/image1"
-                    style="@style/DetailsImagePreview"/>
-
-                <com.mappfia.mobanic.RatioImageView
-                    android:id="@+id/image2"
-                    style="@style/DetailsImagePreview"/>
-
-                <com.mappfia.mobanic.RatioImageView
-                    android:id="@+id/image3"
-                    style="@style/DetailsImagePreview"/>
-
-                <com.mappfia.mobanic.RatioImageView
-                    android:id="@+id/image4"
-                    style="@style/DetailsImagePreview"/>
-
-                <com.mappfia.mobanic.RatioImageView
-                    android:id="@+id/image5"
-                    style="@style/DetailsImagePreview"/>
-
-            </ViewFlipper>
+                android:foreground="?selectableItemBackground"/>
 
             <TextView
                 android:text="@string/features_header"
