@@ -1,11 +1,13 @@
 package com.mappfia.mobanic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ViewFlipper;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -71,6 +73,15 @@ public class DetailActivity extends ActionBarActivity {
                 flipper.stopFlipping();
                 flipper.showNext();
                 flipper.startFlipping();
+            }
+        });
+
+        FloatingActionButton actionButton =
+                (FloatingActionButton) findViewById(R.id.fab);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
             }
         });
 

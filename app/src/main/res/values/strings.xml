@@ -10,4 +10,6 @@
     <string name="specs_header">Specification</string>
     <string name="gallery_header">Gallery</string>
     <string name="features_header">Features</string>
+    <string name="title_activity_contact">Contact Us</string>
+    <string name="action_send">Send</string>
 </resources>
