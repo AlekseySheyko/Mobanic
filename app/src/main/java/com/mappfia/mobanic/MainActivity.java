@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
 
         final CarsAdapter carsAdapter = new CarsAdapter(this);
 
-        ListView carsListView = (ListView) findViewById(R.id.listview_cars);
+        final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
         carsListView.setAdapter(carsAdapter);
         carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -65,6 +65,8 @@ public class MainActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
+                findViewById(R.id.progressBar).setVisibility(View.GONE);
+                carsListView.setVisibility(View.VISIBLE);
                 if (e == null && cars != null) {
                     for (ParseObject car : cars) {
                         carsAdapter.add(car);

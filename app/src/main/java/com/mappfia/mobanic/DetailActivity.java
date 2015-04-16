@@ -39,6 +39,7 @@ public class DetailActivity extends ActionBarActivity {
                 mCarId = savedInstanceState.getString("car_id");
             }
 
+            // TODO: Manage feature list in Parse data console
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
             if (!isOnline()) {
                 query.fromLocalDatastore();
@@ -48,8 +49,12 @@ public class DetailActivity extends ActionBarActivity {
                 public void done(ParseObject car, ParseException e) {
                     mCar = car;
 
-                    getSupportActionBar().setTitle(mCar.getString("make") + " " +
-                            mCar.getString("model"));
+                    String title = mCar.getString("make") + " " +
+                            mCar.getString("model");
+                    if (title.length() > 20) {
+                        title = mCar.getString("model");
+                    }
+                    getSupportActionBar().setTitle(title);
 
                     setCoverImage();
                     fillOutSpecifications();
@@ -75,7 +80,10 @@ public class DetailActivity extends ActionBarActivity {
     }
 
     private void setCoverImage() {
+        findViewById(R.id.progressBar).setVisibility(View.GONE);
+
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
+        imageView.setVisibility(View.VISIBLE);
         // TODO: Restore not as URL, but as file, to show image even in offline mode
         Picasso.with(this)
                 .load(mCar.getParseFile("coverImage").getUrl())
