@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -65,8 +67,11 @@ public class MainActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
+                Animation animationFadeIn = AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_in);
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
                 carsListView.setVisibility(View.VISIBLE);
+                carsListView.setAnimation(animationFadeIn);
+                carsListView.animate();
                 if (e == null && cars != null) {
                     for (ParseObject car : cars) {
                         carsAdapter.add(car);
