@@ -47,7 +47,7 @@
                     <TextView
                         android:id="@+id/make"
                         style="@style/SpecsValue"
-                        android:text="Land Rover"/>
+                        tools:text="Land Rover"/>
 
                 </LinearLayout>
 
@@ -61,7 +61,7 @@
                     <TextView
                         android:id="@+id/year"
                         style="@style/SpecsValue"
-                        android:text="2014"/>
+                        tools:text="2014"/>
 
                 </LinearLayout>
 
@@ -75,7 +75,7 @@
                     <TextView
                         android:id="@+id/mileage"
                         style="@style/SpecsValue"
-                        android:text="50"/>
+                        tools:text="50"/>
 
                 </LinearLayout>
 
@@ -87,9 +87,9 @@
                         style="@style/SpecsKey"/>
 
                     <TextView
-                        android:id="@+id/prevOwners"
+                        android:id="@+id/previousOwners"
                         style="@style/SpecsValue"
-                        android:text="1"/>
+                        tools:text="1"/>
 
                 </LinearLayout>
 
@@ -103,7 +103,7 @@
                     <TextView
                         android:id="@+id/engine"
                         style="@style/SpecsValue"
-                        android:text="3000cc"/>
+                        tools:text="3000cc"/>
 
                 </LinearLayout>
 
@@ -117,7 +117,7 @@
                     <TextView
                         android:id="@+id/transmission"
                         style="@style/SpecsValue"
-                        android:text="Automatic"/>
+                        tools:text="Automatic"/>
 
                 </LinearLayout>
 
@@ -131,7 +131,7 @@
                     <TextView
                         android:id="@+id/fuelType"
                         style="@style/SpecsValue"
-                        android:text="Diesel"/>
+                        tools:text="Diesel"/>
 
                 </LinearLayout>
 
@@ -145,7 +145,7 @@
                     <TextView
                         android:id="@+id/color"
                         style="@style/SpecsValue"
-                        android:text="Paris Grey"/>
+                        tools:text="Paris Grey"/>
 
                 </LinearLayout>
 
@@ -159,7 +159,7 @@
                     <TextView
                         android:id="@+id/location"
                         style="@style/SpecsValue"
-                        android:text="UK"/>
+                        tools:text="UK"/>
 
                 </LinearLayout>
 

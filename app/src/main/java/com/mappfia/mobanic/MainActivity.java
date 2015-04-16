@@ -2,6 +2,8 @@ package com.mappfia.mobanic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -19,6 +21,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.util.List;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -31,30 +40,45 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-
-        setupNavigationDrawer();
+        setupActionBar();
 
 
-        CarsAdapter adapter = new CarsAdapter(this);
+        final CarsAdapter carsAdapter = new CarsAdapter(this);
 
-        adapter.add(new Car("Land Rover", "Range Rover Sport", 82875, "http://www.themotorreport.com.au/content/image/2/0/2014_range_rover_sport_australia_01_1-1020-mc:819x819.jpg"));
-        adapter.add(new Car("Land Rover", "Range Rover Sport", 89475, "http://o.aolcdn.com/hss/storage/midas/ff10ff0b8023231885fcbd74f6d32ed8/200047427/lead22-2014-lr-range-rover-sport-review.jpg"));
-        adapter.add(new Car("Land Rover", "Range Rover Sport", 99875, "http://lexani.com/media/images/rendered/2014_Land%20Rover_Range%20Rover%20Sport_740_v1.jpg"));
-
-        ListView carListView = (ListView) findViewById(R.id.listview_cars);
-        carListView.setAdapter(adapter);
-        carListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView carsListView = (ListView) findViewById(R.id.listview_cars);
+        carsListView.setAdapter(carsAdapter);
+        carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // TODO: Pass car id in intent extra to retrieve the details for the current car from database
-                startActivity(new Intent(MainActivity.this, DetailActivity.class));
+            public void onItemClick(AdapterView<?> adapterView, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(MainActivity.this,
+                        DetailActivity.class);
+                intent.putExtra("car_id", carsAdapter.getItem(position).getObjectId());
+                startActivity(intent);
+            }
+        });
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+        if (!isOnline()) {
+            query.fromLocalDatastore();
+        }
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> cars, ParseException e) {
+                if (e == null) {
+                    for (ParseObject car : cars) {
+                        carsAdapter.add(car);
+                        car.pinInBackground();
+                    }
+                }
             }
         });
     }
 
-    private void setupNavigationDrawer() {
+    private void setupActionBar() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
         String[] navItems = getResources().getStringArray(R.array.categories);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -105,7 +129,8 @@ public class MainActivity extends ActionBarActivity {
             super(context, 0, navItems);
         }
 
-        @Override public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
             String itemName = getItem(position);
 
             if (convertView == null) {
@@ -116,6 +141,13 @@ public class MainActivity extends ActionBarActivity {
 
             return convertView;
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
 }

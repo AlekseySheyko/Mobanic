@@ -1,35 +1,86 @@
 package com.mappfia.mobanic;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 
 public class DetailActivity extends ActionBarActivity {
+
+    private ParseObject mCar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        // TODO: Retrive car make and model from intent
-        getSupportActionBar().setTitle("Range Rover Sport");
+        if (getIntent() != null) {
+            String carId = getIntent().getStringExtra("car_id");
 
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+            if (!isOnline()) {
+                query.fromLocalDatastore();
+            }
+            query.getInBackground(carId, new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject car, ParseException e) {
+                    mCar = car;
+
+                    getSupportActionBar().setTitle(mCar.getString("model"));
+
+                    setCoverImage();
+                    fillOutSpecifications();
+                    setupImageCarousel();
+                }
+            });
+        }
+
+        FloatingActionButton actionButton =
+                (FloatingActionButton) findViewById(R.id.fab);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
+            }
+        });
+    }
+
+    private void setCoverImage() {
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this)
-                .load("http://www.themotorreport.com.au/content/image/2/0/2014_range_rover_sport_australia_01_1-1020-mc:819x819.jpg")
+                .load(mCar.getParseFile("coverImage").getUrl())
                 .fit()
                 .centerCrop()
                 .into(imageView);
+    }
 
+    private void fillOutSpecifications() {
+        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
+        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
+        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
+        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
+        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
+        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
+    }
+
+    private void setupImageCarousel() {
         RatioImageView imageView1 = (RatioImageView) findViewById(R.id.image1);
         RatioImageView imageView2 = (RatioImageView) findViewById(R.id.image2);
         RatioImageView imageView3 = (RatioImageView) findViewById(R.id.image3);
@@ -75,46 +126,12 @@ public class DetailActivity extends ActionBarActivity {
                 flipper.startFlipping();
             }
         });
-
-        FloatingActionButton actionButton =
-                (FloatingActionButton) findViewById(R.id.fab);
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
-            }
-        });
-
-
-        ArrayList<Spec> specs = new ArrayList<>();
-        specs.add(new Spec("Make", "Land Rover"));
-        specs.add(new Spec("Model", "Range Rover Sport"));
-        specs.add(new Spec("Year", "2014"));
-        specs.add(new Spec("Mileage", "50"));
-        specs.add(new Spec("Previous owners", "1"));
-        specs.add(new Spec("Engine", "3000cc"));
-        specs.add(new Spec("Transmission", "Automatic"));
-        specs.add(new Spec("Fuel Type", "Diesel"));
-        specs.add(new Spec("Color", "Paris Grey"));
-        specs.add(new Spec("Location", "UK"));
     }
 
-    private class Spec {
-
-        private String mKey;
-        private String mValue;
-
-        public Spec(String key, String value) {
-            mKey = key;
-            mValue = value;
-        }
-
-        public String getKey() {
-            return mKey;
-        }
-
-        public String getValue() {
-            return mValue;
-        }
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }
