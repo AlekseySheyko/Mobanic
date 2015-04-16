@@ -22,6 +22,7 @@ import com.squareup.picasso.Picasso;
 public class DetailActivity extends ActionBarActivity {
 
     private ParseObject mCar;
+    private String mCarId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +30,17 @@ public class DetailActivity extends ActionBarActivity {
         setContentView(R.layout.activity_detail);
 
         if (getIntent() != null) {
-            String carId = getIntent().getStringExtra("car_id");
+            if (savedInstanceState == null) {
+                mCarId = getIntent().getStringExtra("car_id");
+            } else {
+                mCarId = savedInstanceState.getString("car_id");
+            }
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
             if (!isOnline()) {
                 query.fromLocalDatastore();
             }
-            query.getInBackground(carId, new GetCallback<ParseObject>() {
+            query.getInBackground(mCarId, new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject car, ParseException e) {
                     mCar = car;
@@ -59,9 +64,19 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putString("car_id", mCarId);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     private void setCoverImage() {
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this)
+                // TODO: Restore not as URL, but as file, to show image even in offline mode
                 .load(mCar.getParseFile("coverImage").getUrl())
                 .fit()
                 .centerCrop()
