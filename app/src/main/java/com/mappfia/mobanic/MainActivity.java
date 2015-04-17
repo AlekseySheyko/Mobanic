@@ -16,8 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -31,15 +29,19 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.mappfia.mobanic.MultiSpinner.MultiSpinnerListener;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity
+        implements MultiSpinnerListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
+    private MultiSpinner mMakeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,20 +100,27 @@ public class MainActivity extends ActionBarActivity {
                 }
 
                 progressBar.setVisibility(View.GONE);
-                Animation animationFadeIn =
-                        AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_in);
                 carsListView.setVisibility(View.VISIBLE);
-                carsListView.setAnimation(animationFadeIn);
-                carsListView.animate();
                 if (e == null) {
+                    List<String> makeStrings = new ArrayList<>();
+
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
                         car.pinInBackground();
+                        makeStrings.add(car.getString("make"));
                     }
+
+                    mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+                    mMakeSpinner.setItems(MainActivity.this, makeStrings);
                 }
             }
         });
+    }
+
+    @Override
+    public void onItemsSelected(boolean[] selected) {
+
     }
 
     private void setupActionBar() {
