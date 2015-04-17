@@ -197,6 +197,11 @@
                 android:text="@string/gallery_header"
                 style="@style/HeaderTextView"/>
 
+            <com.mappfia.mobanic.RatioImageView
+                android:id="@+id/gallery_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <ViewFlipper
                 android:id="@+id/flipper"
                 android:layout_width="match_parent"

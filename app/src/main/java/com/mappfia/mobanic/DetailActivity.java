@@ -98,6 +98,7 @@ public class DetailActivity extends ActionBarActivity {
             @Override
             public void done(List<ParseObject> images, ParseException e) {
                 if (e == null && images != null) {
+                    findViewById(R.id.gallery_placeholder).setVisibility(View.GONE);
                     for (ParseObject image : images) {
                         RatioImageView galleryImageView = (RatioImageView)
                                 flipper.inflate(DetailActivity.this, R.layout.gallery_image, null);
