@@ -11,15 +11,15 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiSpinner extends Spinner
+public class MakesSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
-    private MultiSpinnerListener mListener;
+    private MakesSpinnerListener mListener;
     private ArrayAdapter<String> mAdapter;
     private List<String> mMakeStrings;
     private boolean[] mCheckboxes;
 
-    public MultiSpinner(Context context, AttributeSet attrSet) {
+    public MakesSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
 
         List<String> hintString = new ArrayList<>();
@@ -36,31 +36,27 @@ public class MultiSpinner extends Spinner
     }
 
     public void updateSelectedItems() {
-        boolean nothingSelected = true;
-        String selectedMake = null;
-
-        int selectedItemsCount = 0;
+        List<String> selectedItemsList = new ArrayList<>();
         for (int i = 0; i < mCheckboxes.length; i++) {
             if (mCheckboxes[i]) {
-                selectedItemsCount++;
-                selectedMake = mAdapter.getItem(i + 1);
+                selectedItemsList.add(mAdapter.getItem(i + 1));
             }
         }
 
         String spinnerText;
-        if (selectedItemsCount == 0) {
+        if (selectedItemsList.size() == 0) {
             spinnerText = "Make";
-        } else if (selectedItemsCount == 1) {
-            spinnerText = selectedMake;
+        } else if (selectedItemsList.size() == 1) {
+            spinnerText = selectedItemsList.get(0);
         } else {
-            spinnerText = selectedItemsCount + " models";
+            spinnerText = selectedItemsList.size() + " makes";
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item,
                 new String[]{spinnerText});
         setAdapter(adapter);
-        mListener.onItemsSelected(mCheckboxes);
+        mListener.onMakesSelected(selectedItemsList);
     }
 
     @Override
@@ -80,16 +76,15 @@ public class MultiSpinner extends Spinner
         return true;
     }
 
-    public void setItems(MultiSpinnerListener listener, List<String> makeStrings) {
+    public void setItems(MakesSpinnerListener listener, List<String> makeStrings) {
         mMakeStrings = makeStrings;
-        mAdapter.addAll(makeStrings);
-
         mListener = listener;
-
         mCheckboxes = new boolean[makeStrings.size()];
+
+        mAdapter.addAll(makeStrings);
     }
 
-    public interface MultiSpinnerListener {
-        void onItemsSelected(boolean[] selected);
+    public interface MakesSpinnerListener {
+        void onMakesSelected(List<String> itemsList);
     }
 }

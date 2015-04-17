@@ -32,16 +32,16 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mappfia.mobanic.MultiSpinner.MultiSpinnerListener;
+import static com.mappfia.mobanic.MakesSpinner.MakesSpinnerListener;
 
 public class MainActivity extends ActionBarActivity
-        implements MultiSpinnerListener {
+        implements MakesSpinnerListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
-    private MultiSpinner mMakeSpinner;
+    private MakesSpinner mMakeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +75,10 @@ public class MainActivity extends ActionBarActivity
     }
 
     private void populateCarsList(boolean fromNetwork) {
+        populateCarsList(fromNetwork, null, null);
+    }
+
+    private void populateCarsList(boolean fromNetwork, final String key, final List<String> valuesList) {
         final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
         final FrameLayout progressBar = (FrameLayout) findViewById(R.id.progressBar);
 
@@ -84,6 +88,9 @@ public class MainActivity extends ActionBarActivity
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
             query.fromLocalDatastore();
+        }
+        if (key != null && valuesList != null) {
+            query.whereContainedIn(key, valuesList);
         }
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -101,6 +108,7 @@ public class MainActivity extends ActionBarActivity
 
                 progressBar.setVisibility(View.GONE);
                 carsListView.setVisibility(View.VISIBLE);
+
                 if (e == null) {
                     List<String> makeStrings = new ArrayList<>();
 
@@ -111,16 +119,18 @@ public class MainActivity extends ActionBarActivity
                         makeStrings.add(car.getString("make"));
                     }
 
-                    mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                    mMakeSpinner.setItems(MainActivity.this, makeStrings);
+                    if (key == null && valuesList == null) {
+                        mMakeSpinner = (MakesSpinner) findViewById(R.id.make_spinner);
+                        mMakeSpinner.setItems(MainActivity.this, makeStrings);
+                    }
                 }
             }
         });
     }
 
     @Override
-    public void onItemsSelected(boolean[] selected) {
-
+    public void onMakesSelected(List<String> valuesArray) {
+        populateCarsList(true, "make", valuesArray);
     }
 
     private void setupActionBar() {
