@@ -39,11 +39,8 @@ public class DetailActivity extends ActionBarActivity {
                 mCarId = savedInstanceState.getString("car_id");
             }
 
-            // TODO: Manage feature list in Parse data console
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-            if (!isOnline()) {
-                query.fromLocalDatastore();
-            }
+            query.fromLocalDatastore();
             query.getInBackground(mCarId, new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject car, ParseException e) {
@@ -59,6 +56,7 @@ public class DetailActivity extends ActionBarActivity {
                     setCoverImage();
                     fillOutSpecifications();
                     setupImageCarousel();
+                    // TODO: Manage feature list in Parse data console
                 }
             });
         }

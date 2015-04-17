@@ -12,12 +12,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private Toolbar mToolbar;
+    private CarsAdapter mCarsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,36 +48,49 @@ public class MainActivity extends ActionBarActivity {
         setupActionBar();
 
 
-        final CarsAdapter carsAdapter = new CarsAdapter(this);
+        mCarsAdapter = new CarsAdapter(this);
 
         final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
-        carsListView.setAdapter(carsAdapter);
+        carsListView.setAdapter(mCarsAdapter);
         carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this,
                         DetailActivity.class);
-                intent.putExtra("car_id", carsAdapter.getItem(position).getObjectId());
+                intent.putExtra("car_id", mCarsAdapter.getItem(position).getObjectId());
                 startActivity(intent);
             }
         });
 
+        populateCarsList(false);
+    }
+
+    private void populateCarsList(boolean fromNetwork) {
+        final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
+        final FrameLayout progressBar = (FrameLayout) findViewById(R.id.progressBar);
+
+        carsListView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        if (!isOnline()) {
+        if (!fromNetwork) {
             query.fromLocalDatastore();
         }
+        query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
-                Animation animationFadeIn = AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_in);
-                findViewById(R.id.progressBar).setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                Animation animationFadeIn =
+                        AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_in);
                 carsListView.setVisibility(View.VISIBLE);
                 carsListView.setAnimation(animationFadeIn);
                 carsListView.animate();
                 if (e == null && cars != null) {
+                    mCarsAdapter.clear();
                     for (ParseObject car : cars) {
-                        carsAdapter.add(car);
+                        mCarsAdapter.add(car);
                         car.pinInBackground();
                     }
                 }
@@ -111,24 +127,26 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void selectItem(int position) {
-        /*
-        String[] categories = getResources().getStringArray(R.array.categories);
-        String category = categories[position];
-
-        Intent intent = new Intent(this, CategoryActivity.class);
-        intent.putExtra("category", category);
-        startActivity(intent);
-        */
-        Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
-
-        mDrawerLayout.closeDrawer(Gravity.START);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mToolbar.inflateMenu(R.menu.menu_main);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            populateCarsList(true);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void selectItem(int position) {
+        Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
+
+        mDrawerLayout.closeDrawer(Gravity.START);
     }
 
     private class NavigationDrawerAdapter extends ArrayAdapter<String> {
