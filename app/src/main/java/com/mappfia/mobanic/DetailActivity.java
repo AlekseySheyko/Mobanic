@@ -2,9 +2,11 @@ package com.mappfia.mobanic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -25,41 +27,36 @@ import java.util.List;
 public class DetailActivity extends ActionBarActivity {
 
     private ParseObject mCar;
-    private String mCarId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        if (getIntent() != null) {
-            if (savedInstanceState == null) {
-                mCarId = getIntent().getStringExtra("car_id");
-            } else {
-                mCarId = savedInstanceState.getString("car_id");
-            }
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String carId = sharedPrefs.getString("car_id", null);
 
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-            query.fromLocalDatastore();
-            query.getInBackground(mCarId, new GetCallback<ParseObject>() {
-                @Override
-                public void done(ParseObject car, ParseException e) {
-                    mCar = car;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+        query.fromLocalDatastore();
+        query.getInBackground(carId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject car, ParseException e) {
+                mCar = car;
 
-                    String title = mCar.getString("make") + " " +
-                            mCar.getString("model");
-                    if (title.length() > 20) {
-                        title = mCar.getString("model");
-                    }
-                    getSupportActionBar().setTitle(title);
-
-                    setCoverImage();
-                    fillOutSpecifications();
-                    setupImageCarousel();
-                    // TODO: Manage feature list in Parse data console
+                String title = mCar.getString("make") + " " +
+                        mCar.getString("model");
+                if (title.length() > 20) {
+                    title = mCar.getString("model");
                 }
-            });
-        }
+                getSupportActionBar().setTitle(title);
+
+                setCoverImage();
+                fillOutSpecifications();
+                setupImageCarousel();
+                // TODO: Manage feature list in Parse data console
+            }
+        });
 
         FloatingActionButton actionButton =
                 (FloatingActionButton) findViewById(R.id.fab);
@@ -69,12 +66,6 @@ public class DetailActivity extends ActionBarActivity {
                 startActivity(new Intent(DetailActivity.this, ContactActivity.class));
             }
         });
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putString("car_id", mCarId);
-        super.onSaveInstanceState(savedInstanceState);
     }
 
     private void setCoverImage() {
