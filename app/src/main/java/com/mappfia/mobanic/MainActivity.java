@@ -64,6 +64,8 @@ public class MainActivity extends ActionBarActivity {
                 Intent intent = new Intent(MainActivity.this,
                         DetailActivity.class);
                 startActivity(intent);
+
+                // TODO: If selected car is sold, show similar models in listing
             }
         });
 
@@ -101,7 +103,7 @@ public class MainActivity extends ActionBarActivity {
                 carsListView.setVisibility(View.VISIBLE);
                 carsListView.setAnimation(animationFadeIn);
                 carsListView.animate();
-                if (e == null && cars != null) {
+                if (e == null) {
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
@@ -150,6 +152,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        // TODO: Replace the refresh button with GCM live updates from server
         if (id == R.id.action_refresh) {
             populateCarsList(true);
             return true;

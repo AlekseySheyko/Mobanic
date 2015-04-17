@@ -40,6 +40,10 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
         RatioImageView imageView = (RatioImageView) rootView.findViewById(R.id.image);
         Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl()).fit().centerCrop().into(imageView);
 
+        if (car.getBoolean("isSold")) {
+            rootView.findViewById(R.id.sold_mark).setVisibility(View.VISIBLE);
+        }
+
         return rootView;
     }
 

@@ -71,7 +71,6 @@ public class DetailActivity extends ActionBarActivity {
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         imageView.setVisibility(View.VISIBLE);
-        // TODO: Restore not as URL, but as file, to show image even in offline mode
         Picasso.with(this)
                 .load(mCar.getParseFile("coverImage").getUrl())
                 .fit()
