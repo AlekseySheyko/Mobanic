@@ -8,7 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 
 public class SplashActivity extends ActionBarActivity {
 
-    private static final int SPLASH_DISPLAY_LENGTH = 1500;
+    private static final int SPLASH_DISPLAY_LENGTH = 1200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

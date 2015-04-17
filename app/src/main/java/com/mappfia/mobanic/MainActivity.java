@@ -85,6 +85,16 @@ public class MainActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
+                if (cars.size() == 0) {
+                    if (isOnline()) {
+                        populateCarsList(true);
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Connect to a network to load cars list", Toast.LENGTH_LONG).show();
+                    }
+                    return;
+                }
+
                 progressBar.setVisibility(View.GONE);
                 Animation animationFadeIn =
                         AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_in);

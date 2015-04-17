@@ -1,15 +1,13 @@
 package com.mappfia.mobanic;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
@@ -52,9 +50,9 @@ public class DetailActivity extends ActionBarActivity {
                 getSupportActionBar().setTitle(title);
 
                 setCoverImage();
-                fillOutSpecifications();
                 setupImageCarousel();
-                // TODO: Manage feature list in Parse data console
+                fillOutSpecifications();
+                fillOutFeatures();
             }
         });
 
@@ -79,19 +77,6 @@ public class DetailActivity extends ActionBarActivity {
                 .fit()
                 .centerCrop()
                 .into(imageView);
-    }
-
-    private void fillOutSpecifications() {
-        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
-        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
-        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
-        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
-        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
-        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
-        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
-        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
     }
 
     private void setupImageCarousel() {
@@ -129,10 +114,28 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
-    public boolean isOnline() {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
+    private void fillOutSpecifications() {
+        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
+        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
+        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
+        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
+        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
+        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
+        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
+    }
+
+    private void fillOutFeatures() {
+        List<String> features = mCar.getList("features");
+
+        LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
+        for (String feature : features) {
+            TextView featureTextView = (TextView)
+                    featuresContainer.inflate(DetailActivity.this, R.layout.feature_list_item, null);
+            featuresContainer.addView(featureTextView);
+            featureTextView.setText(feature);
+        }
     }
 }
