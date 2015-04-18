@@ -24,6 +24,7 @@ public class ContactActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO: Ask Yogz for email to send message to
         if (item.getItemId() == R.id.action_send) {
             Toast.makeText(this, "Thanks, we'll be in touch shortly!", Toast.LENGTH_LONG).show();
             finish();

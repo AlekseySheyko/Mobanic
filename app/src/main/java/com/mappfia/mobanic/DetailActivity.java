@@ -1,9 +1,7 @@
 package com.mappfia.mobanic;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -11,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.melnykov.fab.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -24,41 +21,40 @@ import java.util.List;
 
 public class DetailActivity extends ActionBarActivity {
 
-    private ParseObject mCar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        String carId = sharedPrefs.getString("car_id", null);
+        String carId = null;
+        if (getIntent() != null) {
+            carId = getIntent().getStringExtra("car_id");
+        } else if (savedInstanceState != null) {
+            carId = savedInstanceState.getString("car_id");
+        }
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         query.fromLocalDatastore();
         query.getInBackground(carId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
-                mCar = car;
+                String make = car.getString("make");
+                String model = car.getString("model");
 
-                String title = mCar.getString("make") + " " +
-                        mCar.getString("model");
+                String title = make + " " + model;
                 if (title.length() > 20) {
-                    title = mCar.getString("model");
+                    title = model;
                 }
                 getSupportActionBar().setTitle(title);
 
-                setCoverImage();
-                setupImageCarousel();
-                fillOutSpecifications();
-                fillOutFeatures();
+                setCoverImage(car);
+                setGalleryImages(car);
+                fillOutSpecs(car);
+                fillOutFeatures(car);
             }
         });
 
-        FloatingActionButton actionButton =
-                (FloatingActionButton) findViewById(R.id.fab);
-        actionButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_contact).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(DetailActivity.this, ContactActivity.class));
@@ -66,19 +62,14 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
-    private void setCoverImage() {
-        findViewById(R.id.progressBar).setVisibility(View.GONE);
+    private void setCoverImage(ParseObject car) {
+        String url = car.getParseFile("coverImage").getUrl();
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
-        imageView.setVisibility(View.VISIBLE);
-        Picasso.with(this)
-                .load(mCar.getParseFile("coverImage").getUrl())
-                .fit()
-                .centerCrop()
-                .into(imageView);
+        Picasso.with(this).load(url).fit().centerCrop().into(imageView);
     }
 
-    private void setupImageCarousel() {
+    private void setGalleryImages(ParseObject car) {
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
         flipper.setInAnimation(AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in));
@@ -93,50 +84,56 @@ public class DetailActivity extends ActionBarActivity {
             }
         });
 
-        ParseQuery<ParseObject> query = mCar.getRelation("galleryImage").getQuery();
+        ParseQuery<ParseObject> query = car.getRelation("galleryImage").getQuery();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> images, ParseException e) {
-                if (e == null && images != null) {
-                    findViewById(R.id.gallery_placeholder).setVisibility(View.GONE);
+                if (e == null) {
+                    flipper.removeAllViews();
                     for (ParseObject image : images) {
-                        RatioImageView galleryImageView = (RatioImageView)
-                                flipper.inflate(DetailActivity.this, R.layout.gallery_image, null);
-                        flipper.addView(galleryImageView);
+                        String url = image.getParseFile("image").getUrl();
+
+                        RatioImageView imageView = (RatioImageView) flipper.inflate(
+                                DetailActivity.this,
+                                R.layout.gallery_image,
+                                null);
                         Picasso.with(DetailActivity.this)
-                                .load(image.getParseFile("image").getUrl())
+                                .load(url)
                                 .fit()
                                 .centerCrop()
-                                .into(galleryImageView);
+                                .into(imageView);
+                        flipper.addView(imageView);
                     }
                 }
             }
         });
     }
 
-    private void fillOutSpecifications() {
-        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
-        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
-        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
+    private void fillOutSpecs(ParseObject car) {
+        ((TextView) findViewById(R.id.make)).setText(car.getString("make"));
+        ((TextView) findViewById(R.id.model)).setText(car.getString("model"));
+        ((TextView) findViewById(R.id.year)).setText(car.getInt("year") + "");
         // TODO: Format mileage properly (add space and "km" label)
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
-        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
-        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
-        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
-        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
-        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
+        ((TextView) findViewById(R.id.mileage)).setText(car.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.previousOwners)).setText(car.getInt("previousOwners") + "");
+        ((TextView) findViewById(R.id.engine)).setText(car.getString("engine"));
+        ((TextView) findViewById(R.id.transmission)).setText(car.getString("transmission"));
+        ((TextView) findViewById(R.id.fuelType)).setText(car.getString("fuelType"));
+        ((TextView) findViewById(R.id.color)).setText(car.getString("color"));
+        ((TextView) findViewById(R.id.location)).setText(car.getString("location"));
     }
 
-    private void fillOutFeatures() {
-        List<String> features = mCar.getList("features");
+    private void fillOutFeatures(ParseObject car) {
+        List<String> features = car.getList("features");
 
         LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
         for (String feature : features) {
-            TextView featureTextView = (TextView)
-                    featuresContainer.inflate(DetailActivity.this, R.layout.feature_list_item, null);
-            featuresContainer.addView(featureTextView);
-            featureTextView.setText(feature);
+            TextView textView = (TextView) featuresContainer.inflate(
+                    DetailActivity.this,
+                    R.layout.feature_list_item,
+                    null);
+            textView.setText(feature);
+            featuresContainer.addView(textView);
         }
     }
 }

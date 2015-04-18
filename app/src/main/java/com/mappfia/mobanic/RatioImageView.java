@@ -14,7 +14,7 @@ public class RatioImageView extends ImageView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         int width = getMeasuredWidth();
-        int height = (int) (width * 0.5625);
+        int height = width / 16 * 9;
 
         setMeasuredDimension(width, height);
     }

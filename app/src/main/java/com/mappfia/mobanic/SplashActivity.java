@@ -8,7 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 
 public class SplashActivity extends ActionBarActivity {
 
-    private static final int SPLASH_DISPLAY_LENGTH = 1200;
+    private static final int DISPLAY_LENGTH = 1200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +21,6 @@ public class SplashActivity extends ActionBarActivity {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
             }
-        }, SPLASH_DISPLAY_LENGTH);
+        }, DISPLAY_LENGTH);
     }
 }

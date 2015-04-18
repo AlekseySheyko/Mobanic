@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -60,11 +59,9 @@ public class MainActivity extends ActionBarActivity
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int position, long id) {
                 String carId = mCarsAdapter.getItem(position).getObjectId();
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
-                        .putString("car_id", carId).apply();
-
                 Intent intent = new Intent(MainActivity.this,
                         DetailActivity.class);
+                intent.putExtra("car_id", carId);
                 startActivity(intent);
 
                 // TODO: If selected car is sold, show similar models in listing
