@@ -67,7 +67,7 @@ public class MainActivity extends ActionBarActivity
         populateCarsList(fromNetwork, null, null);
     }
 
-    private void populateCarsList(boolean fromNetwork, final String key, final List<String> valuesList) {
+    private void populateCarsList(boolean fromNetwork, final String filterKey, final List<String> filterValues) {
         final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
         final FrameLayout progressBar = (FrameLayout) findViewById(R.id.progressBar);
 
@@ -78,8 +78,8 @@ public class MainActivity extends ActionBarActivity
         if (!fromNetwork) {
             query.fromLocalDatastore();
         }
-        if (key != null && valuesList != null) {
-            query.whereContainedIn(key, valuesList);
+        if (filterKey != null && filterValues != null) {
+            query.whereContainedIn(filterKey, filterValues);
         }
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -108,9 +108,9 @@ public class MainActivity extends ActionBarActivity
                         makeStrings.add(car.getString("make"));
                     }
 
-                    if (key == null && valuesList == null) {
+                    if (filterKey == null && filterValues == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                        mMakeSpinner.setItems(MainActivity.this, makeStrings);
+                        mMakeSpinner.setItems(MainActivity.this, "Make", makeStrings);
                     }
                 }
             }
@@ -118,8 +118,8 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onMakesSelected(List<String> valuesArray) {
-        populateCarsList(true, "make", valuesArray);
+    public void onFilterSet(String key, List<String> values) {
+        populateCarsList(true, key, values);
         // TODO: Create menu item in action bar to reset filter
     }
 

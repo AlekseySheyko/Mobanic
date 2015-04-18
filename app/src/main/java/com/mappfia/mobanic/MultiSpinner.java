@@ -18,6 +18,7 @@ public class MultiSpinner extends Spinner
     private ArrayAdapter<String> mAdapter;
     private List<String> mMakeStrings;
     private boolean[] mCheckboxes;
+    private String mSpinnerHint;
 
     public MultiSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
@@ -36,27 +37,27 @@ public class MultiSpinner extends Spinner
     }
 
     public void updateSelectedItems() {
-        List<String> selectedItemsList = new ArrayList<>();
+        List<String> selectedItems = new ArrayList<>();
         for (int i = 0; i < mCheckboxes.length; i++) {
             if (mCheckboxes[i]) {
-                selectedItemsList.add(mAdapter.getItem(i + 1));
+                selectedItems.add(mAdapter.getItem(i + 1));
             }
         }
 
         String spinnerText;
-        if (selectedItemsList.size() == 0) {
+        if (selectedItems.size() == 0) {
             spinnerText = "Make";
-        } else if (selectedItemsList.size() == 1) {
-            spinnerText = selectedItemsList.get(0);
+        } else if (selectedItems.size() == 1) {
+            spinnerText = selectedItems.get(0);
         } else {
-            spinnerText = selectedItemsList.size() + " makes";
+            spinnerText = selectedItems.size() + " makes";
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item,
                 new String[]{spinnerText});
         setAdapter(adapter);
-        mListener.onMakesSelected(selectedItemsList);
+        mListener.onFilterSet(mSpinnerHint, selectedItems);
     }
 
     @Override
@@ -76,15 +77,16 @@ public class MultiSpinner extends Spinner
         return true;
     }
 
-    public void setItems(MakesSpinnerListener listener, List<String> makeStrings) {
-        mMakeStrings = makeStrings;
+    public void setItems(MakesSpinnerListener listener, String filterKey, List<String> allValues) {
+        mMakeStrings = allValues;
         mListener = listener;
-        mCheckboxes = new boolean[makeStrings.size()];
+        mCheckboxes = new boolean[allValues.size()];
+        mSpinnerHint = filterKey;
 
-        mAdapter.addAll(makeStrings);
+        mAdapter.addAll(allValues);
     }
 
     public interface MakesSpinnerListener {
-        void onMakesSelected(List<String> itemsList);
+        void onFilterSet(String filterKey, List<String> itemsList);
     }
 }
