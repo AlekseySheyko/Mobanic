@@ -9,18 +9,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -37,7 +31,6 @@ public class MainActivity extends ActionBarActivity
         implements MakesSpinnerListener {
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
     private MakesSpinner mMakeSpinner;
@@ -134,29 +127,11 @@ public class MainActivity extends ActionBarActivity
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        String[] navItems = getResources().getStringArray(R.array.categories);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        mDrawerList.setAdapter(new NavigationDrawerAdapter(this, navItems));
-        mDrawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                mToolbar, R.string.drawer_open, R.string.drawer_close) {
-
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                float moveFactor = (mDrawerList.getWidth() * slideOffset);
-                LinearLayout container = (LinearLayout) findViewById(R.id.container);
-                container.setTranslationX(moveFactor);
-            }
-        };
-        drawerToggle.syncState();
+                mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
     }
 
     @Override
@@ -174,31 +149,6 @@ public class MainActivity extends ActionBarActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void selectItem(int position) {
-        Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
-
-        mDrawerLayout.closeDrawer(Gravity.START);
-    }
-
-    private class NavigationDrawerAdapter extends ArrayAdapter<String> {
-        public NavigationDrawerAdapter(Context context, String[] navItems) {
-            super(context, 0, navItems);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            String itemName = getItem(position);
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.nav_drawer_item, parent, false);
-            }
-            TextView navLabel = (TextView) convertView.findViewById(R.id.text);
-            navLabel.setText(itemName);
-
-            return convertView;
-        }
     }
 
     public boolean isOnline() {
