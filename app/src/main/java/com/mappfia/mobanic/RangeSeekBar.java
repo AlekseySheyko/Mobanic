@@ -46,8 +46,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     private final Bitmap thumbImage = BitmapFactory.decodeResource(getResources(), R.drawable.seek_thumb_normal);
     private final Bitmap thumbPressedImage = BitmapFactory.decodeResource(getResources(),
             R.drawable.seek_thumb_pressed);
-    private final Bitmap thumbDisabledImage = BitmapFactory.decodeResource(getResources(),
-            R.drawable.seek_thumb_disabled);
     private final float thumbWidth = thumbImage.getWidth();
     private final float thumbHalfWidth = 0.5f * thumbWidth;
     private final float thumbHalfHeight = 0.5f * thumbImage.getHeight();
@@ -261,10 +259,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (!isEnabled()) {
-            return false;
-        }
-
         int pointerIndex;
 
         final int action = event.getAction();
@@ -463,7 +457,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                 selectedValuesAreDefault);
 
         // draw the text if sliders have moved from default edges
-        if (!selectedValuesAreDefault) {
             paint.setTextSize(mTextSize);
             paint.setColor(Color.WHITE);
             // give text a bit more space here so it doesn't get cut off
@@ -486,7 +479,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                     normalizedToScreen(normalizedMaxValue) - maxTextWidth * 0.5f,
                     mDistanceToTop + mTextSize,
                     paint);
-        }
 
     }
 
@@ -521,12 +513,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
      * @param canvas      The canvas to draw upon.
      */
     private void drawThumb(float screenCoord, boolean pressed, Canvas canvas, boolean areSelectedValuesDefault) {
-        Bitmap buttonToDraw;
-        if (areSelectedValuesDefault) {
-            buttonToDraw = thumbDisabledImage;
-        } else {
-            buttonToDraw = pressed ? thumbPressedImage : thumbImage;
-        }
+        Bitmap buttonToDraw = pressed ? thumbPressedImage : thumbImage;
 
         canvas.drawBitmap(buttonToDraw, screenCoord - thumbHalfWidth,
                 mTextOffset,
