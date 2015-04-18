@@ -38,7 +38,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
 
     public static final Integer DEFAULT_MINIMUM = 0;
     public static final Integer DEFAULT_MAXIMUM = 100;
-    public static final int HEIGHT_IN_DP = 30;
+    public static final int HEIGHT_IN_DP = 40;
     public static final int TEXT_LATERAL_PADDING_IN_DP = 3;
     private static final int INITIAL_PADDING_IN_DP = 8;
     private final int LINE_HEIGHT_IN_DP = 1;
@@ -92,18 +92,8 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     private static final int DEFAULT_TEXT_DISTANCE_TO_TOP_IN_DP = 8;
     private boolean mSingleThumb;
 
-    public RangeSeekBar(Context context) {
-        super(context);
-        init(context, null);
-    }
-
     public RangeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
-    }
-
-    public RangeSeekBar(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
         init(context, attrs);
     }
 

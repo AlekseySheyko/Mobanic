@@ -71,7 +71,9 @@
         <com.mappfia.mobanic.RangeSeekBar
             android:id="@+id/price_selector"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"/>
 
         <FrameLayout
             style="@style/Divider"/>
