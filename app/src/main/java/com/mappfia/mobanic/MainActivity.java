@@ -69,10 +69,18 @@ public class MainActivity extends ActionBarActivity
     }
 
     private void populateCarsList(boolean fromNetwork) {
-        populateCarsList(fromNetwork, null, null);
+        populateCarsList(fromNetwork, null, null, null, null);
     }
 
-    private void populateCarsList(boolean fromNetwork, final String filterKey, final List<String> filterValues) {
+    private void populateCarsList(boolean fromNetwork, String filterKey, List<String> filterValues) {
+        populateCarsList(fromNetwork, filterKey, filterValues, null, null);
+    }
+
+    private void populateCarsList(boolean fromNetwork, Integer minPrice, Integer maxPrice) {
+        populateCarsList(fromNetwork, null, null, minPrice, maxPrice);
+    }
+
+    private void populateCarsList(boolean fromNetwork, final String filterKey, final List<String> filterValues, final Integer minPrice, final Integer maxPrice) {
         final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
         final FrameLayout progressBar = (FrameLayout) findViewById(R.id.progressBar);
 
@@ -85,6 +93,12 @@ public class MainActivity extends ActionBarActivity
         }
         if (filterKey != null && filterValues != null) {
             query.whereContainedIn(filterKey, filterValues);
+        }
+        if (minPrice != null) {
+            query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
+        }
+        if (maxPrice != null) {
+            query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -117,7 +131,7 @@ public class MainActivity extends ActionBarActivity
                         priceList.add(car.getInt("price"));
                     }
 
-                    if (filterKey == null && filterValues == null) {
+                    if (filterKey == null && filterValues == null && minPrice == null && maxPrice == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
                         mMakeSpinner.setItems(MainActivity.this, "Make", makeItemsList);
 
@@ -125,19 +139,19 @@ public class MainActivity extends ActionBarActivity
                         mModelSpinner.setItems(MainActivity.this, "Model", modelItemsList);
 
                         Integer minPrice = Collections.min(priceList);
-                        minPrice = minPrice/1000 - 1;
+                        minPrice = minPrice / 1000 - 1;
                         Integer maxPrice = Collections.max(priceList);
-                        maxPrice = maxPrice/1000 + 1;
+                        maxPrice = maxPrice / 1000 + 1;
 
                         RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
                         rangeSeekBar.setRangeValues(minPrice, maxPrice);
                         rangeSeekBar.setSelectedMinValue(minPrice);
-                        rangeSeekBar.setSelectedMaxValue(maxPrice+1);
+                        rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
 
                         rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
                             @Override
-                            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
-
+                            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
+                                populateCarsList(false, minPrice, maxPrice);
                             }
                         });
                     }
