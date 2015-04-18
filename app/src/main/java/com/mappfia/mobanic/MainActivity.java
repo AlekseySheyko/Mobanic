@@ -25,15 +25,14 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mappfia.mobanic.MakesSpinner.MakesSpinnerListener;
+import static com.mappfia.mobanic.MultiSpinner.MakesSpinnerListener;
 
 public class MainActivity extends ActionBarActivity
         implements MakesSpinnerListener {
 
-    private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
-    private MakesSpinner mMakeSpinner;
+    private MultiSpinner mMakeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +109,7 @@ public class MainActivity extends ActionBarActivity
                     }
 
                     if (key == null && valuesList == null) {
-                        mMakeSpinner = (MakesSpinner) findViewById(R.id.make_spinner);
+                        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
                         mMakeSpinner.setItems(MainActivity.this, makeStrings);
                     }
                 }
@@ -121,16 +120,17 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onMakesSelected(List<String> valuesArray) {
         populateCarsList(true, "make", valuesArray);
+        // TODO: Create menu item in action bar to reset filter
     }
 
     private void setupActionBar() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 mToolbar, R.string.drawer_open, R.string.drawer_close);
-        mDrawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
     }
 

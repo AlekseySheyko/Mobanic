@@ -21,6 +21,8 @@ import java.util.List;
 
 public class DetailActivity extends ActionBarActivity {
 
+    private ParseObject mCar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +40,8 @@ public class DetailActivity extends ActionBarActivity {
         query.getInBackground(carId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
+                mCar = car;
+
                 String make = car.getString("make");
                 String model = car.getString("model");
 
@@ -47,10 +51,10 @@ public class DetailActivity extends ActionBarActivity {
                 }
                 getSupportActionBar().setTitle(title);
 
-                setCoverImage(car);
-                setGalleryImages(car);
-                fillOutSpecs(car);
-                fillOutFeatures(car);
+                setCoverImage();
+                setGalleryImages();
+                fillOutSpecs();
+                fillOutFeatures();
             }
         });
 
@@ -62,14 +66,14 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
-    private void setCoverImage(ParseObject car) {
-        String url = car.getParseFile("coverImage").getUrl();
+    private void setCoverImage() {
+        String url = mCar.getParseFile("coverImage").getUrl();
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this).load(url).fit().centerCrop().into(imageView);
     }
 
-    private void setGalleryImages(ParseObject car) {
+    private void setGalleryImages() {
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
         flipper.setInAnimation(AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in));
@@ -84,7 +88,7 @@ public class DetailActivity extends ActionBarActivity {
             }
         });
 
-        ParseQuery<ParseObject> query = car.getRelation("galleryImage").getQuery();
+        ParseQuery<ParseObject> query = mCar.getRelation("galleryImage").getQuery();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> images, ParseException e) {
@@ -109,22 +113,22 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
-    private void fillOutSpecs(ParseObject car) {
-        ((TextView) findViewById(R.id.make)).setText(car.getString("make"));
-        ((TextView) findViewById(R.id.model)).setText(car.getString("model"));
-        ((TextView) findViewById(R.id.year)).setText(car.getInt("year") + "");
+    private void fillOutSpecs() {
+        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
+        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
+        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
         // TODO: Format mileage properly (add space and "km" label)
-        ((TextView) findViewById(R.id.mileage)).setText(car.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText(car.getInt("previousOwners") + "");
-        ((TextView) findViewById(R.id.engine)).setText(car.getString("engine"));
-        ((TextView) findViewById(R.id.transmission)).setText(car.getString("transmission"));
-        ((TextView) findViewById(R.id.fuelType)).setText(car.getString("fuelType"));
-        ((TextView) findViewById(R.id.color)).setText(car.getString("color"));
-        ((TextView) findViewById(R.id.location)).setText(car.getString("location"));
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
+        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
+        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
+        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
+        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
     }
 
-    private void fillOutFeatures(ParseObject car) {
-        List<String> features = car.getList("features");
+    private void fillOutFeatures() {
+        List<String> features = mCar.getList("features");
 
         LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
         for (String feature : features) {
@@ -135,5 +139,11 @@ public class DetailActivity extends ActionBarActivity {
             textView.setText(feature);
             featuresContainer.addView(textView);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("car_id", mCar.getObjectId());
+        super.onSaveInstanceState(outState);
     }
 }
