@@ -48,7 +48,11 @@ public class MultiSpinner extends Spinner
         } else if (selectedItemsList.size() == 1) {
             spinnerText = selectedItemsList.get(0);
         } else {
-            spinnerText = selectedItemsList.size() + " makes";
+            if (!mFilterKey.contains("Trans")) {
+                spinnerText = selectedItemsList.size() + " " + mFilterKey.toLowerCase() + "s";
+            } else {
+                spinnerText = selectedItemsList.size() + " trans. types";
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),

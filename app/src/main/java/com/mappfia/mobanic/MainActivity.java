@@ -44,6 +44,8 @@ public class MainActivity extends ActionBarActivity
     private MultiSpinner mMakeSpinner;
     private MultiSpinner mModelSpinner;
     private MultiSpinner mColorSpinner;
+    private MultiSpinner mTransSpinner;
+    private MultiSpinner mLocationSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,8 @@ public class MainActivity extends ActionBarActivity
                     Set<Integer> priceList = new HashSet<>();
                     Set<Integer> yearsList = new HashSet<>();
                     Set<String> colorList = new HashSet<>();
+                    Set<String> transmissionsList = new HashSet<>();
+                    Set<String> locationsList = new HashSet<>();
 
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
@@ -139,6 +143,8 @@ public class MainActivity extends ActionBarActivity
                         priceList.add(car.getInt("price"));
                         yearsList.add(car.getInt("year"));
                         colorList.add(car.getString("color"));
+                        transmissionsList.add(car.getString("transmission"));
+                        locationsList.add(car.getString("location"));
                     }
 
                     if (filterKey == null && filterValues == null && minPrice == null && maxPrice == null) {
@@ -150,6 +156,12 @@ public class MainActivity extends ActionBarActivity
 
                         mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
                         mColorSpinner.setItems(MainActivity.this, "Color", colorList);
+
+                        mTransSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+                        mTransSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
+
+                        mLocationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
+                        mLocationSpinner.setItems(MainActivity.this, "Location", locationsList);
 
                         Integer minPrice = Collections.min(priceList);
                         minPrice = minPrice / 1000;
@@ -197,8 +209,10 @@ public class MainActivity extends ActionBarActivity
             View v = super.getView(position, convertView, parent);
             if (position == getCount()) {
                 TextView textView = (TextView) v.findViewById(android.R.id.text1);
-                textView.setText("");
-                textView.setHint(getItem(getCount()));
+                textView.setText(getItem(getCount()));
+            } else {
+                TextView textView = (TextView) v.findViewById(android.R.id.text1);
+                textView.setText(">" + getItem(position));
             }
 
             return v;

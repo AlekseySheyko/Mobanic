@@ -53,44 +53,74 @@
         android:orientation="vertical"
         android:background="@color/nav_drawer_bg">
 
-        <com.mappfia.mobanic.MultiSpinner
-            android:id="@+id/make_spinner"
-            style="@style/DrawerListItem"
-            android:layout_marginTop="64dp"/>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:fillViewport="true">
 
-        <FrameLayout
-            style="@style/Divider"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="64dp"
+                android:paddingBottom="64dp">
 
-        <com.mappfia.mobanic.MultiSpinner
-            android:id="@+id/model_spinner"
-            style="@style/DrawerListItem"/>
+                <com.mappfia.mobanic.MultiSpinner
+                    android:id="@+id/make_spinner"
+                    style="@style/DrawerListItem"/>
 
-        <FrameLayout
-            style="@style/Divider"/>
+                <FrameLayout
+                    style="@style/Divider"/>
 
-        <com.mappfia.mobanic.RangeSeekBar
-            android:id="@+id/price_selector"
-            style="@style/DrawerListItem"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"/>
+                <com.mappfia.mobanic.MultiSpinner
+                    android:id="@+id/model_spinner"
+                    style="@style/DrawerListItem"/>
 
-        <FrameLayout
-            style="@style/Divider"/>
+                <FrameLayout
+                    style="@style/Divider"/>
 
-        <Spinner
-            android:id="@+id/age_spinner"
-            style="@style/DrawerListItem"
-            android:spinnerMode="dialog"/>
+                <com.mappfia.mobanic.RangeSeekBar
+                    android:id="@+id/price_selector"
+                    style="@style/DrawerListItem"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"/>
 
-        <FrameLayout
-            style="@style/Divider"/>
+                <FrameLayout
+                    style="@style/Divider"/>
 
-        <com.mappfia.mobanic.MultiSpinner
-            android:id="@+id/color_spinner"
-            style="@style/DrawerListItem"/>
+                <Spinner
+                    android:id="@+id/age_spinner"
+                    style="@style/DrawerListItem"
+                    android:spinnerMode="dialog"/>
 
-        <FrameLayout
-            style="@style/Divider"/>
+                <FrameLayout
+                    style="@style/Divider"/>
+
+                <com.mappfia.mobanic.MultiSpinner
+                    android:id="@+id/color_spinner"
+                    style="@style/DrawerListItem"/>
+
+                <FrameLayout
+                    style="@style/Divider"/>
+
+                <com.mappfia.mobanic.MultiSpinner
+                    android:id="@+id/trans_spinner"
+                    style="@style/DrawerListItem"/>
+
+                <FrameLayout
+                    style="@style/Divider"/>
+
+                <com.mappfia.mobanic.MultiSpinner
+                    android:id="@+id/location_spinner"
+                    style="@style/DrawerListItem"/>
+
+                <FrameLayout
+                    style="@style/Divider"/>
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 
