@@ -32,7 +32,9 @@ public class MainActivity extends ActionBarActivity
 
     private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
+
     private MultiSpinner mMakeSpinner;
+    private MultiSpinner mModelSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,18 +101,23 @@ public class MainActivity extends ActionBarActivity
                 carsListView.setVisibility(View.VISIBLE);
 
                 if (e == null) {
-                    List<String> makeStrings = new ArrayList<>();
+                    List<String> makeItemsList = new ArrayList<>();
+                    List<String> modelItemsList = new ArrayList<>();
 
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
                         car.pinInBackground();
-                        makeStrings.add(car.getString("make"));
+                        makeItemsList.add(car.getString("make"));
+                        modelItemsList.add(car.getString("model"));
                     }
 
                     if (filterKey == null && filterValues == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                        mMakeSpinner.setItems(MainActivity.this, makeStrings);
+                        mMakeSpinner.setItems(MainActivity.this, "Make", makeItemsList);
+
+                        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+                        mModelSpinner.setItems(MainActivity.this, "Model", modelItemsList);
                     }
                 }
             }
@@ -118,8 +125,8 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onFilterSet(List<String> selectedValues) {
-        populateCarsList(false, "make", selectedValues);
+    public void onFilterSet(String filterKey, List<String> selectedValues) {
+        populateCarsList(false, filterKey.toLowerCase(), selectedValues);
         // TODO: Create menu item in action bar to reset filter
     }
 
