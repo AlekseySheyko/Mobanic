@@ -10,13 +10,14 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MultiSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
     private MakesSpinnerListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private List<String> mMakeStrings;
+    private Set<String> mAllItemsList;
     private boolean[] mCheckboxes;
     private String mFilterKey;
 
@@ -61,7 +62,7 @@ public class MultiSpinner extends Spinner
     public boolean performClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMultiChoiceItems(
-                mMakeStrings.toArray(new CharSequence[mMakeStrings.size()]),
+                mAllItemsList.toArray(new CharSequence[mAllItemsList.size()]),
                 mCheckboxes,
                 this);
         builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
@@ -74,14 +75,14 @@ public class MultiSpinner extends Spinner
         return true;
     }
 
-    public void setItems(MakesSpinnerListener listener, String filterKey, List<String> selectedItems) {
-        mMakeStrings = selectedItems;
+    public void setItems(MakesSpinnerListener listener, String filterKey, Set<String> allItemsList) {
+        mAllItemsList = allItemsList;
         mListener = listener;
-        mCheckboxes = new boolean[selectedItems.size()];
+        mCheckboxes = new boolean[allItemsList.size()];
         mFilterKey = filterKey;
 
         mAdapter.add(filterKey);
-        mAdapter.addAll(selectedItems);
+        mAdapter.addAll(allItemsList);
     }
 
     public interface MakesSpinnerListener {

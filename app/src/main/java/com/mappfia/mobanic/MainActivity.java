@@ -13,9 +13,13 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -23,9 +27,10 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.mappfia.mobanic.MultiSpinner.MakesSpinnerListener;
 import static com.mappfia.mobanic.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -38,6 +43,7 @@ public class MainActivity extends ActionBarActivity
 
     private MultiSpinner mMakeSpinner;
     private MultiSpinner mModelSpinner;
+    private MultiSpinner mColorSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,28 +124,35 @@ public class MainActivity extends ActionBarActivity
                 carsListView.setVisibility(View.VISIBLE);
 
                 if (e == null) {
-                    List<String> makeItemsList = new ArrayList<>();
-                    List<String> modelItemsList = new ArrayList<>();
-                    List<Integer> priceList = new ArrayList<>();
+                    Set<String> makesList = new HashSet<>();
+                    Set<String> modelsList = new HashSet<>();
+                    Set<Integer> priceList = new HashSet<>();
+                    Set<Integer> yearsList = new HashSet<>();
+                    Set<String> colorList = new HashSet<>();
 
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
                         car.pinInBackground();
-                        makeItemsList.add(car.getString("make"));
-                        modelItemsList.add(car.getString("model"));
+                        makesList.add(car.getString("make"));
+                        modelsList.add(car.getString("model"));
                         priceList.add(car.getInt("price"));
+                        yearsList.add(car.getInt("year"));
+                        colorList.add(car.getString("color"));
                     }
 
                     if (filterKey == null && filterValues == null && minPrice == null && maxPrice == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                        mMakeSpinner.setItems(MainActivity.this, "Make", makeItemsList);
+                        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
 
                         mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-                        mModelSpinner.setItems(MainActivity.this, "Model", modelItemsList);
+                        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
+
+                        mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+                        mColorSpinner.setItems(MainActivity.this, "Color", colorList);
 
                         Integer minPrice = Collections.min(priceList);
-                        minPrice = minPrice / 1000 - 1;
+                        minPrice = minPrice / 1000;
                         Integer maxPrice = Collections.max(priceList);
                         maxPrice = maxPrice / 1000 + 1;
 
@@ -154,10 +167,47 @@ public class MainActivity extends ActionBarActivity
                                 populateCarsList(false, minPrice, maxPrice);
                             }
                         });
+
+                        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
+
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        for (Integer year : yearsList) {
+                            adapter.add(year.toString());
+                        }
+                        adapter.add("Min. year");
+
+                        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
+                        spinner.setAdapter(adapter);
+                        spinner.setSelection(adapter.getCount());
                     }
                 }
             }
         });
+    }
+
+    private class SpinnerAdapter extends ArrayAdapter<String> {
+
+        public SpinnerAdapter(Context context) {
+            super(context, android.R.layout.simple_spinner_dropdown_item);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View v = super.getView(position, convertView, parent);
+            if (position == getCount()) {
+                TextView textView = (TextView) v.findViewById(android.R.id.text1);
+                textView.setText("");
+                textView.setHint(getItem(getCount()));
+            }
+
+            return v;
+        }
+
+        @Override
+        public int getCount() {
+            return super.getCount() - 1;
+        }
     }
 
     @Override

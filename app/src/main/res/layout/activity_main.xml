@@ -70,10 +70,24 @@
 
         <com.mappfia.mobanic.RangeSeekBar
             android:id="@+id/price_selector"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
+            style="@style/DrawerListItem"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"/>
+
+        <FrameLayout
+            style="@style/Divider"/>
+
+        <Spinner
+            android:id="@+id/age_spinner"
+            style="@style/DrawerListItem"
+            android:spinnerMode="dialog"/>
+
+        <FrameLayout
+            style="@style/Divider"/>
+
+        <com.mappfia.mobanic.MultiSpinner
+            android:id="@+id/color_spinner"
+            style="@style/DrawerListItem"/>
 
         <FrameLayout
             style="@style/Divider"/>

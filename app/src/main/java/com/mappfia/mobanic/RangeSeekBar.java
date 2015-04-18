@@ -1,16 +1,20 @@
 package com.mappfia.mobanic;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
+
 import java.math.BigDecimal;
 
 /**
@@ -49,7 +53,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     private final float thumbWidth = thumbImage.getWidth();
     private final float thumbHalfWidth = 0.5f * thumbWidth;
     private final float thumbHalfHeight = 0.5f * thumbImage.getHeight();
-    private float INITIAL_PADDING;
     private float padding;
     private T absoluteMinValue, absoluteMaxValue;
     private NumberType numberType;
@@ -92,38 +95,15 @@ public class RangeSeekBar<T extends Number> extends ImageView {
 
     public RangeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
-    private T extractNumericValueFromAttributes(TypedArray a, int attribute, int defaultValue) {
-        TypedValue tv = a.peekValue(attribute);
-        if (tv == null) {
-            return (T) Integer.valueOf(defaultValue);
-        }
-
-        int type = tv.type;
-        if (type == TypedValue.TYPE_FLOAT) {
-            return (T) Float.valueOf(a.getFloat(attribute, defaultValue));
-        } else {
-            return (T) Integer.valueOf(a.getInteger(attribute, defaultValue));
-        }
-    }
-
-    private void init(Context context, AttributeSet attrs) {
-        if (attrs == null) {
-            setRangeToDefaultValues();
-        } else {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RangeSeekBar, 0, 0);
-            setRangeValues(
-                    extractNumericValueFromAttributes(a, R.styleable.RangeSeekBar_absoluteMinValue, DEFAULT_MINIMUM),
-                    extractNumericValueFromAttributes(a, R.styleable.RangeSeekBar_absoluteMaxValue, DEFAULT_MAXIMUM));
-            mSingleThumb = a.getBoolean(R.styleable.RangeSeekBar_singleThumb, false);
-            a.recycle();
-        }
+    private void init(Context context) {
+        setRangeToDefaultValues();
 
         setValuePrimAndNumberType();
 
-        INITIAL_PADDING = PixelUtil.dpToPx(context, INITIAL_PADDING_IN_DP);
+        float INITIAL_PADDING = PixelUtil.dpToPx(context, INITIAL_PADDING_IN_DP);
 
         mTextSize = PixelUtil.dpToPx(context, DEFAULT_TEXT_SIZE_IN_DP);
         mDistanceToTop = PixelUtil.dpToPx(context, DEFAULT_TEXT_DISTANCE_TO_TOP_IN_DP);
@@ -350,7 +330,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
         return true;
     }
 
-    private final void onSecondaryPointerUp(MotionEvent ev) {
+    private void onSecondaryPointerUp(MotionEvent ev) {
         final int pointerIndex = (ev.getAction() & ACTION_POINTER_INDEX_MASK) >> ACTION_POINTER_INDEX_SHIFT;
 
         final int pointerId = ev.getPointerId(pointerIndex);
@@ -457,28 +437,28 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                 selectedValuesAreDefault);
 
         // draw the text if sliders have moved from default edges
-            paint.setTextSize(mTextSize);
-            paint.setColor(Color.WHITE);
-            // give text a bit more space here so it doesn't get cut off
-            int offset = PixelUtil.dpToPx(getContext(), TEXT_LATERAL_PADDING_IN_DP);
+        paint.setTextSize(mTextSize);
+        paint.setColor(Color.WHITE);
+        // give text a bit more space here so it doesn't get cut off
+        int offset = PixelUtil.dpToPx(getContext(), TEXT_LATERAL_PADDING_IN_DP);
 
-            String minText = "\u00A3" + getSelectedMinValue() + "k";
-            String maxText = "\u00A3" + getSelectedMaxValue() + "k";
-            float minTextWidth = paint.measureText(minText) + offset;
-            float maxTextWidth = paint.measureText(maxText) + offset;
+        String minText = "\u00A3" + getSelectedMinValue() + "k";
+        String maxText = "\u00A3" + getSelectedMaxValue() + "k";
+        float minTextWidth = paint.measureText(minText) + offset;
+        float maxTextWidth = paint.measureText(maxText) + offset;
 
-            if (!mSingleThumb) {
-                canvas.drawText(minText,
-                        normalizedToScreen(normalizedMinValue) - minTextWidth * 0.5f,
-                        mDistanceToTop + mTextSize,
-                        paint);
-
-            }
-
-            canvas.drawText(maxText,
-                    normalizedToScreen(normalizedMaxValue) - maxTextWidth * 0.5f,
+        if (!mSingleThumb) {
+            canvas.drawText(minText,
+                    normalizedToScreen(normalizedMinValue) - minTextWidth * 0.5f,
                     mDistanceToTop + mTextSize,
                     paint);
+
+        }
+
+        canvas.drawText(maxText,
+                normalizedToScreen(normalizedMaxValue) - maxTextWidth * 0.5f,
+                mDistanceToTop + mTextSize,
+                paint);
 
     }
 
@@ -688,7 +668,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                 case INTEGER:
                     return Integer.valueOf((int) value);
                 case FLOAT:
-                    return Float.valueOf((float)value);
+                    return Float.valueOf((float) value);
                 case SHORT:
                     return Short.valueOf((short) value);
                 case BYTE:
