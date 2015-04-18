@@ -50,6 +50,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     private final Bitmap thumbImage = BitmapFactory.decodeResource(getResources(), R.drawable.seek_thumb_normal);
     private final Bitmap thumbPressedImage = BitmapFactory.decodeResource(getResources(),
             R.drawable.seek_thumb_pressed);
+    private float INITIAL_PADDING = 16;
     private final float thumbWidth = thumbImage.getWidth();
     private final float thumbHalfWidth = 0.5f * thumbWidth;
     private final float thumbHalfHeight = 0.5f * thumbImage.getHeight();
@@ -406,6 +407,8 @@ public class RangeSeekBar<T extends Number> extends ImageView {
         paint.setStyle(Style.FILL);
         paint.setColor(Color.GRAY);
         paint.setAntiAlias(true);
+
+        padding = INITIAL_PADDING + thumbHalfWidth;
 
         // draw seek bar background line
         mRect.left = padding;
