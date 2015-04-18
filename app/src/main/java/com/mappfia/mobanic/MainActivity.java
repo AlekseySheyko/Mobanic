@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,9 +24,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.mappfia.mobanic.MultiSpinner.MakesSpinnerListener;
+import static com.mappfia.mobanic.RangeSeekBar.OnRangeSeekBarChangeListener;
 
 public class MainActivity extends ActionBarActivity
         implements MakesSpinnerListener {
@@ -103,6 +106,7 @@ public class MainActivity extends ActionBarActivity
                 if (e == null) {
                     List<String> makeItemsList = new ArrayList<>();
                     List<String> modelItemsList = new ArrayList<>();
+                    List<Integer> priceList = new ArrayList<>();
 
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
@@ -110,6 +114,7 @@ public class MainActivity extends ActionBarActivity
                         car.pinInBackground();
                         makeItemsList.add(car.getString("make"));
                         modelItemsList.add(car.getString("model"));
+                        priceList.add(car.getInt("price"));
                     }
 
                     if (filterKey == null && filterValues == null) {
@@ -118,6 +123,23 @@ public class MainActivity extends ActionBarActivity
 
                         mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
                         mModelSpinner.setItems(MainActivity.this, "Model", modelItemsList);
+
+                        Integer minPrice = Collections.min(priceList);
+                        minPrice = minPrice/1000 - 1;
+                        Integer maxPrice = Collections.max(priceList);
+                        maxPrice = maxPrice/1000 + 1;
+
+                        RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
+                        rangeSeekBar.setRangeValues(minPrice, maxPrice);
+                        rangeSeekBar.setSelectedMinValue(minPrice);
+                        rangeSeekBar.setSelectedMaxValue(maxPrice+1);
+
+                        rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
+                            @Override
+                            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -139,6 +161,8 @@ public class MainActivity extends ActionBarActivity
                 mToolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
+        // TODO: Remove
+        drawerLayout.openDrawer(Gravity.START);
     }
 
     @Override

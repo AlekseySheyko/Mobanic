@@ -97,7 +97,7 @@ public class DetailActivity extends ActionBarActivity {
                     for (ParseObject image : images) {
                         String url = image.getParseFile("image").getUrl();
 
-                        RatioImageView imageView = (RatioImageView) flipper.inflate(
+                        RatioImageView imageView = (RatioImageView) View.inflate(
                                 DetailActivity.this,
                                 R.layout.gallery_image,
                                 null);
@@ -132,7 +132,7 @@ public class DetailActivity extends ActionBarActivity {
 
         LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
         for (String feature : features) {
-            TextView textView = (TextView) featuresContainer.inflate(
+            TextView textView = (TextView) View.inflate(
                     DetailActivity.this,
                     R.layout.feature_list_item,
                     null);

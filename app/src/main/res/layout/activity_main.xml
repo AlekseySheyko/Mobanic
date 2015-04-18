@@ -46,7 +46,8 @@
 
     <!-- The navigation drawer -->
     <LinearLayout
-        android:layout_width="200dp"
+        android:id="@+id/drawer_container"
+        android:layout_width="230dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
@@ -54,7 +55,7 @@
 
         <com.mappfia.mobanic.MultiSpinner
             android:id="@+id/make_spinner"
-            style="@style/SpinnerFilter"
+            style="@style/DrawerListItem"
             android:layout_marginTop="64dp"/>
 
         <FrameLayout
@@ -62,7 +63,15 @@
 
         <com.mappfia.mobanic.MultiSpinner
             android:id="@+id/model_spinner"
-            style="@style/SpinnerFilter"/>
+            style="@style/DrawerListItem"/>
+
+        <FrameLayout
+            style="@style/Divider"/>
+
+        <com.mappfia.mobanic.RangeSeekBar
+            android:id="@+id/price_selector"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
 
         <FrameLayout
             style="@style/Divider"/>

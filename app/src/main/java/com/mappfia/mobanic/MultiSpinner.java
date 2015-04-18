@@ -18,15 +18,13 @@ public class MultiSpinner extends Spinner
     private ArrayAdapter<String> mAdapter;
     private List<String> mMakeStrings;
     private boolean[] mCheckboxes;
+    private String mFilterKey;
 
     public MultiSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
 
-        List<String> hintString = new ArrayList<>();
-        hintString.add("Make");
-
         mAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, hintString);
+                android.R.layout.simple_spinner_item, new ArrayList<String>());
         setAdapter(mAdapter);
     }
 
@@ -45,7 +43,7 @@ public class MultiSpinner extends Spinner
 
         String spinnerText;
         if (selectedItemsList.size() == 0) {
-            spinnerText = "Make";
+            spinnerText = mFilterKey;
         } else if (selectedItemsList.size() == 1) {
             spinnerText = selectedItemsList.get(0);
         } else {
@@ -56,6 +54,7 @@ public class MultiSpinner extends Spinner
                 android.R.layout.simple_spinner_item,
                 new String[]{spinnerText});
         setAdapter(adapter);
+        mListener.onFilterSet(mFilterKey, selectedItemsList);
     }
 
     @Override
@@ -75,10 +74,17 @@ public class MultiSpinner extends Spinner
         return true;
     }
 
+    public void setItems(MakesSpinnerListener listener, String filterKey, List<String> selectedItems) {
+        mMakeStrings = selectedItems;
         mListener = listener;
+        mCheckboxes = new boolean[selectedItems.size()];
+        mFilterKey = filterKey;
 
+        mAdapter.add(filterKey);
+        mAdapter.addAll(selectedItems);
     }
 
     public interface MakesSpinnerListener {
+        void onFilterSet(String filterKey, List<String> selectedItems);
     }
 }
