@@ -110,7 +110,7 @@ public class MainActivity extends ActionBarActivity
 
                     if (filterKey == null && filterValues == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                        mMakeSpinner.setItems(MainActivity.this, "Make", makeStrings);
+                        mMakeSpinner.setItems(MainActivity.this, makeStrings);
                     }
                 }
             }
@@ -118,8 +118,8 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onFilterSet(String key, List<String> values) {
-        populateCarsList(true, key, values);
+    public void onFilterSet(List<String> selectedValues) {
+        populateCarsList(false, "make", selectedValues);
         // TODO: Create menu item in action bar to reset filter
     }
 
