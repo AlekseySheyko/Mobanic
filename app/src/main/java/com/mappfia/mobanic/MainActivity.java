@@ -9,14 +9,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,7 +34,6 @@ import static com.mappfia.mobanic.RangeSeekBar.OnRangeSeekBarChangeListener;
 public class MainActivity extends ActionBarActivity
         implements MakesSpinnerListener {
 
-    private Toolbar mToolbar;
     private CarsAdapter mCarsAdapter;
 
     private MultiSpinner mMakeSpinner;
@@ -52,12 +47,23 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupActionBar();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
 
         mCarsAdapter = new CarsAdapter(this);
 
-        final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
+        final ListView carsListView = (ListView) findViewById(R.id.cars_listview);
         carsListView.setAdapter(mCarsAdapter);
         carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -89,12 +95,6 @@ public class MainActivity extends ActionBarActivity
     }
 
     private void populateCarsList(boolean fromNetwork, final String filterKey, final List<String> filterValues, final Integer minPrice, final Integer maxPrice) {
-        final ListView carsListView = (ListView) findViewById(R.id.listview_cars);
-        final FrameLayout progressBar = (FrameLayout) findViewById(R.id.progressBar);
-
-        carsListView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
             query.fromLocalDatastore();
@@ -122,14 +122,10 @@ public class MainActivity extends ActionBarActivity
                     return;
                 }
 
-                progressBar.setVisibility(View.GONE);
-                carsListView.setVisibility(View.VISIBLE);
-
                 if (e == null) {
                     Set<String> makesList = new HashSet<>();
                     Set<String> modelsList = new HashSet<>();
                     Set<Integer> priceList = new HashSet<>();
-                    Set<Integer> yearsList = new HashSet<>();
                     Set<String> colorList = new HashSet<>();
                     Set<String> transmissionsList = new HashSet<>();
                     Set<String> locationsList = new HashSet<>();
@@ -141,7 +137,6 @@ public class MainActivity extends ActionBarActivity
                         makesList.add(car.getString("make"));
                         modelsList.add(car.getString("model"));
                         priceList.add(car.getInt("price"));
-                        yearsList.add(car.getInt("year"));
                         colorList.add(car.getString("color"));
                         transmissionsList.add(car.getString("transmission"));
                         locationsList.add(car.getString("location"));
@@ -183,12 +178,15 @@ public class MainActivity extends ActionBarActivity
                         ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
 
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        for (Integer year : yearsList) {
-                            adapter.add(year.toString());
+                        adapter.add("Up to 1 year old");
+                        for (int i = 2; i <= 10; i++) {
+                            adapter.add("Up to " + i + " years old");
                         }
-                        adapter.add("Min. year");
+                        adapter.add("Over 10 years old");
+                        adapter.add("Age");
 
                         Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
+                        spinner.setSelection(0);
                         spinner.setAdapter(adapter);
                         spinner.setSelection(adapter.getCount());
                     }
@@ -212,7 +210,7 @@ public class MainActivity extends ActionBarActivity
                 textView.setText(getItem(getCount()));
             } else {
                 TextView textView = (TextView) v.findViewById(android.R.id.text1);
-                textView.setText(">" + getItem(position));
+                textView.setText(getItem(position));
             }
 
             return v;
@@ -230,37 +228,8 @@ public class MainActivity extends ActionBarActivity
         // TODO: Create menu item in action bar to reset filter
     }
 
-    private void setupActionBar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                mToolbar, R.string.drawer_open, R.string.drawer_close);
-        drawerLayout.setDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-        // TODO: Remove
-        drawerLayout.openDrawer(Gravity.START);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mToolbar.inflateMenu(R.menu.menu_main);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        // TODO: Replace the refresh button with GCM live updates from server
-        if (id == R.id.action_refresh) {
-            populateCarsList(true);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public boolean isOnline() {
+        // TODO: Implement GCM live updates from server
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();

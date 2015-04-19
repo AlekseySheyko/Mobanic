@@ -407,7 +407,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
         paint.setColor(Color.GRAY);
         paint.setAntiAlias(true);
 
-        float initialPadding = 20;
+        float initialPadding = 22;
         padding = initialPadding + thumbHalfWidth;
 
         // draw seek bar background line
