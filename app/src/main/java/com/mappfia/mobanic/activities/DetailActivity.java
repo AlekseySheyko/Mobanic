@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.mappfia.mobanic.R;
+import com.mappfia.mobanic.utils.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;

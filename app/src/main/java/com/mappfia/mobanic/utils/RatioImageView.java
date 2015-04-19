@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.utils;
 
 import android.content.Context;
 import android.util.AttributeSet;

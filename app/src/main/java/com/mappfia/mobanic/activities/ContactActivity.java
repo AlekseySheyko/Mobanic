@@ -1,10 +1,12 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.mappfia.mobanic.R;
 
 
 public class ContactActivity extends ActionBarActivity {

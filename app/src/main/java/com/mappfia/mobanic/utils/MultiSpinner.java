@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,7 +15,7 @@ import java.util.Set;
 public class MultiSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
-    private MakesSpinnerListener mListener;
+    private SearchFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
     private Set<String> mAllItemsList;
     private boolean[] mCheckboxes;
@@ -79,7 +79,7 @@ public class MultiSpinner extends Spinner
         return true;
     }
 
-    public void setItems(MakesSpinnerListener listener, String filterKey, Set<String> allItemsList) {
+    public void setItems(SearchFiltersListener listener, String filterKey, Set<String> allItemsList) {
         mAllItemsList = allItemsList;
         mListener = listener;
         mCheckboxes = new boolean[allItemsList.size()];
@@ -89,7 +89,7 @@ public class MultiSpinner extends Spinner
         mAdapter.addAll(allItemsList);
     }
 
-    public interface MakesSpinnerListener {
+    public interface SearchFiltersListener {
         void onFilterSet(String filterKey, List<String> selectedItems);
     }
 }

@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.mappfia.mobanic.R;
 import com.parse.ParseObject;
 import com.squareup.picasso.Picasso;
 

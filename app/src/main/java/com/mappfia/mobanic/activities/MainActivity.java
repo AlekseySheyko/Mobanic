@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +18,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mappfia.mobanic.R;
+import com.mappfia.mobanic.utils.CarsAdapter;
+import com.mappfia.mobanic.utils.MultiSpinner;
+import com.mappfia.mobanic.utils.RangeSeekBar;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -28,11 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.mappfia.mobanic.MultiSpinner.MakesSpinnerListener;
-import static com.mappfia.mobanic.RangeSeekBar.OnRangeSeekBarChangeListener;
+import static com.mappfia.mobanic.utils.MultiSpinner.SearchFiltersListener;
+import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListener;
 
 public class MainActivity extends ActionBarActivity
-        implements MakesSpinnerListener {
+        implements SearchFiltersListener {
 
     private CarsAdapter mCarsAdapter;
 
@@ -63,7 +67,7 @@ public class MainActivity extends ActionBarActivity
 
         mCarsAdapter = new CarsAdapter(this);
 
-        final ListView carsListView = (ListView) findViewById(R.id.cars_listview);
+        ListView carsListView = (ListView) findViewById(R.id.cars_listview);
         carsListView.setAdapter(mCarsAdapter);
         carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

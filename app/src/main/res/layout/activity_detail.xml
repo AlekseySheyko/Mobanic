@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/detail_window_background"
-    tools:context="com.mappfia.mobanic.DetailActivity">
+    tools:context="com.mappfia.mobanic.activities.DetailActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                     android:layout_gravity="center"
                     style="?android:attr/progressBarStyleLarge"/>
 
-                <com.mappfia.mobanic.RatioImageView
+                <com.mappfia.mobanic.utils.RatioImageView
                     android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -204,7 +204,7 @@
                 android:flipInterval="3000"
                 android:foreground="?selectableItemBackground">
 
-                <com.mappfia.mobanic.RatioImageView
+                <com.mappfia.mobanic.utils.RatioImageView
                     android:id="@+id/gallery_placeholder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

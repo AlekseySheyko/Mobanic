@@ -1,9 +1,11 @@
-package com.mappfia.mobanic;
+package com.mappfia.mobanic.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+
+import com.mappfia.mobanic.R;
 
 
 public class SplashActivity extends ActionBarActivity {

@@ -6,7 +6,6 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -26,63 +25,56 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="230dp"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         android:layout_gravity="start"
-        android:orientation="vertical"
+        android:scrollbars="none"
         android:background="@color/nav_drawer_bg">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:scrollbars="none">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="64dp"
+            android:paddingBottom="64dp"
+            android:showDividers="middle"
+            android:divider="@drawable/separator">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="64dp"
-                android:paddingBottom="64dp"
-                android:showDividers="middle"
-                android:divider="#1c000000">
+            <com.mappfia.mobanic.utils.MultiSpinner
+                android:id="@+id/make_spinner"
+                style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.MultiSpinner
-                    android:id="@+id/make_spinner"
-                    style="@style/DrawerListItem"/>
+            <com.mappfia.mobanic.utils.MultiSpinner
+                android:id="@+id/model_spinner"
+                style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.MultiSpinner
-                    android:id="@+id/model_spinner"
-                    style="@style/DrawerListItem"/>
+            <com.mappfia.mobanic.utils.RangeSeekBar
+                android:id="@+id/price_selector"
+                style="@style/DrawerListItem"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"/>
 
-                <com.mappfia.mobanic.RangeSeekBar
-                    android:id="@+id/price_selector"
-                    style="@style/DrawerListItem"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"/>
+            <Spinner
+                android:id="@+id/age_spinner"
+                style="@style/DrawerListItem"
+                android:spinnerMode="dialog"/>
 
-                <Spinner
-                    android:id="@+id/age_spinner"
-                    style="@style/DrawerListItem"
-                    android:spinnerMode="dialog"/>
+            <com.mappfia.mobanic.utils.MultiSpinner
+                android:id="@+id/color_spinner"
+                style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.MultiSpinner
-                    android:id="@+id/color_spinner"
-                    style="@style/DrawerListItem"/>
+            <com.mappfia.mobanic.utils.MultiSpinner
+                android:id="@+id/trans_spinner"
+                style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.MultiSpinner
-                    android:id="@+id/trans_spinner"
-                    style="@style/DrawerListItem"/>
+            <com.mappfia.mobanic.utils.MultiSpinner
+                android:id="@+id/location_spinner"
+                style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.MultiSpinner
-                    android:id="@+id/location_spinner"
-                    style="@style/DrawerListItem"/>
+        </LinearLayout>
 
-            </LinearLayout>
-
-        </ScrollView>
-
-    </LinearLayout>
+    </ScrollView>
 
 </android.support.v4.widget.DrawerLayout>
