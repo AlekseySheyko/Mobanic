@@ -94,7 +94,7 @@ public class DetailActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> images, ParseException e) {
-                if (e == null) {
+                if (e == null && images.size() > 0) {
                     flipper.removeAllViews();
                     for (ParseObject image : images) {
                         String url = image.getParseFile("image").getUrl();
@@ -110,6 +110,9 @@ public class DetailActivity extends ActionBarActivity {
                                 .into(imageView);
                         flipper.addView(imageView);
                     }
+                } else {
+                    findViewById(R.id.gallery_header).setVisibility(View.GONE);
+                    findViewById(R.id.flipper).setVisibility(View.GONE);
                 }
             }
         });

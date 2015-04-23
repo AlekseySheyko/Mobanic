@@ -192,6 +192,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/gallery_header"
                 android:text="@string/gallery_header"
                 style="@style/HeaderTextView"/>
 
