@@ -12,18 +12,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mappfia.mobanic.R;
 import com.mappfia.mobanic.utils.CarsAdapter;
 import com.mappfia.mobanic.utils.MultiSpinner;
 import com.mappfia.mobanic.utils.RangeSeekBar;
+import com.mappfia.mobanic.utils.SpinnerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -91,8 +90,6 @@ public class MainActivity extends ActionBarActivity
         updateCarsList(false);
     }
 
-    private boolean mFiltersEnabled;
-
     private void updateCarsList(boolean fromNetwork) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
@@ -102,11 +99,9 @@ public class MainActivity extends ActionBarActivity
             query.fromLocalDatastore();
         }
         if (makes != null && makes.size() > 0) {
-            mFiltersEnabled = true;
             query.whereContainedIn("make", makes);
         }
         if (models != null && models.size() > 0) {
-            mFiltersEnabled = true;
             query.whereContainedIn("model", models);
         }
 
@@ -143,15 +138,16 @@ public class MainActivity extends ActionBarActivity
                         car.pinInBackground();
                     }
 
-                    if (!mFiltersEnabled) {
-                        populateSearchPanel(cars);
-                    }
+                    populateSearchPanel(cars);
                 }
             }
         });
     }
 
     private void populateSearchPanel(List<ParseObject> cars) {
+        final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+        final Set<String> models = mSharedPrefs.getStringSet("Model", null);
+
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
         Set<Integer> priceList = new HashSet<>();
@@ -168,11 +164,14 @@ public class MainActivity extends ActionBarActivity
             locationsList.add(car.getString("location"));
         }
 
-        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
-
-        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
+        if (makes == null || makes.size() == 0) {
+            mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+            mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
+        }
+        if (models == null || models.size() == 0 || makes != null || makes.size() > 0) {
+            mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+            mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
+        }
 
         mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         mColorSpinner.setItems(MainActivity.this, "Color", colorList);
@@ -223,42 +222,6 @@ public class MainActivity extends ActionBarActivity
                 .putStringSet(filterKey, selectedValues)
                 .apply();
         updateCarsList(false);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mSharedPrefs.edit()
-                .putStringSet("Make", null)
-                .putStringSet("Model", null)
-                .apply();
-    }
-
-    private class SpinnerAdapter extends ArrayAdapter<String> {
-
-        public SpinnerAdapter(Context context) {
-            super(context, android.R.layout.simple_spinner_dropdown_item);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View v = super.getView(position, convertView, parent);
-            if (position == getCount()) {
-                TextView textView = (TextView) v.findViewById(android.R.id.text1);
-                textView.setText(getItem(getCount()));
-            } else {
-                TextView textView = (TextView) v.findViewById(android.R.id.text1);
-                textView.setText(getItem(position));
-            }
-
-            return v;
-        }
-
-        @Override
-        public int getCount() {
-            return super.getCount() - 1;
-        }
     }
 
     public boolean isOnline() {
