@@ -93,8 +93,8 @@ public class MainActivity extends ActionBarActivity
     private void updateCarsList(boolean fromNetwork) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
-        final Set<String> color = mSharedPrefs.getStringSet("Color", null);
-        final Set<String> transmission = mSharedPrefs.getStringSet("Transmission", null);
+        final Set<String> colors = mSharedPrefs.getStringSet("Color", null);
+        final Set<String> transmissions = mSharedPrefs.getStringSet("Transmission", null);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
@@ -105,6 +105,12 @@ public class MainActivity extends ActionBarActivity
         }
         if (models != null && models.size() > 0) {
             query.whereContainedIn("model", models);
+        }
+        if (colors != null && colors.size() > 0) {
+            query.whereContainedIn("color", colors);
+        }
+        if (transmissions != null && transmissions.size() > 0) {
+            query.whereContainedIn("transmission", transmissions);
         }
         /*
         if (minPrice != null) {
@@ -118,7 +124,9 @@ public class MainActivity extends ActionBarActivity
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
-                if (cars.size() == 0) {
+                mCarsAdapter.clear();
+
+                if (cars.size() == 0 && filtersNotSet()) {
                     if (isOnline()) {
                         updateCarsList(true);
                     } else {
@@ -127,24 +135,33 @@ public class MainActivity extends ActionBarActivity
                                 Toast.LENGTH_SHORT).show();
                     }
                     return;
+                } else if (cars.size() == 0 && !filtersNotSet()) {
+                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 if (e == null) {
-                    mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
                         car.pinInBackground();
                     }
 
-                    populateSearchPanel(cars);
+                    if (filtersNotSet()) {
+                        populateSearchPanel(cars);
+                    }
                 }
+            }
+
+            private boolean filtersNotSet() {
+                return ((makes == null || makes.size() == 0) &&
+                        (models == null || models.size() == 0) &&
+                        (colors == null || colors.size() == 0) &&
+                        (transmissions == null || transmissions.size() == 0));
             }
         });
     }
 
     private void populateSearchPanel(List<ParseObject> cars) {
-        final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-        final Set<String> models = mSharedPrefs.getStringSet("Model", null);
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -162,10 +179,9 @@ public class MainActivity extends ActionBarActivity
             locationsList.add(car.getString("location"));
         }
 
-        if (makes == null || makes.size() == 0) {
-            mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-            mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
-        }
+        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
+
         mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
 
@@ -221,13 +237,15 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onPause() {
+        // TODO: Reset items to spinners when filters are added
+        // TODO: Add feature list uploading to JS web app
+        // TODO: Configure JS GCM updates
         super.onPause();
         mSharedPrefs.edit()
                 .putStringSet("Make", null)
                 .putStringSet("Model", null)
                 .putStringSet("Color", null)
                 .putStringSet("Transmission", null)
-                .putStringSet("Location", null)
                 .apply();
     }
 
