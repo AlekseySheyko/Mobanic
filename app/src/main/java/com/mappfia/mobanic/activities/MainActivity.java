@@ -147,6 +147,8 @@ public class MainActivity extends ActionBarActivity
     private void populateSearchPanel(List<ParseObject> cars) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
+        final Set<String> color = mSharedPrefs.getStringSet("Color", null);
+        final Set<String> transmission = mSharedPrefs.getStringSet("Transmission", null);
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -168,7 +170,7 @@ public class MainActivity extends ActionBarActivity
             mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
         }
-        if (models == null || models.size() == 0 || makes != null || makes.size() > 0) {
+        if (models == null || models.size() == 0 || makes != null && makes.size() > 0) {
             mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
             mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
         }
