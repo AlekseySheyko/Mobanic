@@ -95,6 +95,7 @@ public class MainActivity extends ActionBarActivity
 
     private void updateCarsList(boolean fromNetwork) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+        final Set<String> models = mSharedPrefs.getStringSet("Model", null);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
@@ -104,6 +105,11 @@ public class MainActivity extends ActionBarActivity
             mFiltersEnabled = true;
             query.whereContainedIn("make", makes);
         }
+        if (models != null && models.size() > 0) {
+            mFiltersEnabled = true;
+            query.whereContainedIn("model", models);
+        }
+
         /*
         if (filterKey != null && filterValues != null) {
             query.whereContainedIn(filterKey, filterValues);
@@ -131,7 +137,6 @@ public class MainActivity extends ActionBarActivity
                 }
 
                 if (e == null) {
-
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
@@ -139,14 +144,14 @@ public class MainActivity extends ActionBarActivity
                     }
 
                     if (!mFiltersEnabled) {
-                        populateSearchPanels(cars);
+                        populateSearchPanel(cars);
                     }
                 }
             }
         });
     }
 
-    private void populateSearchPanels(List<ParseObject> cars) {
+    private void populateSearchPanel(List<ParseObject> cars) {
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
         Set<Integer> priceList = new HashSet<>();
@@ -225,6 +230,7 @@ public class MainActivity extends ActionBarActivity
         super.onPause();
         mSharedPrefs.edit()
                 .putStringSet("Make", null)
+                .putStringSet("Model", null)
                 .apply();
     }
 
