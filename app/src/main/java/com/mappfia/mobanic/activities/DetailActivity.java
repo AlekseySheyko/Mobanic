@@ -120,7 +120,7 @@ public class DetailActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
         // TODO: Format mileage properly (add space and "km" label)
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + " mi.");
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
@@ -133,13 +133,18 @@ public class DetailActivity extends ActionBarActivity {
         List<String> features = mCar.getList("features");
 
         LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
-        for (String feature : features) {
-            TextView textView = (TextView) View.inflate(
-                    DetailActivity.this,
-                    R.layout.feature_list_item,
-                    null);
-            textView.setText(feature);
-            featuresContainer.addView(textView);
+        if (features != null) {
+            for (String feature : features) {
+                TextView textView = (TextView) View.inflate(
+                        DetailActivity.this,
+                        R.layout.feature_list_item,
+                        null);
+                textView.setText(feature);
+                featuresContainer.addView(textView);
+            }
+        } else {
+            findViewById(R.id.features_header).setVisibility(View.GONE);
+            findViewById(R.id.features_container).setVisibility(View.GONE);
         }
     }
 

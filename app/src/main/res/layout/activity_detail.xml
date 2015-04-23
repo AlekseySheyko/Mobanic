@@ -10,7 +10,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
         android:fillViewport="true">
 
         <LinearLayout
@@ -212,6 +211,7 @@
             </ViewFlipper>
 
             <TextView
+                android:id="@+id/features_header"
                 android:text="@string/features_header"
                 style="@style/HeaderTextView"/>
 

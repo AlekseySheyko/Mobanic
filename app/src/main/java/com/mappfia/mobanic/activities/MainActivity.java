@@ -74,35 +74,23 @@ public class MainActivity extends ActionBarActivity
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int position, long id) {
                 String carId = mCarsAdapter.getItem(position).getObjectId();
+
                 Intent intent = new Intent(MainActivity.this,
                         DetailActivity.class);
                 intent.putExtra("car_id", carId);
                 startActivity(intent);
-
-                // TODO: If selected car is sold, show similar models in listing
             }
         });
 
-        populateCarsList(false);
+        updateCarsList(false);
     }
 
-    private void populateCarsList(boolean fromNetwork) {
-        populateCarsList(fromNetwork, null, null, null, null);
-    }
-
-    private void populateCarsList(boolean fromNetwork, String filterKey, List<String> filterValues) {
-        populateCarsList(fromNetwork, filterKey, filterValues, null, null);
-    }
-
-    private void populateCarsList(boolean fromNetwork, Integer minPrice, Integer maxPrice) {
-        populateCarsList(fromNetwork, null, null, minPrice, maxPrice);
-    }
-
-    private void populateCarsList(boolean fromNetwork, final String filterKey, final List<String> filterValues, final Integer minPrice, final Integer maxPrice) {
+    private void updateCarsList(boolean fromNetwork) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
             query.fromLocalDatastore();
         }
+        /*
         if (filterKey != null && filterValues != null) {
             query.whereContainedIn(filterKey, filterValues);
         }
@@ -112,16 +100,18 @@ public class MainActivity extends ActionBarActivity
         if (maxPrice != null) {
             query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
+        */
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
                 if (cars.size() == 0) {
                     if (isOnline()) {
-                        populateCarsList(true);
+                        updateCarsList(true);
                     } else {
                         Toast.makeText(MainActivity.this,
-                                "Connect to a network to load cars list", Toast.LENGTH_LONG).show();
+                                "Connect to a network to load cars list",
+                                Toast.LENGTH_SHORT).show();
                     }
                     return;
                 }
@@ -146,7 +136,6 @@ public class MainActivity extends ActionBarActivity
                         locationsList.add(car.getString("location"));
                     }
 
-                    if (filterKey == null && filterValues == null && minPrice == null && maxPrice == null) {
                         mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
                         mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
 
@@ -175,7 +164,7 @@ public class MainActivity extends ActionBarActivity
                         rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
                             @Override
                             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
-                                populateCarsList(false, minPrice, maxPrice);
+                                updateCarsList(false);
                             }
                         });
 
@@ -193,10 +182,14 @@ public class MainActivity extends ActionBarActivity
                         spinner.setSelection(0);
                         spinner.setAdapter(adapter);
                         spinner.setSelection(adapter.getCount());
-                    }
                 }
             }
         });
+    }
+
+    @Override
+    public void onFilterSet(String filterKey, List<String> selectedValues) {
+        // TODO: Create menu item in action bar to reset filter
     }
 
     private class SpinnerAdapter extends ArrayAdapter<String> {
@@ -226,18 +219,10 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    @Override
-    public void onFilterSet(String filterKey, List<String> selectedValues) {
-        populateCarsList(false, filterKey.toLowerCase(), selectedValues);
-        // TODO: Create menu item in action bar to reset filter
-    }
-
     public boolean isOnline() {
-        // TODO: Implement GCM live updates from server
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
-
 }
