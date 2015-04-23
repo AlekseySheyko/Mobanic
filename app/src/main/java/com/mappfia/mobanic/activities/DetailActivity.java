@@ -122,7 +122,6 @@ public class DetailActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        // TODO: Format mileage properly (add space and "km" label)
         ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + " mi.");
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));

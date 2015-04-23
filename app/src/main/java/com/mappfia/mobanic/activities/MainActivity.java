@@ -2,9 +2,11 @@ package com.mappfia.mobanic.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -46,6 +48,8 @@ public class MainActivity extends ActionBarActivity
     private MultiSpinner mTransSpinner;
     private MultiSpinner mLocationSpinner;
 
+    private SharedPreferences mSharedPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,13 +86,23 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         updateCarsList(false);
     }
 
+    private boolean mFiltersEnabled;
+
     private void updateCarsList(boolean fromNetwork) {
+        final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
             query.fromLocalDatastore();
+        }
+        if (makes != null && makes.size() > 0) {
+            mFiltersEnabled = true;
+            query.whereContainedIn("make", makes);
         }
         /*
         if (filterKey != null && filterValues != null) {
@@ -117,79 +131,101 @@ public class MainActivity extends ActionBarActivity
                 }
 
                 if (e == null) {
-                    Set<String> makesList = new HashSet<>();
-                    Set<String> modelsList = new HashSet<>();
-                    Set<Integer> priceList = new HashSet<>();
-                    Set<String> colorList = new HashSet<>();
-                    Set<String> transmissionsList = new HashSet<>();
-                    Set<String> locationsList = new HashSet<>();
 
                     mCarsAdapter.clear();
                     for (ParseObject car : cars) {
                         mCarsAdapter.add(car);
                         car.pinInBackground();
-                        makesList.add(car.getString("make"));
-                        modelsList.add(car.getString("model"));
-                        priceList.add(car.getInt("price"));
-                        colorList.add(car.getString("color"));
-                        transmissionsList.add(car.getString("transmission"));
-                        locationsList.add(car.getString("location"));
                     }
 
-                        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
-
-                        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-                        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
-
-                        mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-                        mColorSpinner.setItems(MainActivity.this, "Color", colorList);
-
-                        mTransSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-                        mTransSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
-
-                        mLocationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
-                        mLocationSpinner.setItems(MainActivity.this, "Location", locationsList);
-
-                        Integer minPrice = Collections.min(priceList);
-                        minPrice = minPrice / 1000;
-                        Integer maxPrice = Collections.max(priceList);
-                        maxPrice = maxPrice / 1000 + 1;
-
-                        RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-                        rangeSeekBar.setRangeValues(minPrice, maxPrice);
-                        rangeSeekBar.setSelectedMinValue(minPrice);
-                        rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
-
-                        rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
-                            @Override
-                            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
-                                updateCarsList(false);
-                            }
-                        });
-
-                        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
-
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        adapter.add("Up to 1 year old");
-                        for (int i = 2; i <= 10; i++) {
-                            adapter.add("Up to " + i + " years old");
-                        }
-                        adapter.add("Over 10 years old");
-                        adapter.add("Age");
-
-                        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
-                        spinner.setSelection(0);
-                        spinner.setAdapter(adapter);
-                        spinner.setSelection(adapter.getCount());
+                    if (!mFiltersEnabled) {
+                        populateSearchPanels(cars);
+                    }
                 }
             }
         });
     }
 
+    private void populateSearchPanels(List<ParseObject> cars) {
+        Set<String> makesList = new HashSet<>();
+        Set<String> modelsList = new HashSet<>();
+        Set<Integer> priceList = new HashSet<>();
+        Set<String> colorList = new HashSet<>();
+        Set<String> transmissionsList = new HashSet<>();
+        Set<String> locationsList = new HashSet<>();
+
+        for (ParseObject car : cars) {
+            makesList.add(car.getString("make"));
+            modelsList.add(car.getString("model"));
+            priceList.add(car.getInt("price"));
+            colorList.add(car.getString("color"));
+            transmissionsList.add(car.getString("transmission"));
+            locationsList.add(car.getString("location"));
+        }
+
+        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
+
+        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
+
+        mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+        mColorSpinner.setItems(MainActivity.this, "Color", colorList);
+
+        mTransSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+        mTransSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
+
+        mLocationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
+        mLocationSpinner.setItems(MainActivity.this, "Location", locationsList);
+
+        Integer minPrice = Collections.min(priceList);
+        minPrice = minPrice / 1000;
+        Integer maxPrice = Collections.max(priceList);
+        maxPrice = maxPrice / 1000 + 1;
+
+        RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
+        rangeSeekBar.setRangeValues(minPrice, maxPrice);
+        rangeSeekBar.setSelectedMinValue(minPrice);
+        rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
+
+        rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
+            @Override
+            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
+                updateCarsList(false);
+            }
+        });
+
+        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.add("Up to 1 year old");
+        for (int i = 2; i <= 10; i++) {
+            adapter.add("Up to " + i + " years old");
+        }
+        adapter.add("Over 10 years old");
+        adapter.add("Age");
+
+        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
+        spinner.setSelection(0);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(adapter.getCount());
+    }
+
     @Override
-    public void onFilterSet(String filterKey, List<String> selectedValues) {
+    public void onFilterSet(String filterKey, Set<String> selectedValues) {
         // TODO: Create menu item in action bar to reset filter
+        mSharedPrefs.edit()
+                .putStringSet(filterKey, selectedValues)
+                .apply();
+        updateCarsList(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSharedPrefs.edit()
+                .putStringSet("Make", null)
+                .apply();
     }
 
     private class SpinnerAdapter extends ArrayAdapter<String> {

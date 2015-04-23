@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 public class MultiSpinner extends Spinner
@@ -35,10 +35,13 @@ public class MultiSpinner extends Spinner
     }
 
     public void updateSelectedItems() {
-        List<String> selectedItemsList = new ArrayList<>();
+        String selectedValue = null;
+
+        Set<String> selectedItemsList = new HashSet<>();
         for (int i = 0; i < mCheckboxes.length; i++) {
             if (mCheckboxes[i]) {
-                selectedItemsList.add(mAdapter.getItem(i + 1));
+                selectedValue = mAdapter.getItem(i + 1);
+                selectedItemsList.add(selectedValue);
             }
         }
 
@@ -46,7 +49,7 @@ public class MultiSpinner extends Spinner
         if (selectedItemsList.size() == 0) {
             spinnerText = mFilterKey;
         } else if (selectedItemsList.size() == 1) {
-            spinnerText = selectedItemsList.get(0);
+            spinnerText = selectedValue;
         } else {
             if (!mFilterKey.contains("Trans")) {
                 spinnerText = selectedItemsList.size() + " " + mFilterKey.toLowerCase() + "s";
@@ -90,6 +93,6 @@ public class MultiSpinner extends Spinner
     }
 
     public interface SearchFiltersListener {
-        void onFilterSet(String filterKey, List<String> selectedItems);
+        void onFilterSet(String filterKey, Set<String> selectedItems);
     }
 }
