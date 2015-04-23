@@ -93,6 +93,8 @@ public class MainActivity extends ActionBarActivity
     private void updateCarsList(boolean fromNetwork) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
+        final Set<String> color = mSharedPrefs.getStringSet("Color", null);
+        final Set<String> transmission = mSharedPrefs.getStringSet("Transmission", null);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
@@ -104,11 +106,7 @@ public class MainActivity extends ActionBarActivity
         if (models != null && models.size() > 0) {
             query.whereContainedIn("model", models);
         }
-
         /*
-        if (filterKey != null && filterValues != null) {
-            query.whereContainedIn(filterKey, filterValues);
-        }
         if (minPrice != null) {
             query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
         }
@@ -147,8 +145,6 @@ public class MainActivity extends ActionBarActivity
     private void populateSearchPanel(List<ParseObject> cars) {
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
-        final Set<String> color = mSharedPrefs.getStringSet("Color", null);
-        final Set<String> transmission = mSharedPrefs.getStringSet("Transmission", null);
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -170,10 +166,8 @@ public class MainActivity extends ActionBarActivity
             mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
         }
-        if (models == null || models.size() == 0 || makes != null && makes.size() > 0) {
-            mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-            mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
-        }
+        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
 
         mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         mColorSpinner.setItems(MainActivity.this, "Color", colorList);
@@ -219,11 +213,22 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
-        // TODO: Create menu item in action bar to reset filter
         mSharedPrefs.edit()
                 .putStringSet(filterKey, selectedValues)
                 .apply();
         updateCarsList(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSharedPrefs.edit()
+                .putStringSet("Make", null)
+                .putStringSet("Model", null)
+                .putStringSet("Color", null)
+                .putStringSet("Transmission", null)
+                .putStringSet("Location", null)
+                .apply();
     }
 
     public boolean isOnline() {
