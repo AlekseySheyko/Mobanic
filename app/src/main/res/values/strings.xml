@@ -13,4 +13,5 @@
     <string name="title_activity_contact">Contact Us</string>
     <string name="action_send">Send</string>
     <string name="action_refresh">Refresh</string>
+    <string name="remove_filter">Remove filter</string>
 </resources>

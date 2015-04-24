@@ -48,20 +48,21 @@ public class MainActivity extends ActionBarActivity
     private MultiSpinner mLocationSpinner;
 
     private SharedPreferences mSharedPrefs;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
-                toolbar,
+                mToolbar,
                 R.string.drawer_open,
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -256,9 +257,9 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onPause() {
-        // TODO: Reset items to spinners when filters are added
         // TODO: Add feature list uploading to JS web app
         // TODO: Configure JS GCM updates
+        // TODO: Fix multiple image uploading
         super.onPause();
         mSharedPrefs.edit()
                 .putStringSet("Make", null)
