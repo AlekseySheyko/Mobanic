@@ -90,11 +90,16 @@ public class MainActivity extends ActionBarActivity
         updateCarsList(false);
     }
 
+    private boolean mFiltersNotSet;
+
     private void updateCarsList(boolean fromNetwork) {
+
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
         final Set<String> colors = mSharedPrefs.getStringSet("Color", null);
         final Set<String> transmissions = mSharedPrefs.getStringSet("Transmission", null);
+        final int minPrice = mSharedPrefs.getInt("minPrice", -1);
+        final int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
         if (!fromNetwork) {
@@ -112,18 +117,18 @@ public class MainActivity extends ActionBarActivity
         if (transmissions != null && transmissions.size() > 0) {
             query.whereContainedIn("transmission", transmissions);
         }
-        /*
-        if (minPrice != null) {
+        if (minPrice != -1) {
             query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
         }
-        if (maxPrice != null) {
+        if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
-        */
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
+                mFiltersNotSet = filtersNotSet();
+
                 mCarsAdapter.clear();
 
                 if (cars.size() == 0 && filtersNotSet()) {
@@ -156,7 +161,8 @@ public class MainActivity extends ActionBarActivity
                 return ((makes == null || makes.size() == 0) &&
                         (models == null || models.size() == 0) &&
                         (colors == null || colors.size() == 0) &&
-                        (transmissions == null || transmissions.size() == 0));
+                        (transmissions == null || transmissions.size() == 0) &&
+                        (minPrice == -1 || maxPrice == -1));
             }
         });
     }
@@ -200,13 +206,23 @@ public class MainActivity extends ActionBarActivity
         maxPrice = maxPrice / 1000 + 1;
 
         RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        rangeSeekBar.setRangeValues(minPrice, maxPrice);
-        rangeSeekBar.setSelectedMinValue(minPrice);
-        rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
+        if (mFiltersNotSet) {
+            rangeSeekBar.setRangeValues(minPrice, maxPrice);
+        }
+        if (minPrice == -1) {
+            rangeSeekBar.setSelectedMinValue(minPrice);
+        }
+        if (maxPrice == -1) {
+            rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
+        }
 
         rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
+                mSharedPrefs.edit()
+                        .putInt("minPrice", minPrice)
+                        .putInt("maxPrice", maxPrice)
+                        .apply();
                 updateCarsList(false);
             }
         });
@@ -246,6 +262,8 @@ public class MainActivity extends ActionBarActivity
                 .putStringSet("Model", null)
                 .putStringSet("Color", null)
                 .putStringSet("Transmission", null)
+                .putInt("minPrice", -1)
+                .putInt("maxPrice", -1)
                 .apply();
     }
 
