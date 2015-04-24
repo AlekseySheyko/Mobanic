@@ -59,7 +59,8 @@ public class ContactActivity extends ActionBarActivity {
         String name = mNameEditText.getText().toString();
         String emailAddress = mEmailEditText.getText().toString();
         String phone = mPhoneEditText.getText().toString();
-        String message = mMessageEditText.getText().toString();
+        String message = mMessageEditText.getText().toString() + "\n\n"
+                + "From: " + emailAddress;
         String subject = "Contact request: " + phone;
 
         if (name.isEmpty()) {
@@ -79,6 +80,7 @@ public class ContactActivity extends ActionBarActivity {
             return;
         }
 
+        Toast.makeText(this, "Sending email...", Toast.LENGTH_SHORT).show();
         new SendEmailTask().execute(emailAddress, subject, message);
     }
 
