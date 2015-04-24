@@ -104,8 +104,10 @@ public class MainActivity extends ActionBarActivity
         final int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        if (!fromNetwork) {
+        if (!fromNetwork && !mSharedPrefs.getBoolean("update", false)) {
             query.fromLocalDatastore();
+        } else {
+            mSharedPrefs.edit().putBoolean("update", false).apply();
         }
         if (makes != null && makes.size() > 0) {
             query.whereContainedIn("make", makes);
