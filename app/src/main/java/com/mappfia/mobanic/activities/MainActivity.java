@@ -12,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -100,9 +99,6 @@ public class MainActivity extends ActionBarActivity
     private boolean mFiltersNotSet;
 
     public void updateCarsList(boolean fromNetwork) {
-        if (fromNetwork) {
-            Log.d("MainActivity", "Update from network request");
-        }
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
@@ -268,7 +264,6 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onPause() {
         // TODO: Add feature list uploading to JS web app
-        // TODO: Configure JS GCM updates
         // TODO: Fix multiple image uploading
         super.onPause();
         mSharedPrefs.edit()
@@ -295,7 +290,6 @@ public class MainActivity extends ActionBarActivity
     public static class PushReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("PushReceiver", "Push received - MainActivity");
             ((MainActivity) MainActivity.getContext()).updateCarsList(true);
         }
     }

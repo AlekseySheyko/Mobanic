@@ -37,10 +37,11 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:singleLine="false"
-        android:inputType="textCapSentences|textNoSuggestions|textMultiLine"
+        android:inputType="textCapSentences|textNoSuggestions"
+        android:gravity="top"
+        android:imeOptions="actionSend"
         android:layout_marginTop="12dp"
         android:hint="Message"
-        android:gravity="top"
         style="@style/EditTextContact"/>
 
 </LinearLayout>
