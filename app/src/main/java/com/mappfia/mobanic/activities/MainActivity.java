@@ -72,6 +72,7 @@ public class MainActivity extends ActionBarActivity
 
         ListView carsListView = (ListView) findViewById(R.id.cars_listview);
         carsListView.setAdapter(mCarsAdapter);
+        carsListView.setEmptyView(findViewById(R.id.spinner));
         carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view,
@@ -142,6 +143,8 @@ public class MainActivity extends ActionBarActivity
                     return;
                 } else if (cars.size() == 0 && !filtersNotSet()) {
                     Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.spinner).setVisibility(View.GONE);
+                    findViewById(R.id.search_empty).setVisibility(View.VISIBLE);
                     return;
                 }
 
