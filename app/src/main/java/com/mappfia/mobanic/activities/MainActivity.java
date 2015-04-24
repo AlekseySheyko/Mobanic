@@ -42,15 +42,9 @@ public class MainActivity extends ActionBarActivity
 
     private CarsAdapter mCarsAdapter;
 
-    private MultiSpinner mMakeSpinner;
-    private MultiSpinner mModelSpinner;
-    private MultiSpinner mColorSpinner;
-    private MultiSpinner mTransSpinner;
-    private MultiSpinner mLocationSpinner;
-
     private SharedPreferences mSharedPrefs;
-    private Toolbar mToolbar;
     public static Context mContext;
+    private int mMaxAge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +53,14 @@ public class MainActivity extends ActionBarActivity
 
         mContext = this;
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
-                mToolbar,
+                toolbar,
                 R.string.drawer_open,
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -104,7 +98,6 @@ public class MainActivity extends ActionBarActivity
     private boolean mFiltersNotSet;
 
     public void updateCarsList(boolean fromNetwork) {
-//        TODO: Make locations and age spinners work
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
@@ -141,6 +134,10 @@ public class MainActivity extends ActionBarActivity
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
+        if (mMaxAge != 0) {
+            query.whereGreaterThanOrEqualTo("year", (2015 - mMaxAge));
+        }
+
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -183,6 +180,7 @@ public class MainActivity extends ActionBarActivity
                         (colors == null || colors.size() == 0) &&
                         (transmissions == null || transmissions.size() == 0) &&
                         (locations == null || locations.size() == 0) &&
+                        mMaxAge == 0 &&
                         (minPrice == -1 || maxPrice == -1));
             }
         });
@@ -206,20 +204,20 @@ public class MainActivity extends ActionBarActivity
             locationsList.add(car.getString("location"));
         }
 
-        mMakeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-        mMakeSpinner.setItems(MainActivity.this, "Make", makesList);
+        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+        makeSpinner.setItems(MainActivity.this, "Make", makesList);
 
-        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        mModelSpinner.setItems(MainActivity.this, "Model", modelsList);
+        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        modelSpinner.setItems(MainActivity.this, "Model", modelsList);
 
-        mColorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-        mColorSpinner.setItems(MainActivity.this, "Color", colorList);
+        MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+        colorSpinner.setItems(MainActivity.this, "Color", colorList);
 
-        mTransSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-        mTransSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
+        MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+        transSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
 
-        mLocationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
-        mLocationSpinner.setItems(MainActivity.this, "Location", locationsList);
+        MultiSpinner locationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
+        locationSpinner.setItems(MainActivity.this, "Location", locationsList);
 
         Integer minPrice = Collections.min(priceList);
         minPrice = minPrice / 1000;
@@ -262,6 +260,17 @@ public class MainActivity extends ActionBarActivity
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
         spinner.setSelection(adapter.getCount());
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                mMaxAge = position + 1;
+                updateCarsList(false);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
     }
 
     @Override
