@@ -82,12 +82,17 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int position, long id) {
-                String carId = mCarsAdapter.getItem(position).getObjectId();
+                ParseObject car = mCarsAdapter.getItem(position);
+                String carId = car.getObjectId();
 
-                Intent intent = new Intent(MainActivity.this,
-                        DetailActivity.class);
-                intent.putExtra("car_id", carId);
-                startActivity(intent);
+                if (!car.getBoolean("isSold")) {
+                    Intent intent = new Intent(MainActivity.this,
+                            DetailActivity.class);
+                    intent.putExtra("car_id", carId);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "The cars is sold", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
