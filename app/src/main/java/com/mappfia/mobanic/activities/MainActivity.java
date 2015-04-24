@@ -99,11 +99,13 @@ public class MainActivity extends ActionBarActivity
     private boolean mFiltersNotSet;
 
     public void updateCarsList(boolean fromNetwork) {
+//        TODO: Make locations and age spinners work
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
         final Set<String> colors = mSharedPrefs.getStringSet("Color", null);
         final Set<String> transmissions = mSharedPrefs.getStringSet("Transmission", null);
+        final Set<String> locations = mSharedPrefs.getStringSet("Location", null);
         final int minPrice = mSharedPrefs.getInt("minPrice", -1);
         final int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 
@@ -124,6 +126,9 @@ public class MainActivity extends ActionBarActivity
         }
         if (transmissions != null && transmissions.size() > 0) {
             query.whereContainedIn("transmission", transmissions);
+        }
+        if (locations != null && locations.size() > 0) {
+            query.whereContainedIn("location", locations);
         }
         if (minPrice != -1) {
             query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
@@ -172,6 +177,7 @@ public class MainActivity extends ActionBarActivity
                         (models == null || models.size() == 0) &&
                         (colors == null || colors.size() == 0) &&
                         (transmissions == null || transmissions.size() == 0) &&
+                        (locations == null || locations.size() == 0) &&
                         (minPrice == -1 || maxPrice == -1));
             }
         });
@@ -263,14 +269,13 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onPause() {
-        // TODO: Add feature list uploading to JS web app
-        // TODO: Fix multiple image uploading
         super.onPause();
         mSharedPrefs.edit()
                 .putStringSet("Make", null)
                 .putStringSet("Model", null)
                 .putStringSet("Color", null)
                 .putStringSet("Transmission", null)
+                .putStringSet("Location", null)
                 .putInt("minPrice", -1)
                 .putInt("maxPrice", -1)
                 .apply();

@@ -21,8 +21,7 @@ import com.mappfia.mobanic.utils.Mail;
 
 public class ContactActivity extends ActionBarActivity {
 
-//    private static final String MOBANIC_EMAIL_ADDRESS = "info@mobanic.com";
-    private static final String MOBANIC_EMAIL_ADDRESS = "sheykoaaleksey@gmail.com";
+    private static final String MOBANIC_EMAIL_ADDRESS = "info@mobanic.com";
 
     private EditText mNameEditText;
     private EditText mEmailEditText;
