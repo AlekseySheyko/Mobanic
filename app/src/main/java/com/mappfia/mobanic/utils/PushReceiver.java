@@ -10,7 +10,7 @@ import android.util.Log;
 public class PushReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("PushReceiver", "Push received");
+        Log.d("PushReceiver", "Push received - Global");
         SharedPreferences sharedPrefs =
                 PreferenceManager.getDefaultSharedPreferences(context);
         sharedPrefs.edit().putBoolean("update", true).apply();
