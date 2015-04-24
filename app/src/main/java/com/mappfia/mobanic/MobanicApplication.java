@@ -7,6 +7,7 @@ import com.parse.ParseInstallation;
 import com.parse.ParsePush;
 
 public class MobanicApplication extends Application {
+
     @Override
     public void onCreate() {
         super.onCreate();

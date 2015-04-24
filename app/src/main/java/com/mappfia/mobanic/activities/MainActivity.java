@@ -51,11 +51,14 @@ public class MainActivity extends ActionBarActivity
 
     private SharedPreferences mSharedPrefs;
     private Toolbar mToolbar;
+    public static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mContext = this;
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -96,7 +99,10 @@ public class MainActivity extends ActionBarActivity
 
     private boolean mFiltersNotSet;
 
-    private void updateCarsList(boolean fromNetwork) {
+    public void updateCarsList(boolean fromNetwork) {
+        if (fromNetwork) {
+            Log.d("MainActivity", "Update from network request");
+        }
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
@@ -282,11 +288,15 @@ public class MainActivity extends ActionBarActivity
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    public static Context getContext() {
+        return mContext;
+    }
+
     public static class PushReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("PushReceiver", "Push received - MainActivity");
-            updateCarsList();
+            ((MainActivity) MainActivity.getContext()).updateCarsList(true);
         }
     }
 }
