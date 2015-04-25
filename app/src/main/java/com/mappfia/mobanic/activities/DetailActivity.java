@@ -3,7 +3,9 @@ package com.mappfia.mobanic.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +33,7 @@ public class DetailActivity extends ActionBarActivity {
     private String mCarId;
 
     public static Context mContext;
+    private SharedPreferences mSharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,8 @@ public class DetailActivity extends ActionBarActivity {
         } else if (savedInstanceState != null) {
             mCarId = savedInstanceState.getString("car_id");
         }
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         updateCarsList(false);
 
@@ -59,8 +64,10 @@ public class DetailActivity extends ActionBarActivity {
         if (mCarId == null) return;
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        if (!fromNetwork) {
+        if (!fromNetwork && !mSharedPrefs.getBoolean("update", false)) {
             query.fromLocalDatastore();
+        } else {
+            mSharedPrefs.edit().putBoolean("update", false).apply();
         }
         query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
@@ -183,15 +190,18 @@ public class DetailActivity extends ActionBarActivity {
         return mContext;
     }
 
-public static class PushReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        try {
-            ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
-        } catch (Exception e) {
-            Log.d("MainActivity", "Can't get activity context to update content. " +
-                    "Just skip, will be updated in a moment.");
+    public static class PushReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
+                SharedPreferences sharedPrefs =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                sharedPrefs.edit().putBoolean("update", true).apply();
+            } catch (Exception e) {
+                Log.d("MainActivity", "Can't get activity context to update content. " +
+                        "Just skip, will be updated in a moment.");
+            }
         }
     }
-}
 }
