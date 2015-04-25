@@ -170,7 +170,7 @@ public class MainActivity extends ActionBarActivity
                         car.pinInBackground();
                     }
 
-                    if (filtersNotSet()) {
+                    if (filtersNotSet() || (makes != null && makes.size() > 0)) {
                         populateSearchPanel(cars);
                     }
                 }
@@ -265,7 +265,7 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mMaxAge = position + 1;
-                updateCarsList(false);
+//TODO:                updateCarsList(false);
             }
 
             @Override
