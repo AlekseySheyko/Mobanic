@@ -84,11 +84,11 @@
                 style="@style/DrawerListItem"/>
 
             <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/trans_spinner"
+                android:id="@+id/fuel_type_spinner"
                 style="@style/DrawerListItem"/>
 
             <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/location_spinner"
+                android:id="@+id/trans_spinner"
                 style="@style/DrawerListItem"/>
 
         </LinearLayout>

@@ -86,7 +86,7 @@ public class MainActivity extends ActionBarActivity
                     intent.putExtra("car_id", carId);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(MainActivity.this, "This cars is sold", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "This car has been sold!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -98,13 +98,13 @@ public class MainActivity extends ActionBarActivity
 
     private boolean mFiltersNotSet;
 
-    public void updateCarsList(boolean fromNetwork) {
+    public void updateCarsList(final boolean fromNetwork) {
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
         final Set<String> colors = mSharedPrefs.getStringSet("Color", null);
         final Set<String> transmissions = mSharedPrefs.getStringSet("Transmission", null);
-        final Set<String> locations = mSharedPrefs.getStringSet("Location", null);
+        final Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
         final int minPrice = mSharedPrefs.getInt("minPrice", -1);
         final int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 
@@ -126,8 +126,8 @@ public class MainActivity extends ActionBarActivity
         if (transmissions != null && transmissions.size() > 0) {
             query.whereContainedIn("transmission", transmissions);
         }
-        if (locations != null && locations.size() > 0) {
-            query.whereContainedIn("location", locations);
+        if (fuelTypes != null && fuelTypes.size() > 0) {
+            query.whereContainedIn("fuelType", fuelTypes);
         }
         if (minPrice != -1) {
             query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
@@ -151,13 +151,14 @@ public class MainActivity extends ActionBarActivity
                     if (isOnline()) {
                         updateCarsList(true);
                     } else {
+                        findViewById(R.id.spinner).setVisibility(View.GONE);
                         Toast.makeText(MainActivity.this,
                                 "Connect to a network to load cars list",
                                 Toast.LENGTH_SHORT).show();
                     }
                     return;
                 } else if (cars.size() == 0 && !filtersNotSet()) {
-                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_LONG).show();
                     findViewById(R.id.spinner).setVisibility(View.GONE);
                     findViewById(R.id.search_empty).setVisibility(View.VISIBLE);
                     return;
@@ -180,7 +181,7 @@ public class MainActivity extends ActionBarActivity
                         (models == null || models.size() == 0) &&
                         (colors == null || colors.size() == 0) &&
                         (transmissions == null || transmissions.size() == 0) &&
-                        (locations == null || locations.size() == 0) &&
+                        (fuelTypes == null || fuelTypes.size() == 0) &&
                         mMaxAge == 0 &&
                         (minPrice == -1 || maxPrice == -1));
             }
@@ -194,7 +195,7 @@ public class MainActivity extends ActionBarActivity
         Set<Integer> priceList = new HashSet<>();
         Set<String> colorList = new HashSet<>();
         Set<String> transmissionsList = new HashSet<>();
-        Set<String> locationsList = new HashSet<>();
+        Set<String> fuelTypesList = new HashSet<>();
 
         for (ParseObject car : cars) {
             makesList.add(car.getString("make"));
@@ -202,7 +203,7 @@ public class MainActivity extends ActionBarActivity
             priceList.add(car.getInt("price"));
             colorList.add(car.getString("color"));
             transmissionsList.add(car.getString("transmission"));
-            locationsList.add(car.getString("location"));
+            fuelTypesList.add(car.getString("fuelType"));
         }
 
         MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
@@ -217,8 +218,8 @@ public class MainActivity extends ActionBarActivity
         MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
         transSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
 
-        MultiSpinner locationSpinner = (MultiSpinner) findViewById(R.id.location_spinner);
-        locationSpinner.setItems(MainActivity.this, "Location", locationsList);
+        MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
+        fuelTypeSpinner.setItems(MainActivity.this, "Fuel Type", fuelTypesList);
 
         Integer minPrice = Collections.min(priceList);
         minPrice = minPrice / 1000;
@@ -258,7 +259,6 @@ public class MainActivity extends ActionBarActivity
         adapter.add("Age");
 
         Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
-        spinner.setSelection(0);
         spinner.setAdapter(adapter);
         spinner.setSelection(adapter.getCount());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -290,7 +290,7 @@ public class MainActivity extends ActionBarActivity
                 .putStringSet("Model", null)
                 .putStringSet("Color", null)
                 .putStringSet("Transmission", null)
-                .putStringSet("Location", null)
+                .putStringSet("Fuel Type", null)
                 .putInt("minPrice", -1)
                 .putInt("maxPrice", -1)
                 .apply();
