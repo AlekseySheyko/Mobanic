@@ -86,7 +86,7 @@ public class MainActivity extends ActionBarActivity
                     intent.putExtra("car_id", carId);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(MainActivity.this, "The cars is sold", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "This cars is sold", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -313,6 +313,9 @@ public class MainActivity extends ActionBarActivity
             try {
                 ((MainActivity) MainActivity.getContext()).updateCarsList(true);
             } catch (Exception e) {
+                SharedPreferences sharedPrefs =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                sharedPrefs.edit().putBoolean("update", true).apply();
                 Log.d("MainActivity", "Can't get activity context to update content. " +
                         "Just skip, will be updated in a moment.");
             }
