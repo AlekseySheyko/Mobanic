@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.mappfia.mobanic.R;
@@ -65,6 +66,13 @@ public class DetailActivity extends ActionBarActivity {
             @Override
             public void done(ParseObject car, ParseException e) {
                 mCar = car;
+
+                boolean isSold = car.getBoolean("isSold");
+                if (isSold) {
+                    Toast.makeText(DetailActivity.this,
+                            "Sorry, this car was sold recently", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(DetailActivity.this, MainActivity.class));
+                }
 
                 String make = car.getString("make");
                 String model = car.getString("model");
