@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -309,7 +310,12 @@ public class MainActivity extends ActionBarActivity
     public static class PushReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ((MainActivity) MainActivity.getContext()).updateCarsList(true);
+            try {
+                ((MainActivity) MainActivity.getContext()).updateCarsList(true);
+            } catch (Exception e) {
+                Log.d("MainActivity", "Can't get activity context to update content. " +
+                        "Just skip, will be updated in a moment.");
+            }
         }
     }
 }

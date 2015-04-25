@@ -1,8 +1,11 @@
 package com.mappfia.mobanic.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -24,22 +27,41 @@ import java.util.List;
 public class DetailActivity extends ActionBarActivity {
 
     private ParseObject mCar;
+    private String mCarId;
+
+    public static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        String carId = null;
+        mContext = this;
+
         if (getIntent() != null) {
-            carId = getIntent().getStringExtra("car_id");
+            mCarId = getIntent().getStringExtra("car_id");
         } else if (savedInstanceState != null) {
-            carId = savedInstanceState.getString("car_id");
+            mCarId = savedInstanceState.getString("car_id");
         }
 
+        updateCarsList(false);
+
+        findViewById(R.id.button_contact).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
+            }
+        });
+    }
+
+    private void updateCarsList(boolean fromNetwork) {
+        if (mCarId == null) return;
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        query.fromLocalDatastore();
-        query.getInBackground(carId, new GetCallback<ParseObject>() {
+        if (!fromNetwork) {
+            query.fromLocalDatastore();
+        }
+        query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
                 mCar = car;
@@ -59,14 +81,7 @@ public class DetailActivity extends ActionBarActivity {
                 fillOutFeatures();
             }
         });
-
-        findViewById(R.id.button_contact).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
-            }
-        });
-    }
+}
 
     private void setCoverImage() {
         String url = mCar.getParseFile("coverImage").getUrl();
@@ -122,7 +137,7 @@ public class DetailActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + " mi.");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
@@ -155,4 +170,20 @@ public class DetailActivity extends ActionBarActivity {
         outState.putString("car_id", mCar.getObjectId());
         super.onSaveInstanceState(outState);
     }
+
+    public static Context getContext() {
+        return mContext;
+    }
+
+public static class PushReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        try {
+            ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
+        } catch (Exception e) {
+            Log.d("MainActivity", "Can't get activity context to update content. " +
+                    "Just skip, will be updated in a moment.");
+        }
+    }
+}
 }
