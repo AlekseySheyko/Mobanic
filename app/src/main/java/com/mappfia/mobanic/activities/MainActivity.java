@@ -170,8 +170,10 @@ public class MainActivity extends ActionBarActivity
                         car.pinInBackground();
                     }
 
-                    if (filtersNotSet() || (makes != null && makes.size() > 0)) {
-                        populateSearchPanel(cars);
+                    if (filtersNotSet()) {
+                        populateSearchPanel(cars, false);
+                    } else if (makes != null && makes.size() > 0) {
+                        populateSearchPanel(cars, true);
                     }
                 }
             }
@@ -188,7 +190,7 @@ public class MainActivity extends ActionBarActivity
         });
     }
 
-    private void populateSearchPanel(List<ParseObject> cars) {
+    private void populateSearchPanel(List<ParseObject> cars, boolean b) {
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -206,8 +208,10 @@ public class MainActivity extends ActionBarActivity
             fuelTypesList.add(car.getString("fuelType"));
         }
 
-        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-        makeSpinner.setItems(MainActivity.this, "Make", makesList);
+        if (!b) {
+            MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+            makeSpinner.setItems(MainActivity.this, "Make", makesList);
+        }
 
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         modelSpinner.setItems(MainActivity.this, "Model", modelsList);
