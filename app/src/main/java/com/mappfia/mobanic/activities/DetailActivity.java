@@ -138,6 +138,7 @@ public class DetailActivity extends ActionBarActivity {
             mShareIntent.setAction(Intent.ACTION_SEND);
             mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
             mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out the car I've got with Mobanic. Care for your own test drive? - mobanic.com");
+            mShareIntent.putExtra("sms_body", "Check out the car I've got with Mobanic. Care for your own test drive? - mobanic.com");
             mShareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
             mShareIntent.setType("text/plain");
             mShareIntent.setType("image/*");
