@@ -46,14 +46,11 @@ public class MainActivity extends ActionBarActivity
     private SharedPreferences mSharedPrefs;
     public static Context mContext;
     private int mMaxAge;
-    private MultiSpinner mModelSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
 
         mContext = this;
 
@@ -216,10 +213,9 @@ public class MainActivity extends ActionBarActivity
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             makeSpinner.setItems(this, "Make", makesList);
         }
-        mModelSpinner.setItems(this, "Model", modelsList);
-        if (b) {
-            mModelSpinner.update();
-        }
+
+        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        modelSpinner.setItems(this, "Model", modelsList);
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);

@@ -15,22 +15,34 @@ import java.util.Set;
 public class MultiSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
-    private static final String LOG_TAG = MultiSpinner.class.getSimpleName();
+    private String LOG_TAG = MultiSpinner.class.getSimpleName();
 
     private SearchFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private Set<String> mAllItemsList;
+    private Set<String> mChoicesList;
     private boolean[] mCheckboxes;
-    private String mFilterKey;
-    private AlertDialog.Builder builder;
+    private String mSearchKey;
 
     public MultiSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
 
-        mAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, new ArrayList<String>());
+        mAdapter = new ArrayAdapter<>(
+                getContext(),
+                android.R.layout.simple_spinner_item,
+                new ArrayList<String>());
+
         setAdapter(mAdapter);
-        setSelection(mAdapter.getCount());
+    }
+
+    public void setItems(SearchFiltersListener listener, String filterKey, Set<String> choicesList) {
+        mListener = listener;
+        mChoicesList = choicesList;
+        mCheckboxes = new boolean[choicesList.size()];
+        mSearchKey = filterKey;
+
+        mAdapter.clear();
+        mAdapter.add(filterKey);
+        mAdapter.addAll(choicesList);
     }
 
     @Override
@@ -39,43 +51,41 @@ public class MultiSpinner extends Spinner
     }
 
     private void updateSelectedItems() {
-        String selectedValue = null;
+        String shownValue = null;
 
-        Set<String> selectedItemsList = new HashSet<>();
+        Set<String> selectedItems = new HashSet<>();
         for (int i = 0; i < mCheckboxes.length; i++) {
             if (mCheckboxes[i]) {
-                selectedValue = mAdapter.getItem(i + 1);
-                selectedItemsList.add(selectedValue);
+                shownValue = mAdapter.getItem(i + 1);
+                selectedItems.add(shownValue);
             }
         }
 
-        String spinnerText;
-        if (selectedItemsList.size() == 0) {
-            spinnerText = mFilterKey;
-        } else if (selectedItemsList.size() == 1) {
-            spinnerText = selectedValue;
+        mAdapter.clear();
+        mAdapter.addAll(mChoicesList);
+        if (selectedItems.size() == 0) {
+            mAdapter.add(mSearchKey);
+        } else if (selectedItems.size() == 1) {
+            mAdapter.add(shownValue);
         } else {
-            if (!mFilterKey.contains("Trans")) {
-                spinnerText = selectedItemsList.size() + " " + mFilterKey.toLowerCase() + "s";
+            if (!mSearchKey.contains("Trans")) {
+                mAdapter.add(selectedItems.size() + " " + mSearchKey.toLowerCase() + "s");
             } else {
-                spinnerText = selectedItemsList.size() + " trans. types";
+                mAdapter.add(selectedItems.size() + " trans. types");
             }
         }
+        setSelection(mAdapter.getCount());
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item,
-                new String[]{spinnerText});
-        setAdapter(adapter);
-        mListener.onFilterSet(mFilterKey, selectedItemsList);
+        mListener.onFilterSet(mSearchKey, selectedItems);
     }
 
     @Override
     public boolean performClick() {
-        builder = new AlertDialog.Builder(getContext());
-        builder.setMultiChoiceItems(
-                mAllItemsList.toArray(new CharSequence[mAllItemsList.size()]),
-                mCheckboxes,
-                this);
+        CharSequence[] choices = mChoicesList.toArray(
+                new CharSequence[mChoicesList.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMultiChoiceItems(choices, mCheckboxes, this);
         builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -84,21 +94,6 @@ public class MultiSpinner extends Spinner
         });
         builder.show();
         return true;
-    }
-
-    public void update() {
-        updateSelectedItems();
-    }
-
-    public void setItems(SearchFiltersListener listener, String filterKey, Set<String> allItemsList) {
-        mAllItemsList = allItemsList;
-        mListener = listener;
-        mCheckboxes = new boolean[allItemsList.size()];
-        mFilterKey = filterKey;
-
-        mAdapter.clear();
-        mAdapter.add(filterKey);
-        mAdapter.addAll(allItemsList);
     }
 
     public interface SearchFiltersListener {
