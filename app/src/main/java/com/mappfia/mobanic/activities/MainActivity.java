@@ -217,6 +217,11 @@ public class MainActivity extends ActionBarActivity
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         modelSpinner.setItems(this, "Model", modelsList);
 
+        Log.d("MainActivity", "Set model items:");
+        for (String model : modelsList) {
+            Log.d("MainActivity", model);
+        }
+
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);
 
@@ -283,9 +288,11 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
-        mSharedPrefs.edit()
-                .putStringSet(filterKey, selectedValues)
-                .apply();
+        if (!filterKey.equals("Model")) {
+            mSharedPrefs.edit()
+                    .putStringSet(filterKey, selectedValues)
+                    .apply();
+        }
         updateCarsList(false);
     }
 

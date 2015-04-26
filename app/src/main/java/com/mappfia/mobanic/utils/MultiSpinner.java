@@ -56,7 +56,7 @@ public class MultiSpinner extends Spinner
         Set<String> selectedItems = new HashSet<>();
         for (int i = 0; i < mCheckboxes.length; i++) {
             if (mCheckboxes[i]) {
-                shownValue = mAdapter.getItem(i + 1);
+                shownValue = mAdapter.getItem(i);
                 selectedItems.add(shownValue);
             }
         }
