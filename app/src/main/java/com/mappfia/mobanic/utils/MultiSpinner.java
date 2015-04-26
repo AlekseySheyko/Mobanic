@@ -88,6 +88,7 @@ public class MultiSpinner extends Spinner
         mCheckboxes = new boolean[allItemsList.size()];
         mFilterKey = filterKey;
 
+        mAdapter.clear();
         mAdapter.add(filterKey);
         mAdapter.addAll(allItemsList);
     }
