@@ -216,8 +216,10 @@ public class MainActivity extends ActionBarActivity
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             makeSpinner.setItems(this, "Make", makesList);
         }
-        Toast.makeText(this, "Set items. B = " + b, Toast.LENGTH_SHORT).show();
         mModelSpinner.setItems(this, "Model", modelsList);
+        if (b) {
+            mModelSpinner.update();
+        }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);

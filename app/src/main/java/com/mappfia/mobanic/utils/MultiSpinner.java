@@ -22,6 +22,7 @@ public class MultiSpinner extends Spinner
     private Set<String> mAllItemsList;
     private boolean[] mCheckboxes;
     private String mFilterKey;
+    private AlertDialog.Builder builder;
 
     public MultiSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
@@ -70,7 +71,7 @@ public class MultiSpinner extends Spinner
 
     @Override
     public boolean performClick() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder = new AlertDialog.Builder(getContext());
         builder.setMultiChoiceItems(
                 mAllItemsList.toArray(new CharSequence[mAllItemsList.size()]),
                 mCheckboxes,
@@ -83,6 +84,10 @@ public class MultiSpinner extends Spinner
         });
         builder.show();
         return true;
+    }
+
+    public void update() {
+        updateSelectedItems();
     }
 
     public void setItems(SearchFiltersListener listener, String filterKey, Set<String> allItemsList) {
