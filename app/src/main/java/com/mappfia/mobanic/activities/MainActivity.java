@@ -46,11 +46,14 @@ public class MainActivity extends ActionBarActivity
     private SharedPreferences mSharedPrefs;
     public static Context mContext;
     private int mMaxAge;
+    private MultiSpinner multiSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        multiSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
 
         mContext = this;
 
@@ -143,6 +146,7 @@ public class MainActivity extends ActionBarActivity
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
+
                 mFiltersNotSet = filtersNotSet();
 
                 mCarsAdapter.clear();
@@ -190,7 +194,7 @@ public class MainActivity extends ActionBarActivity
         });
     }
 
-    private void populateSearchPanel(List<ParseObject> cars, boolean b) {
+    private void populateSearchPanel(List<ParseObject> cars, final boolean b) {
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -210,20 +214,18 @@ public class MainActivity extends ActionBarActivity
 
         if (!b) {
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-            makeSpinner.setItems(MainActivity.this, "Make", makesList);
+            makeSpinner.setItems(this, "Make", makesList);
         }
-
-        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        modelSpinner.setItems(MainActivity.this, "Model", modelsList);
+        multiSpinner.setItems(this, "Model", modelsList);
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-        colorSpinner.setItems(MainActivity.this, "Color", colorList);
+        colorSpinner.setItems(this, "Color", colorList);
 
         MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-        transSpinner.setItems(MainActivity.this, "Transmission", transmissionsList);
+        transSpinner.setItems(this, "Transmission", transmissionsList);
 
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
-        fuelTypeSpinner.setItems(MainActivity.this, "Fuel Type", fuelTypesList);
+        fuelTypeSpinner.setItems(this, "Fuel Type", fuelTypesList);
 
         Integer minPrice = Collections.min(priceList);
         minPrice = minPrice / 1000;
@@ -231,7 +233,7 @@ public class MainActivity extends ActionBarActivity
         maxPrice = maxPrice / 1000 + 1;
 
         RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        if (mFiltersNotSet || (makesList != null && makesList.size() > 0)) {
+        if (mFiltersNotSet) {
             rangeSeekBar.setRangeValues(minPrice, maxPrice);
         }
         if (minPrice == -1) {
@@ -269,7 +271,10 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mMaxAge = position + 1;
-//TODO:                updateCarsList(false);
+                Log.w("MainActivity", "Cycle");
+                if (!b) {
+                    updateCarsList(false);
+                }
             }
 
             @Override

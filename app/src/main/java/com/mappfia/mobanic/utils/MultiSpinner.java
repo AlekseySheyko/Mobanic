@@ -15,6 +15,8 @@ import java.util.Set;
 public class MultiSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
+    private static final String LOG_TAG = MultiSpinner.class.getSimpleName();
+
     private SearchFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
     private Set<String> mAllItemsList;
@@ -35,7 +37,7 @@ public class MultiSpinner extends Spinner
         mCheckboxes[position] = isChecked;
     }
 
-    public void updateSelectedItems() {
+    private void updateSelectedItems() {
         String selectedValue = null;
 
         Set<String> selectedItemsList = new HashSet<>();
