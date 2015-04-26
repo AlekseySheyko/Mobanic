@@ -46,14 +46,14 @@ public class MainActivity extends ActionBarActivity
     private SharedPreferences mSharedPrefs;
     public static Context mContext;
     private int mMaxAge;
-    private MultiSpinner multiSpinner;
+    private MultiSpinner mModelSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        multiSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        mModelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
 
         mContext = this;
 
@@ -216,7 +216,8 @@ public class MainActivity extends ActionBarActivity
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             makeSpinner.setItems(this, "Make", makesList);
         }
-        multiSpinner.setItems(this, "Model", modelsList);
+        Toast.makeText(this, "Set items. B = " + b, Toast.LENGTH_SHORT).show();
+        mModelSpinner.setItems(this, "Model", modelsList);
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);
@@ -271,7 +272,6 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mMaxAge = position + 1;
-                Log.w("MainActivity", "Cycle");
                 if (!b) {
                     updateCarsList(false);
                 }
