@@ -41,6 +41,7 @@ import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListene
 public class MainActivity extends ActionBarActivity
         implements SearchFiltersListener {
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private CarsAdapter mCarsAdapter;
 
     private SharedPreferences mSharedPrefs;
@@ -98,7 +99,7 @@ public class MainActivity extends ActionBarActivity
 
     private boolean mFiltersNotSet;
 
-    public void updateCarsList(final boolean fromNetwork) {
+    public void updateCarsList(boolean fromNetwork) {
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
@@ -138,12 +139,10 @@ public class MainActivity extends ActionBarActivity
         if (mMaxAge != 0) {
             query.whereGreaterThanOrEqualTo("year", (2015 - mMaxAge));
         }
-
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
-
                 mFiltersNotSet = filtersNotSet();
 
                 mCarsAdapter.clear();
@@ -155,11 +154,11 @@ public class MainActivity extends ActionBarActivity
                         findViewById(R.id.spinner).setVisibility(View.GONE);
                         Toast.makeText(MainActivity.this,
                                 "Connect to a network to load cars list",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_LONG).show();
                     }
                     return;
                 } else if (cars.size() == 0 && !filtersNotSet()) {
-                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_SHORT).show();
                     findViewById(R.id.spinner).setVisibility(View.GONE);
                     findViewById(R.id.search_empty).setVisibility(View.VISIBLE);
                     return;
@@ -216,11 +215,6 @@ public class MainActivity extends ActionBarActivity
 
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         modelSpinner.setItems(this, "Model", modelsList);
-
-        Log.d("MainActivity", "Set model items:");
-        for (String model : modelsList) {
-            Log.d("MainActivity", model);
-        }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);
@@ -288,11 +282,17 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
-        if (!filterKey.equals("Model")) {
-            mSharedPrefs.edit()
-                    .putStringSet(filterKey, selectedValues)
-                    .apply();
+
+        Log.d(LOG_TAG, "Key: " + filterKey);
+        for (String value : selectedValues) {
+            Log.d(LOG_TAG, "Value: " + value);
         }
+        Log.d(LOG_TAG, "***");
+
+
+        mSharedPrefs.edit()
+                .putStringSet(filterKey, selectedValues)
+                .apply();
         updateCarsList(false);
     }
 
