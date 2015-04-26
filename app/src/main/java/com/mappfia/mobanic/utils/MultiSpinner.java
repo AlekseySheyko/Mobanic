@@ -27,6 +27,7 @@ public class MultiSpinner extends Spinner
         mAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, new ArrayList<String>());
         setAdapter(mAdapter);
+        setSelection(mAdapter.getCount());
     }
 
     @Override

@@ -231,7 +231,7 @@ public class MainActivity extends ActionBarActivity
         maxPrice = maxPrice / 1000 + 1;
 
         RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        if (mFiltersNotSet) {
+        if (mFiltersNotSet || (makesList != null && makesList.size() > 0)) {
             rangeSeekBar.setRangeValues(minPrice, maxPrice);
         }
         if (minPrice == -1) {
