@@ -47,6 +47,7 @@ public class MainActivity extends ActionBarActivity
     private SharedPreferences mSharedPrefs;
     public static Context mContext;
     private int mMaxAge;
+    private Set<String> mModelsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,7 +194,9 @@ public class MainActivity extends ActionBarActivity
     private void populateSearchPanel(List<ParseObject> cars, final boolean b) {
 
         Set<String> makesList = new HashSet<>();
-        Set<String> modelsList = new HashSet<>();
+        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
+            mModelsList = new HashSet<>();
+        }
         Set<Integer> priceList = new HashSet<>();
         Set<String> colorList = new HashSet<>();
         Set<String> transmissionsList = new HashSet<>();
@@ -201,7 +204,9 @@ public class MainActivity extends ActionBarActivity
 
         for (ParseObject car : cars) {
             makesList.add(car.getString("make"));
-            modelsList.add(car.getString("model"));
+            if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
+                mModelsList.add(car.getString("model"));
+            }
             priceList.add(car.getInt("price"));
             colorList.add(car.getString("color"));
             transmissionsList.add(car.getString("transmission"));
@@ -213,8 +218,14 @@ public class MainActivity extends ActionBarActivity
             makeSpinner.setItems(this, "Make", makesList);
         }
 
-        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        modelSpinner.setItems(this, "Model", modelsList);
+        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
+            Toast.makeText(this, "Update models", Toast.LENGTH_SHORT).show();
+            MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+            modelSpinner.setItems(this, "Model", mModelsList);
+        } else {
+            Toast.makeText(this, "DO NOT update models", Toast.LENGTH_SHORT).show();
+            mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
+        }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);
@@ -283,12 +294,9 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
 
-        Log.d(LOG_TAG, "Key: " + filterKey);
-        for (String value : selectedValues) {
-            Log.d(LOG_TAG, "Value: " + value);
+        if (filterKey.equals("Model")) {
+            mSharedPrefs.edit().putBoolean("doNotSetModels", true).apply();
         }
-        Log.d(LOG_TAG, "***");
-
 
         mSharedPrefs.edit()
                 .putStringSet(filterKey, selectedValues)
