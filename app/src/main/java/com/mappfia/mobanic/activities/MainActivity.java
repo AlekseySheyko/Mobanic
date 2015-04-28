@@ -41,6 +41,10 @@ import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListene
 public class MainActivity extends ActionBarActivity
         implements SearchFiltersListener {
 
+    private String LOG_TAG = MainActivity.class.getSimpleName();
+    private boolean FROM_LOCAL_STORAGE = false;
+    private boolean FROM_NETWORK = true;
+
     private CarsAdapter mCarsAdapter;
 
     public static Context mContext;
@@ -92,7 +96,34 @@ public class MainActivity extends ActionBarActivity
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        updateCarsList(false);
+        updateCarsList(FROM_LOCAL_STORAGE);
+
+
+
+        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.add("Up to 1 year old");
+        for (int i = 2; i <= 10; i++) {
+            adapter.add("Up to " + i + " years old");
+        }
+        adapter.add("Over 10 years old");
+        adapter.add("Age");
+
+        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(adapter.getCount());
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                updateCarsList(FROM_LOCAL_STORAGE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
     }
 
     public void updateCarsList(boolean fromNetwork) {
@@ -144,7 +175,7 @@ public class MainActivity extends ActionBarActivity
 
                 if (cars.size() == 0 && filtersNotSet()) {
                     if (isOnline()) {
-                        updateCarsList(true);
+                        updateCarsList(FROM_NETWORK);
                     } else {
                         findViewById(R.id.spinner).setVisibility(View.GONE);
                         Toast.makeText(MainActivity.this,
@@ -166,9 +197,11 @@ public class MainActivity extends ActionBarActivity
                     }
 
                     if (filtersNotSet()) {
-                        updateSearchPanel(cars, true);
-                    } else if (makes != null && makes.size() > 0) {
+                        Toast.makeText(MainActivity.this, "Filters NOT set", Toast.LENGTH_SHORT).show();
                         updateSearchPanel(cars, false);
+                    } else if (makes != null && makes.size() > 0) {
+                        Toast.makeText(MainActivity.this, "Filters set", Toast.LENGTH_SHORT).show();
+                        updateSearchPanel(cars, true);
                     }
                 }
             }
@@ -184,7 +217,7 @@ public class MainActivity extends ActionBarActivity
         });
     }
 
-    private void updateSearchPanel(List<ParseObject> cars, final boolean firstLaunch) {
+    private void updateSearchPanel(List<ParseObject> cars, final boolean filtersSet) {
 
         Set<String> makesList = new HashSet<>();
         Set<String> modelsList = new HashSet<>();
@@ -202,7 +235,7 @@ public class MainActivity extends ActionBarActivity
             fuelTypesList.add(car.getString("fuelType"));
         }
 
-        if (firstLaunch) {
+        if (!filtersSet) {
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             makeSpinner.setItems(this, "Make", makesList);
         }
@@ -222,52 +255,25 @@ public class MainActivity extends ActionBarActivity
         Integer minPrice = Collections.min(priceList) / 1000;
         Integer maxPrice = Collections.max(priceList) / 1000 + 1;
 
-        RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        if (firstLaunch) {
-            rangeSeekBar.setRangeValues(minPrice, maxPrice);
+        RangeSeekBar<Integer> priceSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
+        if (!filtersSet) {
+            priceSeekBar.setRangeValues(minPrice, maxPrice);
         }
         if (minPrice == -1) {
-            rangeSeekBar.setSelectedMinValue(minPrice);
+            priceSeekBar.setSelectedMinValue(minPrice);
         }
         if (maxPrice == -1) {
-            rangeSeekBar.setSelectedMaxValue(maxPrice + 1);
+            priceSeekBar.setSelectedMaxValue(maxPrice + 1);
         }
 
-        rangeSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
+        priceSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice)
                         .apply();
-                updateCarsList(false);
-            }
-        });
-
-        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter.add("Up to 1 year old");
-        for (int i = 2; i <= 10; i++) {
-            adapter.add("Up to " + i + " years old");
-        }
-        adapter.add("Over 10 years old");
-        adapter.add("Age");
-
-        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(adapter.getCount());
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
-                if (firstLaunch) {
-                    updateCarsList(false);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+                updateCarsList(FROM_LOCAL_STORAGE);
             }
         });
     }
