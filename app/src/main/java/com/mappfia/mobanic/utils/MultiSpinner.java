@@ -15,8 +15,6 @@ import java.util.Set;
 public class MultiSpinner extends Spinner
         implements OnMultiChoiceClickListener {
 
-    private String LOG_TAG = MultiSpinner.class.getSimpleName();
-
     private SearchFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
     private Set<String> mChoicesList;
@@ -26,6 +24,8 @@ public class MultiSpinner extends Spinner
     public MultiSpinner(Context context, AttributeSet attrSet) {
         super(context, attrSet);
 
+        mListener = (SearchFiltersListener) context;
+
         mAdapter = new ArrayAdapter<>(
                 getContext(),
                 android.R.layout.simple_spinner_item,
@@ -34,15 +34,20 @@ public class MultiSpinner extends Spinner
         setAdapter(mAdapter);
     }
 
-    public void setItems(SearchFiltersListener listener, String filterKey, Set<String> choicesList) {
-        mListener = listener;
+    public void setItems(String filterKey, Set<String> choicesList) {
         mChoicesList = choicesList;
         mCheckboxes = new boolean[choicesList.size()];
         mSearchKey = filterKey;
 
         mAdapter.clear();
-        mAdapter.add(filterKey);
         mAdapter.addAll(choicesList);
+        mAdapter.add(filterKey);
+    }
+
+    public void refresh() {
+        mAdapter.clear();
+        mAdapter.addAll(mChoicesList);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

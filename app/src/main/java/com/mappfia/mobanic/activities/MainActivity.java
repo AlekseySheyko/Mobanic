@@ -115,7 +115,7 @@ public class MainActivity extends ActionBarActivity
         spinner.setSelection(adapter.getCount());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> spinner, View view, int position, long id) {
                 mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
                 updateCarsList(FROM_LOCAL_STORAGE);
             }
@@ -172,6 +172,8 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
                 mCarsAdapter.clear();
+                if (e != null) return;
+
 
                 if (cars.size() == 0 && filtersNotSet()) {
                     if (isOnline()) {
@@ -190,19 +192,18 @@ public class MainActivity extends ActionBarActivity
                     return;
                 }
 
-                if (e == null) {
-                    for (ParseObject car : cars) {
-                        mCarsAdapter.add(car);
-                        car.pinInBackground();
-                    }
+                for (ParseObject car : cars) {
+                    mCarsAdapter.add(car);
+                    car.pinInBackground();
+                }
 
-                    if (filtersNotSet()) {
-                        Toast.makeText(MainActivity.this, "Filters NOT set", Toast.LENGTH_SHORT).show();
-                        updateSearchPanel(cars, false);
-                    } else if (makes != null && makes.size() > 0) {
-                        Toast.makeText(MainActivity.this, "Filters set", Toast.LENGTH_SHORT).show();
-                        updateSearchPanel(cars, true);
-                    }
+                if (filtersNotSet()) {
+                    updateSearchPanel(cars, false);
+                } else if (models != null && models.size() > 0) {
+                    mSharedPrefs.edit().putBoolean("doNotSetModels", true).apply();
+                    updateSearchPanel(cars, true);
+                } else if (makes != null && makes.size() > 0) {
+                    updateSearchPanel(cars, true);
                 }
             }
 
@@ -237,20 +238,34 @@ public class MainActivity extends ActionBarActivity
 
         if (!filtersSet) {
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-            makeSpinner.setItems(this, "Make", makesList);
+            makeSpinner.setItems("Make", makesList);
+            makeSpinner.setSelection(makesList.size() + 1);
         }
 
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        modelSpinner.setItems(this, "Model", modelsList);
+        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
+            modelSpinner.setItems("Model", modelsList);
+            if (!filtersSet) {
+                modelSpinner.setSelection(makesList.size() + 1);
+            }
+            if (filtersSet) {
+                modelSpinner.refresh();
+            }
+        } else {
+            mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
+        }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-        colorSpinner.setItems(this, "Color", colorList);
+        colorSpinner.setItems("Color", colorList);
+        colorSpinner.setSelection(makesList.size() + 1);
 
         MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-        transSpinner.setItems(this, "Transmission", transTypesList);
+        transSpinner.setItems("Transmission", transTypesList);
+        transSpinner.setSelection(makesList.size() + 1);
 
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
-        fuelTypeSpinner.setItems(this, "Fuel Type", fuelTypesList);
+        fuelTypeSpinner.setItems("Fuel Type", fuelTypesList);
+        fuelTypeSpinner.setSelection(makesList.size() + 1);
 
         Integer minPrice = Collections.min(priceList) / 1000;
         Integer maxPrice = Collections.max(priceList) / 1000 + 1;
