@@ -148,7 +148,9 @@ public class MainActivity extends ActionBarActivity
             query.whereContainedIn("make", makes);
         }
         if (models != null && models.size() > 0) {
-            query.whereContainedIn("model", models);
+            if (!mSharedPrefs.getBoolean("forceUpdate", false)) {
+                query.whereContainedIn("model", models);
+            }
         }
         if (colors != null && colors.size() > 0) {
             query.whereContainedIn("color", colors);
@@ -246,13 +248,19 @@ public class MainActivity extends ActionBarActivity
         if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
             modelSpinner.setItems("Model", modelsList);
             if (!filtersSet) {
-                modelSpinner.setSelection(makesList.size() + 1);
+                modelSpinner.setSelection(modelsList.size() + 1);
             }
             if (filtersSet) {
                 modelSpinner.refresh();
             }
         } else {
             mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
+        }
+
+        if (mSharedPrefs.getBoolean("forceUpdate", false)) {
+            Toast.makeText(this, "Force update", Toast.LENGTH_SHORT).show();
+            modelSpinner.setItems("Model", modelsList);
+            mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
         }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
@@ -299,6 +307,9 @@ public class MainActivity extends ActionBarActivity
         if (filterKey.equals("Model")) {
             mSharedPrefs.edit().putBoolean("doNotSetModels", true).apply();
         }
+        if (filterKey.equals("Make")) {
+            mSharedPrefs.edit().putBoolean("forceUpdate", true).apply();
+        }
 
         mSharedPrefs.edit()
                 .putStringSet(filterKey, selectedValues)
@@ -318,6 +329,8 @@ public class MainActivity extends ActionBarActivity
                 .putInt("minPrice", -1)
                 .putInt("maxPrice", -1)
                 .putInt("maxAge", -1)
+                .putBoolean("doNotSetModels", false)
+                .putBoolean("forceUpdate", false)
                 .apply();
     }
 
