@@ -252,13 +252,13 @@ public class MainActivity extends ActionBarActivity
             }
             if (filtersSet) {
                 modelSpinner.refresh();
+                modelSpinner.setSelection(modelsList.size() + 1);
             }
         } else {
             mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
         }
 
         if (mSharedPrefs.getBoolean("forceUpdate", false)) {
-            Toast.makeText(this, "Force update", Toast.LENGTH_SHORT).show();
             modelSpinner.setItems("Model", modelsList);
             mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
         }
