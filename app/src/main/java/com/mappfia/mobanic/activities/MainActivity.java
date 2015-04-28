@@ -99,7 +99,6 @@ public class MainActivity extends ActionBarActivity
         updateCarsList(FROM_LOCAL_STORAGE);
 
 
-
         ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
