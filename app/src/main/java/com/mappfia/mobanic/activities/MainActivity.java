@@ -41,13 +41,10 @@ import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListene
 public class MainActivity extends ActionBarActivity
         implements SearchFiltersListener {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private CarsAdapter mCarsAdapter;
 
-    private SharedPreferences mSharedPrefs;
     public static Context mContext;
-    private int mMaxAge;
-    private Set<String> mModelsList;
+    private SharedPreferences mSharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,19 +95,19 @@ public class MainActivity extends ActionBarActivity
         updateCarsList(false);
     }
 
-    private boolean mFiltersNotSet;
-
     public void updateCarsList(boolean fromNetwork) {
 
         final Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         final Set<String> models = mSharedPrefs.getStringSet("Model", null);
         final Set<String> colors = mSharedPrefs.getStringSet("Color", null);
-        final Set<String> transmissions = mSharedPrefs.getStringSet("Transmission", null);
+        final Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
         final Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
         final int minPrice = mSharedPrefs.getInt("minPrice", -1);
         final int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
+        final int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+        query.orderByDescending("createdAt");
         if (!fromNetwork && !mSharedPrefs.getBoolean("update", false)) {
             query.fromLocalDatastore();
         } else {
@@ -125,8 +122,8 @@ public class MainActivity extends ActionBarActivity
         if (colors != null && colors.size() > 0) {
             query.whereContainedIn("color", colors);
         }
-        if (transmissions != null && transmissions.size() > 0) {
-            query.whereContainedIn("transmission", transmissions);
+        if (transTypes != null && transTypes.size() > 0) {
+            query.whereContainedIn("transmission", transTypes);
         }
         if (fuelTypes != null && fuelTypes.size() > 0) {
             query.whereContainedIn("fuelType", fuelTypes);
@@ -137,15 +134,12 @@ public class MainActivity extends ActionBarActivity
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
-        if (mMaxAge != 0) {
-            query.whereGreaterThanOrEqualTo("year", (2015 - mMaxAge));
+        if (maxAge != -1) {
+            query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
-        query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> cars, ParseException e) {
-                mFiltersNotSet = filtersNotSet();
-
                 mCarsAdapter.clear();
 
                 if (cars.size() == 0 && filtersNotSet()) {
@@ -172,9 +166,9 @@ public class MainActivity extends ActionBarActivity
                     }
 
                     if (filtersNotSet()) {
-                        populateSearchPanel(cars, false);
+                        updateSearchPanel(cars, true);
                     } else if (makes != null && makes.size() > 0) {
-                        populateSearchPanel(cars, true);
+                        updateSearchPanel(cars, false);
                     }
                 }
             }
@@ -183,66 +177,53 @@ public class MainActivity extends ActionBarActivity
                 return ((makes == null || makes.size() == 0) &&
                         (models == null || models.size() == 0) &&
                         (colors == null || colors.size() == 0) &&
-                        (transmissions == null || transmissions.size() == 0) &&
+                        (transTypes == null || transTypes.size() == 0) &&
                         (fuelTypes == null || fuelTypes.size() == 0) &&
-                        mMaxAge == 0 &&
-                        (minPrice == -1 || maxPrice == -1));
+                        (minPrice == -1 || maxPrice == -1) && maxAge == -1);
             }
         });
     }
 
-    private void populateSearchPanel(List<ParseObject> cars, final boolean b) {
+    private void updateSearchPanel(List<ParseObject> cars, final boolean firstLaunch) {
 
         Set<String> makesList = new HashSet<>();
-        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
-            mModelsList = new HashSet<>();
-        }
+        Set<String> modelsList = new HashSet<>();
         Set<Integer> priceList = new HashSet<>();
         Set<String> colorList = new HashSet<>();
-        Set<String> transmissionsList = new HashSet<>();
+        Set<String> transTypesList = new HashSet<>();
         Set<String> fuelTypesList = new HashSet<>();
 
         for (ParseObject car : cars) {
             makesList.add(car.getString("make"));
-            if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
-                mModelsList.add(car.getString("model"));
-            }
+            modelsList.add(car.getString("model"));
             priceList.add(car.getInt("price"));
             colorList.add(car.getString("color"));
-            transmissionsList.add(car.getString("transmission"));
+            transTypesList.add(car.getString("transmission"));
             fuelTypesList.add(car.getString("fuelType"));
         }
 
-        if (!b) {
+        if (firstLaunch) {
             MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
             makeSpinner.setItems(this, "Make", makesList);
         }
 
-        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
-            Toast.makeText(this, "Update models", Toast.LENGTH_SHORT).show();
-            MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-            modelSpinner.setItems(this, "Model", mModelsList);
-        } else {
-            Toast.makeText(this, "DO NOT update models", Toast.LENGTH_SHORT).show();
-            mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
-        }
+        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+        modelSpinner.setItems(this, "Model", modelsList);
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(this, "Color", colorList);
 
         MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-        transSpinner.setItems(this, "Transmission", transmissionsList);
+        transSpinner.setItems(this, "Transmission", transTypesList);
 
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
         fuelTypeSpinner.setItems(this, "Fuel Type", fuelTypesList);
 
-        Integer minPrice = Collections.min(priceList);
-        minPrice = minPrice / 1000;
-        Integer maxPrice = Collections.max(priceList);
-        maxPrice = maxPrice / 1000 + 1;
+        Integer minPrice = Collections.min(priceList) / 1000;
+        Integer maxPrice = Collections.max(priceList) / 1000 + 1;
 
         RangeSeekBar<Integer> rangeSeekBar = (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        if (mFiltersNotSet) {
+        if (firstLaunch) {
             rangeSeekBar.setRangeValues(minPrice, maxPrice);
         }
         if (minPrice == -1) {
@@ -279,8 +260,8 @@ public class MainActivity extends ActionBarActivity
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                mMaxAge = position + 1;
-                if (!b) {
+                mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                if (firstLaunch) {
                     updateCarsList(false);
                 }
             }
@@ -315,6 +296,7 @@ public class MainActivity extends ActionBarActivity
                 .putStringSet("Fuel Type", null)
                 .putInt("minPrice", -1)
                 .putInt("maxPrice", -1)
+                .putInt("maxAge", -1)
                 .apply();
     }
 
