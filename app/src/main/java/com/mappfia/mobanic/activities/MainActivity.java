@@ -259,6 +259,7 @@ public class MainActivity extends ActionBarActivity
 
         if (mSharedPrefs.getBoolean("forceUpdate", false)) {
             modelSpinner.setItems("Model", modelsList);
+            modelSpinner.refresh();
             modelSpinner.setSelection(modelsList.size() + 1);
             mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
         }
