@@ -7,7 +7,6 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,11 +42,6 @@ public class MultiSpinner extends Spinner
         mAdapter.clear();
         mAdapter.addAll(choicesList);
         mAdapter.add(filterKey);
-
-        if (mSearchKey.equals("Model")) {
-            Toast.makeText(getContext(), "Count: " +
-                    mAdapter.getCount(), Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void refresh() {
