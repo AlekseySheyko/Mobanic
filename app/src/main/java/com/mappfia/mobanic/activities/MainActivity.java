@@ -31,9 +31,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static com.mappfia.mobanic.utils.MultiSpinner.SearchFiltersListener;
 import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -221,12 +221,12 @@ public class MainActivity extends ActionBarActivity
 
     private void updateSearchPanel(List<ParseObject> cars, final boolean filtersSet) {
 
-        Set<String> makesList = new HashSet<>();
-        Set<String> modelsList = new HashSet<>();
-        Set<Integer> priceList = new HashSet<>();
-        Set<String> colorList = new HashSet<>();
-        Set<String> transTypesList = new HashSet<>();
-        Set<String> fuelTypesList = new HashSet<>();
+        Set<String> makesList = new TreeSet<>();
+        Set<String> modelsList = new TreeSet<>();
+        Set<Integer> priceList = new TreeSet<>();
+        Set<String> colorList = new TreeSet<>();
+        Set<String> transTypesList = new TreeSet<>();
+        Set<String> fuelTypesList = new TreeSet<>();
 
         for (ParseObject car : cars) {
             makesList.add(car.getString("make"));
