@@ -1,6 +1,6 @@
 <android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -32,66 +32,82 @@
             android:id="@+id/search_empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal"
             android:layout_marginTop="128dp"
-            android:text="No cars found"
-            android:textSize="24sp"
             android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:text="No cars found"
             android:textColor="#36ffffff"
+            android:textSize="24sp"
             android:visibility="gone"/>
 
     </LinearLayout>
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="230dp"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:layout_gravity="start"
-        android:scrollbars="none"
-        android:background="@color/nav_drawer_bg">
+        android:orientation="vertical"
+        android:layout_gravity="start">
 
-        <LinearLayout
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="64dp"
-            android:paddingBottom="64dp"
-            android:showDividers="middle"
-            android:divider="@drawable/separator">
+            android:layout_height="56dp"
+            android:background="#090909"
+            android:paddingLeft="40dp"
+            android:paddingRight="46dp"
+            android:src="@drawable/ic_logo"/>
 
-            <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/make_spinner"
-                style="@style/DrawerListItem"/>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/nav_drawer_bg"
+            android:fillViewport="true"
+            android:scrollbars="none">
 
-            <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/model_spinner"
-                style="@style/DrawerListItem"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/separator"
+                android:orientation="vertical"
+                android:paddingBottom="64dp"
+                android:paddingTop="16dp"
+                android:showDividers="middle">
 
-            <com.mappfia.mobanic.utils.RangeSeekBar
-                android:id="@+id/price_selector"
-                style="@style/DrawerListItem"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"/>
+                <com.mappfia.mobanic.utils.MultiSpinner
+                    android:id="@+id/make_spinner"
+                    style="@style/DrawerListItem"/>
 
-            <Spinner
-                android:id="@+id/age_spinner"
-                style="@style/DrawerListItem"
-                android:spinnerMode="dialog"/>
+                <com.mappfia.mobanic.utils.MultiSpinner
+                    android:id="@+id/model_spinner"
+                    style="@style/DrawerListItem"/>
 
-            <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/color_spinner"
-                style="@style/DrawerListItem"/>
+                <com.mappfia.mobanic.utils.RangeSeekBar
+                    android:id="@+id/price_selector"
+                    style="@style/DrawerListItem"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"/>
 
-            <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/fuel_type_spinner"
-                style="@style/DrawerListItem"/>
+                <Spinner
+                    android:id="@+id/age_spinner"
+                    style="@style/DrawerListItem"
+                    android:spinnerMode="dialog"/>
 
-            <com.mappfia.mobanic.utils.MultiSpinner
-                android:id="@+id/trans_spinner"
-                style="@style/DrawerListItem"/>
+                <com.mappfia.mobanic.utils.MultiSpinner
+                    android:id="@+id/color_spinner"
+                    style="@style/DrawerListItem"/>
 
-        </LinearLayout>
+                <com.mappfia.mobanic.utils.MultiSpinner
+                    android:id="@+id/fuel_type_spinner"
+                    style="@style/DrawerListItem"/>
 
-    </ScrollView>
+                <com.mappfia.mobanic.utils.MultiSpinner
+                    android:id="@+id/trans_spinner"
+                    style="@style/DrawerListItem"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
