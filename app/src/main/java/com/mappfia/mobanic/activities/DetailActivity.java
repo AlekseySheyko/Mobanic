@@ -105,7 +105,9 @@ public class DetailActivity extends ActionBarActivity {
                 fillOutFeatures();
 
                 String url = mCar.getParseFile("coverImage").getUrl();
-                new SetShareIntentTask().execute(title, url);
+                if (url != null) {
+                    new SetShareIntentTask().execute(title, url);
+                }
             }
         });
     }
@@ -132,6 +134,8 @@ public class DetailActivity extends ActionBarActivity {
             }
 
             String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap,"title", null);
+            if (imagePath == null) return null;
+
             Uri imageUri = Uri.parse(imagePath);
 
             mShareIntent = new Intent();
@@ -150,7 +154,9 @@ public class DetailActivity extends ActionBarActivity {
         protected void onPostExecute(Intent intent) {
             super.onPostExecute(intent);
 
-            invalidateOptionsMenu();
+            if (intent != null) {
+                invalidateOptionsMenu();
+            }
         }
     }
 
@@ -271,6 +277,17 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+                query.fromLocalDatastore();
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> cars, ParseException e) {
+                        for (ParseObject car : cars) {
+                            car.unpinInBackground();
+                        }
+                    }
+                });
+
                 ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
             } catch (Exception e) {
                 Log.d("DetailActivity", "Can't get activity context to update content. " +

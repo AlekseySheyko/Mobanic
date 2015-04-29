@@ -7,6 +7,7 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -87,18 +88,22 @@ public class MultiSpinner extends Spinner
 
     @Override
     public boolean performClick() {
-        CharSequence[] choices = mChoicesList.toArray(
-                new CharSequence[mChoicesList.size()]);
+        if (mChoicesList.size() > 0) {
+            CharSequence[] choices = mChoicesList.toArray(
+                    new CharSequence[mChoicesList.size()]);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMultiChoiceItems(choices, mCheckboxes, this);
-        builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                updateSelectedItems();
-            }
-        });
-        builder.show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMultiChoiceItems(choices, mCheckboxes, this);
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    updateSelectedItems();
+                }
+            });
+            builder.show();
+        } else {
+            Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 

@@ -31,6 +31,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,7 +42,6 @@ import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListene
 public class MainActivity extends ActionBarActivity
         implements SearchFiltersListener {
 
-    private String LOG_TAG = MainActivity.class.getSimpleName();
     private boolean FROM_LOCAL_STORAGE = false;
     private boolean FROM_NETWORK = true;
 
@@ -187,7 +187,23 @@ public class MainActivity extends ActionBarActivity
                     }
                     return;
                 } else if (cars.size() == 0 && !filtersNotSet()) {
-                    Toast.makeText(MainActivity.this, "No items match your search", Toast.LENGTH_SHORT).show();
+                    MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+                    makeSpinner.setItems("Make", new HashSet<String>());
+
+                    MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+                    modelSpinner.setItems("Model", new HashSet<String>());
+
+                    MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+                    colorSpinner.setItems("Color", new HashSet<String>());
+
+                    MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+                    transSpinner.setItems("Transmission", new HashSet<String>());
+
+                    MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
+                    fuelTypeSpinner.setItems("Fuel Type", new HashSet<String>());
+
+
+                    Toast.makeText(MainActivity.this, "No cars found", Toast.LENGTH_SHORT).show();
                     findViewById(R.id.spinner).setVisibility(View.GONE);
                     findViewById(R.id.search_empty).setVisibility(View.VISIBLE);
                     return;
@@ -229,12 +245,24 @@ public class MainActivity extends ActionBarActivity
         Set<String> fuelTypesList = new TreeSet<>();
 
         for (ParseObject car : cars) {
-            makesList.add(car.getString("make"));
-            modelsList.add(car.getString("model"));
-            priceList.add(car.getInt("price"));
-            colorList.add(car.getString("color"));
-            transTypesList.add(car.getString("transmission"));
-            fuelTypesList.add(car.getString("fuelType"));
+            if (car.getString("make") != null) {
+                makesList.add(car.getString("make"));
+            }
+            if (car.getString("model") != null) {
+                modelsList.add(car.getString("model"));
+            }
+            if (car.getInt("price") != 0) {
+                priceList.add(car.getInt("price"));
+            }
+            if (car.getString("color") != null) {
+                colorList.add(car.getString("color"));
+            }
+            if (car.getString("transmission") != null) {
+                transTypesList.add(car.getString("transmission"));
+            }
+            if (car.getString("fuelType") != null) {
+                fuelTypesList.add(car.getString("fuelType"));
+            }
         }
 
         if (!filtersSet) {
@@ -350,6 +378,18 @@ public class MainActivity extends ActionBarActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+                query.orderByDescending("createdAt");
+                query.fromLocalDatastore();
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> cars, ParseException e) {
+                        for (ParseObject car : cars) {
+                            car.unpinInBackground();
+                        }
+                    }
+                });
+
                 ((MainActivity) MainActivity.getContext()).updateCarsList(true);
             } catch (Exception e) {
                 SharedPreferences sharedPrefs =
