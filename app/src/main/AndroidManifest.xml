@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.mappfia.mobanic">
+          package="com.mobanic">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,8 +12,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <permission android:protectionLevel="signature"
-                android:name="com.mappfia.mobanic.permission.C2D_MESSAGE" />
-    <uses-permission android:name="com.mappfia.mobanic.permission.C2D_MESSAGE" />
+                android:name="com.mobanic.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.mobanic.permission.C2D_MESSAGE" />
 
     <application
         android:name=".MobanicApplication"
@@ -66,7 +66,7 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.mappfia.mobanic.utils.PushReceiver"
+        <receiver android:name="com.mobanic.utils.PushReceiver"
                   android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -74,7 +74,7 @@
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.mappfia.mobanic.activities.MainActivity$PushReceiver"
+        <receiver android:name="com.mobanic.activities.MainActivity$PushReceiver"
                   android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -82,7 +82,7 @@
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.mappfia.mobanic.activities.DetailActivity$PushReceiver"
+        <receiver android:name="com.mobanic.activities.DetailActivity$PushReceiver"
                   android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -96,7 +96,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <category android:name="com.mappfia.mobanic" />
+                <category android:name="com.mobanic" />
             </intent-filter>
         </receiver>
     </application>

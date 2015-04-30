@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.activities;
+package com.mobanic.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,11 +21,11 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.mappfia.mobanic.R;
-import com.mappfia.mobanic.utils.CarsAdapter;
-import com.mappfia.mobanic.utils.MultiSpinner;
-import com.mappfia.mobanic.utils.RangeSeekBar;
-import com.mappfia.mobanic.utils.SpinnerAdapter;
+import com.mobanic.R;
+import com.mobanic.utils.CarsAdapter;
+import com.mobanic.utils.MultiSpinner;
+import com.mobanic.utils.RangeSeekBar;
+import com.mobanic.utils.SpinnerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.mappfia.mobanic.utils.MultiSpinner.SearchFiltersListener;
-import static com.mappfia.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListener;
+import static com.mobanic.utils.MultiSpinner.SearchFiltersListener;
+import static com.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListener;
 
 public class MainActivity extends ActionBarActivity
         implements SearchFiltersListener {

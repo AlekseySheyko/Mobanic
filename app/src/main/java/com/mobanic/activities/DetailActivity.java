@@ -1,12 +1,11 @@
-package com.mappfia.mobanic.activities;
+package com.mobanic.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
@@ -22,8 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mappfia.mobanic.R;
-import com.mappfia.mobanic.utils.RatioImageView;
+import com.mobanic.R;
+import com.mobanic.utils.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -31,11 +30,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 
 public class DetailActivity extends ActionBarActivity {
@@ -47,6 +44,7 @@ public class DetailActivity extends ActionBarActivity {
 
     private ShareActionProvider mShareActionProvider;
     private Intent mShareIntent;
+    private RatioImageView mImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,62 +102,35 @@ public class DetailActivity extends ActionBarActivity {
                 fillOutSpecs();
                 fillOutFeatures();
 
-                String url = mCar.getParseFile("coverImage").getUrl();
-                new SetShareIntentTask().execute(title, url);
+                composeShareIntent(title);
             }
         });
     }
 
-    private class SetShareIntentTask extends AsyncTask<String, Void, Intent> {
+    private void composeShareIntent(String title) {
 
-        @Override
-        protected Intent doInBackground(String... strings) {
+        Bitmap bitmap = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
+        String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
 
-            String title = strings[0];
-            String urlStr = strings[1];
+        Uri imageUri = Uri.parse(imagePath);
 
-            Bitmap bitmap = null;
-            try {
-                URL url = new URL(urlStr);
-                HttpURLConnection connection = (HttpURLConnection) url
-                        .openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                bitmap = BitmapFactory.decodeStream(input);
-            } catch (IOException e) {
-                Log.e("DetailActivity", "Failed to attach image to share intent");
-            }
+        mShareIntent = new Intent();
+        mShareIntent.setAction(Intent.ACTION_SEND);
+        mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
+        mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - mobanic.com");
+        mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - mobanic.com");
+        mShareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        mShareIntent.setType("text/plain");
+        mShareIntent.setType("image/*");
 
-            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
-
-            Uri imageUri = Uri.parse(imagePath);
-
-            mShareIntent = new Intent();
-            mShareIntent.setAction(Intent.ACTION_SEND);
-            mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
-            mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - mobanic.com");
-            mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - mobanic.com");
-            mShareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-            mShareIntent.setType("text/plain");
-            mShareIntent.setType("image/*");
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Intent intent) {
-            super.onPostExecute(intent);
-
-            invalidateOptionsMenu();
-        }
+        invalidateOptionsMenu();
     }
 
     private void setCoverImage() {
         String url = mCar.getParseFile("coverImage").getUrl();
 
-        RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
-        Picasso.with(this).load(url).fit().centerCrop().into(imageView);
+        mImageView = (RatioImageView) findViewById(R.id.image);
+        Picasso.with(this).load(url).fit().centerCrop().into(mImageView);
     }
 
     private void setGalleryImages() {
@@ -209,7 +180,8 @@ public class DetailActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        String mileage = NumberFormat.getNumberInstance(Locale.US).format(mCar.getInt("mileage"));
+        ((TextView) findViewById(R.id.mileage)).setText(mileage);
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));

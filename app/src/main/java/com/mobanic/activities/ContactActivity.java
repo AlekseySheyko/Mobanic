@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.activities;
+package com.mobanic.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mappfia.mobanic.R;
-import com.mappfia.mobanic.utils.Mail;
+import com.mobanic.R;
+import com.mobanic.utils.Mail;
 
 
 public class ContactActivity extends ActionBarActivity {

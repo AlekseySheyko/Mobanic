@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.utils;
+package com.mobanic.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
-import com.mappfia.mobanic.R;
+import com.mobanic.R;
 
 import java.math.BigDecimal;
 

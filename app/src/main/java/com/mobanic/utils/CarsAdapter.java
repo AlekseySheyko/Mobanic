@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.utils;
+package com.mobanic.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,13 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.mappfia.mobanic.R;
+import com.mobanic.R;
 import com.parse.ParseObject;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
@@ -53,6 +55,6 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
         symbols.setGroupingSeparator(' ');
         DecimalFormat format = new DecimalFormat("#,###", symbols);
 
-        return "\u00A3" + format.format(price);
+        return "\u00A3" + NumberFormat.getNumberInstance(Locale.US).format(price);
     }
 }

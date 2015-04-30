@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.utils;
+package com.mobanic.utils;
 
 import android.content.Context;
 import android.view.View;

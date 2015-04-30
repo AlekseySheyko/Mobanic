@@ -73,15 +73,15 @@
                 android:paddingTop="16dp"
                 android:showDividers="middle">
 
-                <com.mappfia.mobanic.utils.MultiSpinner
+                <com.mobanic.utils.MultiSpinner
                     android:id="@+id/make_spinner"
                     style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.utils.MultiSpinner
+                <com.mobanic.utils.MultiSpinner
                     android:id="@+id/model_spinner"
                     style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.utils.RangeSeekBar
+                <com.mobanic.utils.RangeSeekBar
                     android:id="@+id/price_selector"
                     style="@style/DrawerListItem"
                     android:layout_marginLeft="16dp"
@@ -92,15 +92,15 @@
                     style="@style/DrawerListItem"
                     android:spinnerMode="dialog"/>
 
-                <com.mappfia.mobanic.utils.MultiSpinner
+                <com.mobanic.utils.MultiSpinner
                     android:id="@+id/color_spinner"
                     style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.utils.MultiSpinner
+                <com.mobanic.utils.MultiSpinner
                     android:id="@+id/fuel_type_spinner"
                     style="@style/DrawerListItem"/>
 
-                <com.mappfia.mobanic.utils.MultiSpinner
+                <com.mobanic.utils.MultiSpinner
                     android:id="@+id/trans_spinner"
                     style="@style/DrawerListItem"/>
 

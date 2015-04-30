@@ -1,4 +1,4 @@
-package com.mappfia.mobanic.utils;
+package com.mobanic.utils;
 
 import java.util.Date;
 import java.util.Properties;

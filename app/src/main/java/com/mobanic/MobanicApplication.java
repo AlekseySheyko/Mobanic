@@ -1,4 +1,4 @@
-package com.mappfia.mobanic;
+package com.mobanic;
 
 import android.app.Application;
 
