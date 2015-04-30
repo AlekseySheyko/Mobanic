@@ -117,7 +117,9 @@ public class MainActivity extends ActionBarActivity
         mAgeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> spinner, View view, int position, long id) {
-                mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                if ((position + 1) != 11) {
+                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                }
                 updateCarsList(FROM_LOCAL_STORAGE);
             }
 
@@ -177,18 +179,7 @@ public class MainActivity extends ActionBarActivity
                 mCarsAdapter.clear();
                 if (e != null) return;
 
-
                 if (cars.size() == 0 && filtersNotSet()) {
-                    if (isOnline()) {
-                        updateCarsList(FROM_NETWORK);
-                    } else {
-                        findViewById(R.id.spinner).setVisibility(View.GONE);
-                        Toast.makeText(MainActivity.this,
-                                "Connect to a network to load cars list",
-                                Toast.LENGTH_LONG).show();
-                    }
-                    return;
-                } else if (cars.size() == 0 && !filtersNotSet()) {
                     MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
                     makeSpinner.setItems("Make", new HashSet<String>());
 
@@ -212,6 +203,18 @@ public class MainActivity extends ActionBarActivity
                         }
                     });
 
+                    Toast.makeText(MainActivity.this, "No cars found", Toast.LENGTH_SHORT).show();
+
+                    if (isOnline()) {
+                        updateCarsList(FROM_NETWORK);
+                    } else {
+                        findViewById(R.id.spinner).setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this,
+                                "Connect to a network to load cars list",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    return;
+                } else if (cars.size() == 0 && !filtersNotSet()) {
 
                     Toast.makeText(MainActivity.this, "No cars found", Toast.LENGTH_SHORT).show();
                     findViewById(R.id.spinner).setVisibility(View.GONE);
@@ -385,8 +388,11 @@ public class MainActivity extends ActionBarActivity
     }
 
     public static class PushReceiver extends BroadcastReceiver {
+        private final String LOG_TAG = MainActivity.class.getSimpleName();
+
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(LOG_TAG, "Receive update");
             try {
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
                 query.orderByDescending("createdAt");

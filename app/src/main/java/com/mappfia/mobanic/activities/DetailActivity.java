@@ -97,7 +97,7 @@ public class DetailActivity extends ActionBarActivity {
                 if (title.length() > 20) {
                     title = model;
                 }
-                getSupportActionBar().setTitle(title);
+                getSupportActionBar().setTitle(make);
 
                 setCoverImage();
                 setGalleryImages();
@@ -105,9 +105,7 @@ public class DetailActivity extends ActionBarActivity {
                 fillOutFeatures();
 
                 String url = mCar.getParseFile("coverImage").getUrl();
-                if (url != null) {
-                    new SetShareIntentTask().execute(title, url);
-                }
+                new SetShareIntentTask().execute(title, url);
             }
         });
     }
@@ -133,8 +131,7 @@ public class DetailActivity extends ActionBarActivity {
                 Log.e("DetailActivity", "Failed to attach image to share intent");
             }
 
-            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap,"title", null);
-            if (imagePath == null) return null;
+            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
 
             Uri imageUri = Uri.parse(imagePath);
 
@@ -154,9 +151,7 @@ public class DetailActivity extends ActionBarActivity {
         protected void onPostExecute(Intent intent) {
             super.onPostExecute(intent);
 
-            if (intent != null) {
-                invalidateOptionsMenu();
-            }
+            invalidateOptionsMenu();
         }
     }
 
