@@ -3,13 +3,12 @@ package com.mobanic.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
@@ -20,6 +19,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.mobanic.R;
@@ -31,15 +31,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 
 
 public class DetailActivity extends ActionBarActivity {
@@ -49,16 +45,14 @@ public class DetailActivity extends ActionBarActivity {
 
     public static Context mContext;
 
+    private ShareActionProvider mShareActionProvider;
     private Intent mShareIntent;
-    private SharedPreferences mSharedPrefs;
+    private Uri mImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPrefs.edit().putBoolean("imageReady", false).apply();
 
         mContext = this;
 
@@ -88,7 +82,12 @@ public class DetailActivity extends ActionBarActivity {
         query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
-                if (car == null) return;
+                if (car == null) {
+                    Toast.makeText(DetailActivity.this,
+                            "This car no longer exists", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(DetailActivity.this, MainActivity.class));
+                    return;
+                }
 
                 mCar = car;
 
@@ -107,7 +106,7 @@ public class DetailActivity extends ActionBarActivity {
                 fillOutFeatures();
 
                 String url = mCar.getParseFile("coverImage").getUrl();
-                if (title != null & url != null) {
+                if (url != null) {
                     new SetShareIntentTask().execute(title, url);
                 }
             }
@@ -120,56 +119,31 @@ public class DetailActivity extends ActionBarActivity {
         protected Intent doInBackground(String... strings) {
 
             String title = strings[0];
-            String strUrl = strings[1];
+            String urlStr = strings[1];
 
+            Bitmap bitmap = null;
             try {
-                SharedPreferences sharedPrefs =
-                        PreferenceManager.getDefaultSharedPreferences(DetailActivity.this);
-                int imageNum = sharedPrefs.getInt("imageNum", 0);
-
-                if (imageNum > 0) {
-                    File dir = getFilesDir();
-                    File file = new File(dir, "car" + imageNum + ".png");
-                    file.delete();
-                }
-
-                URL url = new URL(strUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setDoInput(true);
-                conn.connect();
-                InputStream is = conn.getInputStream();
-                Bitmap bm = BitmapFactory.decodeStream(is);
-                FileOutputStream fos = DetailActivity.this.openFileOutput("car" + (imageNum + 1) + ".png", Context.MODE_WORLD_READABLE);
-                sharedPrefs.edit().putInt("imageNum", imageNum+1).apply();
-
-                ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-
-                bm.compress(Bitmap.CompressFormat.PNG, 100, outstream);
-                byte[] byteArray = outstream.toByteArray();
-
-                fos.write(byteArray);
-                fos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+                URL url = new URL(urlStr);
+                HttpURLConnection connection = (HttpURLConnection) url
+                        .openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                bitmap = BitmapFactory.decodeStream(input);
+            } catch (IOException e) {
+                Log.e("DetailActivity", "Failed to attach image to share intent");
             }
 
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
+
+            mImageUri = Uri.parse(imagePath);
 
             mShareIntent = new Intent();
             mShareIntent.setAction(Intent.ACTION_SEND);
             mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
             mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - mobanic.com");
             mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - mobanic.com");
-
-            SharedPreferences sharedPrefs =
-                    PreferenceManager.getDefaultSharedPreferences(DetailActivity.this);
-            int imageNum = sharedPrefs.getInt("imageNum", 0);
-            mShareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(getFilesDir(), "car" + imageNum + ".png")));
-
+            mShareIntent.putExtra(Intent.EXTRA_STREAM, mImageUri);
             mShareIntent.setType("text/plain");
             mShareIntent.setType("image/*");
 
@@ -180,8 +154,15 @@ public class DetailActivity extends ActionBarActivity {
         protected void onPostExecute(Intent intent) {
             super.onPostExecute(intent);
 
-            mSharedPrefs.edit().putBoolean("imageReady", true);
             invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mImageUri != null) {
+            getContentResolver().delete(mImageUri, null, null);
         }
     }
 
@@ -239,8 +220,7 @@ public class DetailActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        String mileage = NumberFormat.getNumberInstance(Locale.US).format(mCar.getInt("mileage"));
-        ((TextView) findViewById(R.id.mileage)).setText(mileage);
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
@@ -273,14 +253,23 @@ public class DetailActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
 
         MenuItem item = menu.findItem(R.id.menu_item_share);
-        ShareActionProvider shareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
 
-            if (shareActionProvider != null & mShareIntent != null) {
-                shareActionProvider.setShareIntent(mShareIntent);
-            }
+        if (mShareActionProvider != null & mShareIntent != null) {
+            mShareActionProvider.setShareIntent(mShareIntent);
+        }
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return(true);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
