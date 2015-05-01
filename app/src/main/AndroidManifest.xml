@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <permission android:protectionLevel="signature"
                 android:name="com.mobanic.permission.C2D_MESSAGE" />
@@ -41,7 +40,6 @@
         <activity
             android:name=".activities.DetailActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

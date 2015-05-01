@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -195,16 +194,6 @@ public class MainActivity extends ActionBarActivity
                     MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
                     fuelTypeSpinner.setItems("Fuel Type", new HashSet<String>());
 
-                    mAgeSpinner.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent motionEvent) {
-                            Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
-                            return true;
-                        }
-                    });
-
-                    Toast.makeText(MainActivity.this, "No cars found", Toast.LENGTH_SHORT).show();
-
                     if (isOnline()) {
                         updateCarsList(FROM_NETWORK);
                     } else {
@@ -216,7 +205,6 @@ public class MainActivity extends ActionBarActivity
                     return;
                 } else if (cars.size() == 0 && !filtersNotSet()) {
 
-                    Toast.makeText(MainActivity.this, "No cars found", Toast.LENGTH_SHORT).show();
                     findViewById(R.id.spinner).setVisibility(View.GONE);
                     findViewById(R.id.search_empty).setVisibility(View.VISIBLE);
                     return;
