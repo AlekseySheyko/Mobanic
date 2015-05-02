@@ -3,11 +3,13 @@ package com.mobanic.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -56,11 +58,9 @@ public class DetailActivity extends ActionBarActivity {
 
         mContext = this;
 
-        if (getIntent() != null) {
-            mCarId = getIntent().getStringExtra("car_id");
-        } else if (savedInstanceState != null) {
-            mCarId = savedInstanceState.getString("car_id");
-        }
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        mCarId = sharedPrefs.getString("car_id", "");
 
         updateCarsList(false);
 
@@ -270,12 +270,6 @@ public class DetailActivity extends ActionBarActivity {
                 return(true);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("car_id", mCar.getObjectId());
-        super.onSaveInstanceState(outState);
     }
 
     public static Context getContext() {

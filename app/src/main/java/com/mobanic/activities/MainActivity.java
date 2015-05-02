@@ -83,11 +83,18 @@ public class MainActivity extends ActionBarActivity
                                     int position, long id) {
                 ParseObject car = mCarsAdapter.getItem(position);
                 String carId = car.getObjectId();
+                String carMake = car.getString("make");
+                String carModel = car.getString("model");
 
                 if (!car.getBoolean("isSold")) {
                     Intent intent = new Intent(MainActivity.this,
                             DetailActivity.class);
-                    intent.putExtra("car_id", carId);
+                    mSharedPrefs.edit()
+                            .putString("car_id", carId)
+                            .putString("car_make", carMake)
+                            .putString("car_model", carModel)
+                            .putInt("car_position", position + 1)
+                            .apply();
                     startActivity(intent);
                 } else {
                     Toast.makeText(MainActivity.this, "This car has been sold!", Toast.LENGTH_SHORT).show();

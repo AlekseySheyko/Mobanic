@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ public class ContactActivity extends ActionBarActivity {
     private EditText mEmailEditText;
     private EditText mPhoneEditText;
     private EditText mMessageEditText;
+    protected Spinner mSubjectSpinner;
 
     private SharedPreferences mSharedPrefs;
 
@@ -41,6 +45,19 @@ public class ContactActivity extends ActionBarActivity {
         mEmailEditText = (EditText) findViewById(R.id.email);
         mPhoneEditText = (EditText) findViewById(R.id.phone);
         mMessageEditText = (EditText) findViewById(R.id.message);
+        mSubjectSpinner = (Spinner) findViewById(R.id.subject);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.subjects, android.R.layout.simple_list_item_1);
+        mSubjectSpinner.setAdapter(adapter);
+
+        View spinnerIcon = findViewById(R.id.spinner_icon);
+        spinnerIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSubjectSpinner.performClick();
+            }
+        });
 
         mMessageEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -55,12 +72,19 @@ public class ContactActivity extends ActionBarActivity {
     }
 
     private void sendMessage() {
+        String make = mSharedPrefs.getString("car_make", "");
+        String model = mSharedPrefs.getString("car_model", "");
+        int position = mSharedPrefs.getInt("car_position", -1);
+
         String name = mNameEditText.getText().toString();
         String emailAddress = mEmailEditText.getText().toString();
         String phone = mPhoneEditText.getText().toString();
         String message = mMessageEditText.getText().toString() + "\n\n"
-                + "From: " + emailAddress;
-        String subject = "Contact request: " + phone;
+                + "Name: " + name + "\n"
+                + "Email: " + emailAddress + "\n"
+                + "Phone: " + "+" + phone + "\n"
+                + "About: " + make + " " + model + ", #" + position;
+        String subject = mSubjectSpinner.getSelectedItem().toString();
 
         if (name.isEmpty()) {
             showError(mNameEditText);
@@ -92,7 +116,7 @@ public class ContactActivity extends ActionBarActivity {
             String subject = strings[1];
             String message = strings[2];
 
-            Mail m = new Mail("mobanic.user@gmail.com", "mobuser123");
+            Mail m = new Mail("mobanic.user@gmail.com", "mob12345");
 
             String[] toArr = {MOBANIC_EMAIL_ADDRESS};
             m.setTo(toArr);
@@ -101,11 +125,7 @@ public class ContactActivity extends ActionBarActivity {
             m.setBody(message);
 
             try {
-                if(m.send()) {
-                    Toast.makeText(ContactActivity.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(ContactActivity.this, "Email was not sent.", Toast.LENGTH_LONG).show();
-                }
+                m.send();
             } catch(Exception e) {
                 Log.e("ContactActivity", "Could not send email", e);
             }

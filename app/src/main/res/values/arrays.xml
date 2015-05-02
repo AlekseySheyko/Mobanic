@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="subjects">
+        <item>General enquiry</item>
+        <item>Request full details</item>
+    </string-array>
+</resources>
