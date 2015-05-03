@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -88,7 +90,15 @@ public class MultiSpinner extends Spinner
 
     @Override
     public boolean performClick() {
-        if (mChoicesList.size() > 0) {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        Set<String> makes = sharedPrefs.getStringSet("Make", null);
+
+        if (mChoicesList.size() == 0) {
+            Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
+        } else if (mSearchKey.equals("Model") && (makes == null || makes.size() == 0)) {
+            Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
+        } else {
             CharSequence[] choices = mChoicesList.toArray(
                     new CharSequence[mChoicesList.size()]);
 
@@ -101,8 +111,6 @@ public class MultiSpinner extends Spinner
                 }
             });
             builder.show();
-        } else {
-            Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
         }
         return true;
     }

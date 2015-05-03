@@ -34,7 +34,8 @@
         <Spinner
             android:id="@+id/subject"
             style="@style/FormElement"
-            android:layout_marginBottom="-2dp"/>
+            android:layout_marginBottom="-2dp"
+            android:layout_marginRight="1dp"/>
 
     </LinearLayout>
 

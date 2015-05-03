@@ -144,8 +144,7 @@ public class ContactActivity extends ActionBarActivity {
     }
 
     private void showError(EditText editText) {
-        Toast.makeText(this, "Enter your " + editText.getHint().toString().toLowerCase(),
-                Toast.LENGTH_SHORT).show();
+        editText.requestFocus();
         editText.setError(editText.getHint().toString() + " is required");
     }
 
@@ -159,7 +158,6 @@ public class ContactActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_send) {
             sendMessage();
-            finish();
         }
         return super.onOptionsItemSelected(item);
     }
