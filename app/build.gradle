@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.parse'
 
 android {
     compileSdkVersion 22
@@ -27,4 +28,23 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.parse.bolts:bolts-android:1.1.4'
     compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://maven.parse.com/repo'
+        }
+    }
+    dependencies {
+        classpath 'com.parse.tools:gradle:1.1'
+    }
+}
+
+parse {
+    applicationId "asQfJUeEXdJnbfvG2iefkvjhVpcmIq2GnOp5x5P2"
+    masterKey "f6d4Oc0w9RfHUdppa0ZKKWardqRxDEoRTshjzJWG"
+    // This makes it automatic. Otherwise you would have to run e.g. gradlew parseUploadSymbolsRelease.
+    uploadSymbols true
 }
