@@ -11,8 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,24 +47,24 @@ public class MainActivity extends ActionBarActivity implements SearchFiltersList
     private CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private static Context mContext;
-    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
+                toolbar,
                 R.string.drawer_open,
                 R.string.drawer_close);
-        drawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
 
 
         mCarsAdapter = new CarsAdapter(this);
@@ -240,14 +240,6 @@ public class MainActivity extends ActionBarActivity implements SearchFiltersList
                         (minPrice == -1 || maxPrice == -1) && maxAge == -1);
             }
         });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void updateSearchPanel(List<ParseObject> cars, final boolean filtersSet) {

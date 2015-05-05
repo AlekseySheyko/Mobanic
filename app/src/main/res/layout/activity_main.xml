@@ -9,6 +9,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"/>
+
         <ListView
             android:id="@+id/cars_listview"
             android:layout_width="match_parent"
@@ -54,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/nav_drawer_bg"
+            android:background="@color/nav_drawer_background"
             android:fillViewport="true"
             android:scrollbars="none">
 
