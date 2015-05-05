@@ -14,25 +14,26 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
-import com.mobanic.utils.SpinnerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
 
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -53,6 +54,103 @@ public class MainActivity extends ActionBarActivity implements SearchFiltersList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupActionBar();
+
+        ParseQueryAdapter<ParseObject> adapter = new ParseQueryAdapter<ParseObject>(this, getQueryFactory()) {
+            @Override
+            public View getItemView(ParseObject car, View v, ViewGroup parent) {
+                if (v == null) {
+                    v = View.inflate(getContext(), R.layout.list_item_car, null);
+                }
+
+                TextView makeTextView = (TextView) v.findViewById(R.id.make);
+                makeTextView.setText(car.getString("make"));
+
+                TextView modelTextView = (TextView) v.findViewById(R.id.model);
+                modelTextView.setText(car.getString("model"));
+
+                TextView priceTextView = (TextView) v.findViewById(R.id.price);
+                priceTextView.setText(formatPrice(car.getInt("price")));
+
+                super.getItemView(car, v, parent);
+
+                return v;
+            }
+        };
+        adapter.setImageKey("coverImage");
+
+        ListView listView = (ListView) findViewById(R.id.cars_listview);
+        listView.setAdapter(adapter);
+
+
+//        mCarsAdapter = new CarsAdapter(this);
+//
+//        ListView carsListView = (ListView) findViewById(R.id.cars_listview);
+//        carsListView.setAdapter(mCarsAdapter);
+//        carsListView.setEmptyView(findViewById(R.id.spinner));
+//        carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view,
+//                                    int position, long id) {
+//                ParseObject car = mCarsAdapter.getItem(position);
+//                String carId = car.getObjectId();
+//                String carMake = car.getString("make");
+//                String carModel = car.getString("model");
+//
+//                if (!car.getBoolean("isSold")) {
+//                    Intent intent = new Intent(MainActivity.this,
+//                            DetailActivity.class);
+//                    mSharedPrefs.edit()
+//                            .putString("car_id", carId)
+//                            .putString("car_make", carMake)
+//                            .putString("car_model", carModel)
+//                            .putInt("car_position", position + 1)
+//                            .apply();
+//                    startActivity(intent);
+//                } else {
+//                    Toast.makeText(MainActivity.this, "This car has been sold!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+//        updateCarsList(UPDATE_LOCALLY);
+
+
+//        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
+//
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        adapter.add("Up to 1 year old");
+//        for (int i = 2; i <= 10; i++) {
+//            adapter.add("Up to " + i + " years old");
+//        }
+//        adapter.add("Over 10 years old");
+//        adapter.add("Age");
+//
+//        Spinner ageSpinner = (Spinner) findViewById(R.id.age_spinner);
+//        ageSpinner.setAdapter(adapter);
+//        ageSpinner.setSelection(adapter.getCount());
+//        ageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> spinner, View view, int position, long id) {
+//                if ((position + 1) != 11) {
+//                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+//                }
+//                updateCarsList(UPDATE_LOCALLY);
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//            }
+//        });
+
+        mContext = this;
+
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
+    }
+
+    private void setupActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,73 +163,20 @@ public class MainActivity extends ActionBarActivity implements SearchFiltersList
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+    }
 
-
-        mCarsAdapter = new CarsAdapter(this);
-
-        ListView carsListView = (ListView) findViewById(R.id.cars_listview);
-        carsListView.setAdapter(mCarsAdapter);
-        carsListView.setEmptyView(findViewById(R.id.spinner));
-        carsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view,
-                                    int position, long id) {
-                ParseObject car = mCarsAdapter.getItem(position);
-                String carId = car.getObjectId();
-                String carMake = car.getString("make");
-                String carModel = car.getString("model");
-
-                if (!car.getBoolean("isSold")) {
-                    Intent intent = new Intent(MainActivity.this,
-                            DetailActivity.class);
-                    mSharedPrefs.edit()
-                            .putString("car_id", carId)
-                            .putString("car_make", carMake)
-                            .putString("car_model", carModel)
-                            .putInt("car_position", position + 1)
-                            .apply();
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "This car has been sold!", Toast.LENGTH_SHORT).show();
-                }
+    private ParseQueryAdapter.QueryFactory<ParseObject> getQueryFactory() {
+        return new ParseQueryAdapter.QueryFactory<ParseObject>() {
+            public ParseQuery<ParseObject> create() {
+                ParseQuery<ParseObject> query = new ParseQuery<>("Car");
+                query.orderByDescending("createdAt");
+                return query;
             }
-        });
+        };
+    }
 
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        updateCarsList(UPDATE_LOCALLY);
-
-
-        ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter.add("Up to 1 year old");
-        for (int i = 2; i <= 10; i++) {
-            adapter.add("Up to " + i + " years old");
-        }
-        adapter.add("Over 10 years old");
-        adapter.add("Age");
-
-        Spinner ageSpinner = (Spinner) findViewById(R.id.age_spinner);
-        ageSpinner.setAdapter(adapter);
-        ageSpinner.setSelection(adapter.getCount());
-        ageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> spinner, View view, int position, long id) {
-                if ((position + 1) != 11) {
-                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
-                }
-                updateCarsList(UPDATE_LOCALLY);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-
-        mContext = this;
-
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
+    public String formatPrice(int price) {
+        return "\u00A3" + NumberFormat.getNumberInstance(Locale.US).format(price);
     }
 
     public void updateCarsList(boolean fromNetwork) {
