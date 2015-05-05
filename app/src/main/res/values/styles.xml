@@ -1,13 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="colorAccent">#ff4081</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorAccent">#ff4081</item>
-        <item name="colorPrimary">@color/primary</item>
-    </style>
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar"/>
 
     <style name="CardTextView">
         <item name="android:layout_width">wrap_content</item>
