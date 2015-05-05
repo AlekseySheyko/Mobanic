@@ -1,11 +1,9 @@
-package com.mobanic.activities;
+package com.mobanic;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-
-import com.mobanic.R;
 
 
 public class SplashActivity extends ActionBarActivity {

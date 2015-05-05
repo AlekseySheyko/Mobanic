@@ -1,4 +1,4 @@
-package com.mobanic.activities;
+package com.mobanic;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mobanic.R;
 import com.mobanic.utils.Mail;
 
 

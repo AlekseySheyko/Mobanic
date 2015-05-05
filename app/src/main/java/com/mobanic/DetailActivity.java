@@ -1,4 +1,4 @@
-package com.mobanic.activities;
+package com.mobanic;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mobanic.R;
 import com.mobanic.utils.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;

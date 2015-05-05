@@ -1,4 +1,4 @@
-package com.mobanic.activities;
+package com.mobanic;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,7 +20,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.mobanic.R;
 import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
@@ -40,26 +39,19 @@ import java.util.TreeSet;
 import static com.mobanic.utils.MultiSpinner.SearchFiltersListener;
 import static com.mobanic.utils.RangeSeekBar.OnRangeSeekBarChangeListener;
 
-public class MainActivity extends ActionBarActivity
-        implements SearchFiltersListener {
+public class MainActivity extends ActionBarActivity implements SearchFiltersListener {
 
-    private boolean FROM_LOCAL_STORAGE = false;
-    private boolean FROM_NETWORK = true;
+    private final static boolean UPDATE_LOCALLY = false;
+    private final static boolean UPDATE_FROM_NETWORK = true;
 
     private CarsAdapter mCarsAdapter;
-
-    public static Context mContext;
     private SharedPreferences mSharedPrefs;
-    private Spinner mAgeSpinner;
+    private static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Something changed
-
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
         mContext = this;
 
@@ -109,7 +101,7 @@ public class MainActivity extends ActionBarActivity
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        updateCarsList(FROM_LOCAL_STORAGE);
+        updateCarsList(UPDATE_LOCALLY);
 
 
         ArrayAdapter<String> adapter = new SpinnerAdapter(MainActivity.this);
@@ -122,22 +114,24 @@ public class MainActivity extends ActionBarActivity
         adapter.add("Over 10 years old");
         adapter.add("Age");
 
-        mAgeSpinner = (Spinner) findViewById(R.id.age_spinner);
-        mAgeSpinner.setAdapter(adapter);
-        mAgeSpinner.setSelection(adapter.getCount());
-        mAgeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        Spinner ageSpinner = (Spinner) findViewById(R.id.age_spinner);
+        ageSpinner.setAdapter(adapter);
+        ageSpinner.setSelection(adapter.getCount());
+        ageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> spinner, View view, int position, long id) {
                 if ((position + 1) != 11) {
                     mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
                 }
-                updateCarsList(FROM_LOCAL_STORAGE);
+                updateCarsList(UPDATE_LOCALLY);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
+
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
     public void updateCarsList(boolean fromNetwork) {
@@ -207,7 +201,7 @@ public class MainActivity extends ActionBarActivity
                     fuelTypeSpinner.setItems("Fuel Type", new HashSet<String>());
 
                     if (isOnline()) {
-                        updateCarsList(FROM_NETWORK);
+                        updateCarsList(UPDATE_FROM_NETWORK);
                     } else {
                         findViewById(R.id.spinner).setVisibility(View.GONE);
                         Toast.makeText(MainActivity.this,
@@ -338,7 +332,7 @@ public class MainActivity extends ActionBarActivity
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice)
                         .apply();
-                updateCarsList(FROM_LOCAL_STORAGE);
+                updateCarsList(UPDATE_LOCALLY);
             }
         });
     }
