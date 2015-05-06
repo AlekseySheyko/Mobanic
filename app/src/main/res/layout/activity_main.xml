@@ -15,15 +15,15 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"/>
 
-        <ProgressBar
-            android:id="@android:id/progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+        <ListView
+            android:id="@+id/cars_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:layout_below="@+id/toolbar"/>
 
         <TextView
-            android:id="@android:id/empty"
+            android:id="@+id/empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -32,13 +32,6 @@
             android:textColor="#36ffffff"
             android:textSize="24sp"
             android:visibility="gone"/>
-
-        <ListView
-            android:id="@+id/cars_listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:layout_below="@+id/toolbar"/>
 
     </RelativeLayout>
 

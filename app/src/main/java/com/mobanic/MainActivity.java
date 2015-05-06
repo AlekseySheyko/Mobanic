@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
     private SharedPreferences mSharedPrefs;
+    private boolean mFiltersNotSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,29 +106,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         mCarsAdapter = new ParseQueryAdapter<ParseObject>(this, getQueryFactory()) {
             @Override
             public View getItemView(ParseObject car, View v, ViewGroup parent) {
-                if (v == null) {
-                    v = View.inflate(getContext(), R.layout.list_item_car, null);
-                }
-                TextView makeTextView = (TextView) v.findViewById(R.id.make);
-                makeTextView.setText(car.getString("make"));
+                v = View.inflate(getContext(), R.layout.list_item_car, null);
 
-                TextView modelTextView = (TextView) v.findViewById(R.id.model);
-                modelTextView.setText(car.getString("model"));
-
-                TextView priceTextView = (TextView) v.findViewById(R.id.price);
-                priceTextView.setText(formatPrice(car.getInt("price")));
+                ((TextView) v.findViewById(R.id.make)).setText(car.getString("make"));
+                ((TextView) v.findViewById(R.id.model)).setText(car.getString("model"));
+                ((TextView) v.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
 
                 RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-                Picasso.with(getContext())
-                        .load(car.getParseFile("coverImage").getUrl())
+                Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl())
                         .fit().centerCrop().into(imageView);
 
                 if (car.getBoolean("isSold")) {
-                    v.findViewById(R.id.sold_mark).setVisibility(View.VISIBLE);
-                } else {
-                    v.findViewById(R.id.sold_mark).setVisibility(View.GONE);
+                    v.findViewById(R.id.sold_label).setVisibility(View.VISIBLE);
                 }
-
                 super.getItemView(car, v, parent);
 
                 return v;
@@ -136,32 +126,31 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         };
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParseObject>() {
             @Override
-            public void onLoading() {
+            public void onLoaded(List<ParseObject> cars, Exception e) {
+                if (e == null) {
+                    updateSearchPanel();
+                } else {
+                    findViewById(R.id.empty).setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
-            public void onLoaded(List<ParseObject> cars, Exception e) {
-                findViewById(android.R.id.progress).setVisibility(View.GONE);
-
-                if (e != null) {
-                    View emptyText = findViewById(android.R.id.empty);
-                    emptyText.setVisibility(View.VISIBLE);
-                } else {
-                    updateSearchPanel();
-                }
+            public void onLoading() {
             }
         });
         populateList();
     }
 
     public String formatPrice(int price) {
-        return "\u00A3" + NumberFormat.getNumberInstance(Locale.US).format(price);
+        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
+        f.setMaximumFractionDigits(0);
+        return f.format(price);
     }
 
     private void populateList() {
-        ListView listView = (ListView) findViewById(R.id.cars_listview);
-        listView.setAdapter(mCarsAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView lv = (ListView) findViewById(R.id.cars_listview);
+        lv.setAdapter(mCarsAdapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 ParseObject car = mCarsAdapter.getItem(position);
@@ -232,6 +221,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         if (maxAge != -1) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
+
+        mFiltersNotSet = (makes.size() == 0 && models.size() == 0 && colors.size() == 0
+                && transTypes.size() == 0 && fuelTypes.size() == 0 && minPrice == -1
+                && maxPrice == -1 && maxAge == -1);
+
         return query;
     }
 
@@ -255,20 +249,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             fuelTypes.add(car.getString("fuelType"));
         }
 
-        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-        makeSpinner.setItems(makes);
+        if (mFiltersNotSet) {
+            MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+            makeSpinner.setItems(makes);
+        }
 
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
-            modelSpinner.setItems(models);
-        } else {
-            mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
-        }
-
-        if (mSharedPrefs.getBoolean("forceUpdate", false)) {
-            modelSpinner.setItems(models);
-            mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
-        }
+        modelSpinner.setItems(models);
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
         colorSpinner.setItems(colors);
@@ -278,13 +265,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
         fuelTypeSpinner.setItems(fuelTypes);
-
-        // TODO: Fix crash when first start
-        try {
-            Collections.min(prices);
-        } catch (NoSuchElementException e) {
-            return;
-        }
 
         Integer minPrice = Collections.min(prices) / 1000;
         Integer maxPrice = Collections.max(prices) / 1000 + 1;
@@ -311,13 +291,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
-
-        if (filterKey.equals("Model")) {
-            mSharedPrefs.edit().putBoolean("doNotSetModels", true).apply();
-        }
-        if (filterKey.equals("Make")) {
-            mSharedPrefs.edit().putBoolean("forceUpdate", true).apply();
-        }
         mSharedPrefs.edit().putStringSet(filterKey, selectedValues).apply();
         updateCarsAdapter();
     }
@@ -327,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         super.onStop();
         mSharedPrefs.edit().clear().apply();
     }
+
 
     private static Context sContext;
 
@@ -339,12 +313,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Receive update");
             try {
                 SharedPreferences sharedPrefs =
                         PreferenceManager.getDefaultSharedPreferences(getContext());
                 sharedPrefs.edit().putBoolean("forceUpdate", true).apply();
-                        ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
+                ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }

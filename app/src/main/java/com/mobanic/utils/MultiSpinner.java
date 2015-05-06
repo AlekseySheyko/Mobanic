@@ -58,9 +58,9 @@ public class MultiSpinner extends Spinner
         mCheckboxes = new boolean[choicesList.size()];
 
         mAdapter.clear();
-        mAdapter.addAll(choicesList);
+        mAdapter.addAll(mChoicesList);
         mAdapter.add(mSearchKey);
-        // TODO: Maybe set getCount() + 1
+
         setSelection(mAdapter.getCount());
     }
 
