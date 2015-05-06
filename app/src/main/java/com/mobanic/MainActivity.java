@@ -35,14 +35,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
 import static com.mobanic.utils.MultiSpinner.SearchFiltersListener;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersListener {
-
-    private static final String TAG = MainActivity.class.getSimpleName();
 
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
     private SharedPreferences mSharedPrefs;
@@ -52,13 +51,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupNavDrawer();
-        setupAgeSpinner();
+        setupNavigationDrawer();
 
-        updateAdapter();
+        updateCarsAdapter();
     }
 
-    private void setupNavDrawer() {
+    private void setupNavigationDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -71,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+
+        setupAgeSpinner();
     }
 
     private void setupAgeSpinner() {
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 if (position <= 10) {
                     mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
                 }
-                updateAdapter();
+                updateCarsAdapter();
             }
 
             @Override
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         sContext = this;
     }
 
-    public void updateAdapter() {
+    public void updateCarsAdapter() {
         mCarsAdapter = new ParseQueryAdapter<ParseObject>(this, getQueryFactory()) {
             @Override
             public View getItemView(ParseObject car, View v, ViewGroup parent) {
@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
                 if (car.getBoolean("isSold")) {
                     v.findViewById(R.id.sold_mark).setVisibility(View.VISIBLE);
+                } else {
+                    v.findViewById(R.id.sold_mark).setVisibility(View.GONE);
                 }
 
                 super.getItemView(car, v, parent);
@@ -195,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
-        // TODO: Fix crash when first start
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
         if (makes.size() > 0) {
@@ -271,6 +272,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
         fuelTypeSpinner.setItems(fuelTypes);
 
+        // TODO: Fix crash when first start
+        try {
+            Collections.min(prices);
+        } catch (NoSuchElementException e) {
+            return;
+        }
+
         Integer minPrice = Collections.min(prices) / 1000;
         Integer maxPrice = Collections.max(prices) / 1000 + 1;
 
@@ -289,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice)
                         .apply();
-                updateAdapter();
+                updateCarsAdapter();
             }
         });
     }
@@ -304,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             mSharedPrefs.edit().putBoolean("forceUpdate", true).apply();
         }
         mSharedPrefs.edit().putStringSet(filterKey, selectedValues).apply();
-        updateAdapter();
+        updateCarsAdapter();
     }
 
     @Override
@@ -326,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Receive update");
             try {
-                ((MainActivity) MainActivity.getContext()).updateAdapter();
+                ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }
