@@ -15,4 +15,5 @@
     <string name="action_refresh">Refresh</string>
     <string name="remove_filter">Remove filter</string>
     <string name="empty">No cars found</string>
+    <string name="sold">This car has been sold!</string>
 </resources>

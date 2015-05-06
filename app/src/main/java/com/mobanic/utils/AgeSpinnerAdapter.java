@@ -6,10 +6,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class SpinnerAdapter extends ArrayAdapter<String> {
+public class AgeSpinnerAdapter extends ArrayAdapter<String> {
 
-    public SpinnerAdapter(Context context) {
-        super(context, android.R.layout.simple_spinner_dropdown_item);
+    public AgeSpinnerAdapter(Context context, String[] values) {
+        super(context, android.R.layout.simple_spinner_dropdown_item, values);
     }
 
     @Override
@@ -17,11 +17,7 @@ public class SpinnerAdapter extends ArrayAdapter<String> {
 
         View v = super.getView(position, convertView, parent);
         if (position == getCount()) {
-            TextView textView = (TextView) v.findViewById(android.R.id.text1);
-            textView.setText(getItem(getCount()));
-        } else {
-            TextView textView = (TextView) v.findViewById(android.R.id.text1);
-            textView.setText(getItem(position));
+            ((TextView)v.findViewById(android.R.id.text1)).setText(getItem(getCount()));
         }
 
         return v;

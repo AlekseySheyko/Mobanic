@@ -3,4 +3,18 @@
         <item>General enquiry</item>
         <item>Request full details</item>
     </string-array>
+    <string-array name="car_ages">
+        <item>Up to 1 year old</item>
+        <item>Up to 2 years old</item>
+        <item>Up to 3 years old</item>
+        <item>Up to 4 years old</item>
+        <item>Up to 5 years old</item>
+        <item>Up to 6 years old</item>
+        <item>Up to 7 years old</item>
+        <item>Up to 8 years old</item>
+        <item>Up to 9 years old</item>
+        <item>Up to 10 years old</item>
+        <item>Over 10 years old</item>
+        <item>Age</item>
+    </string-array>
 </resources>

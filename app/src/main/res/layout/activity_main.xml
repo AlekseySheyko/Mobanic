@@ -1,6 +1,7 @@
 <android.support.v4.widget.DrawerLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -38,8 +39,8 @@
     <LinearLayout
         android:layout_width="230dp"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="match_parent"
@@ -68,11 +69,13 @@
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/make_spinner"
-                    style="@style/DrawerListItem"/>
+                    style="@style/DrawerListItem"
+                    custom:searchKey="Make"/>
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/model_spinner"
-                    style="@style/DrawerListItem"/>
+                    style="@style/DrawerListItem"
+                    custom:searchKey="Model"/>
 
                 <com.mobanic.utils.RangeSeekBar
                     android:id="@+id/price_selector"
@@ -87,15 +90,18 @@
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/color_spinner"
-                    style="@style/DrawerListItem"/>
+                    style="@style/DrawerListItem"
+                    custom:searchKey="Color"/>
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/fuel_type_spinner"
-                    style="@style/DrawerListItem"/>
+                    style="@style/DrawerListItem"
+                    custom:searchKey="Fuel Type"/>
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/trans_spinner"
-                    style="@style/DrawerListItem"/>
+                    style="@style/DrawerListItem"
+                    custom:searchKey="Transmission"/>
 
             </LinearLayout>
 

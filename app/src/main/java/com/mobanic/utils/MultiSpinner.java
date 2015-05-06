@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.mobanic.R;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,8 +27,18 @@ public class MultiSpinner extends Spinner
     private boolean[] mCheckboxes;
     private String mSearchKey;
 
-    public MultiSpinner(Context context, AttributeSet attrSet) {
-        super(context, attrSet);
+    public MultiSpinner(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        TypedArray a = context.getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.SearchSpinner,
+                0, 0);
+
+        try {
+            mSearchKey = a.getString(R.styleable.SearchSpinner_searchKey);
+        } finally {
+            a.recycle();
+        }
 
         mListener = (SearchFiltersListener) context;
 
@@ -33,18 +46,18 @@ public class MultiSpinner extends Spinner
                 getContext(),
                 android.R.layout.simple_spinner_item,
                 new ArrayList<String>());
+        mAdapter.add(mSearchKey);
 
         setAdapter(mAdapter);
     }
 
-    public void setItems(String filterKey, Set<String> choicesList) {
+    public void setItems(Set<String> choicesList) {
         mChoicesList = choicesList;
         mCheckboxes = new boolean[choicesList.size()];
-        mSearchKey = filterKey;
 
         mAdapter.clear();
         mAdapter.addAll(choicesList);
-        mAdapter.add(filterKey);
+        mAdapter.add(mSearchKey);
     }
 
     public void refresh() {
@@ -94,9 +107,7 @@ public class MultiSpinner extends Spinner
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mChoicesList.size() == 0) {
-            Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
-        } else if (mSearchKey.equals("Model") && (makes == null || makes.size() == 0)) {
+        if (mSearchKey.equals("Model") && (makes == null || makes.size() == 0)) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
         } else {
             CharSequence[] choices = mChoicesList.toArray(
