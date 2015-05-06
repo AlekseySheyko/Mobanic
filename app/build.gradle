@@ -23,8 +23,6 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.melnykov:floatingactionbutton:1.2.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.parse.bolts:bolts-android:1.1.4'
     compile fileTree(dir: 'libs', include: '*.jar')
 }

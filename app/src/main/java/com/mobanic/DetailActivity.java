@@ -21,13 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mobanic.utils.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -161,10 +161,9 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setCoverImage() {
-        String url = mCar.getParseFile("coverImage").getUrl();
-
-        RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
-        Picasso.with(this).load(url).fit().centerCrop().into(imageView);
+        ParseImageView imageView = (ParseImageView) findViewById(R.id.image);
+        imageView.setParseFile(mCar.getParseFile("coverImage"));
+        imageView.loadInBackground();
     }
 
     private void setGalleryImages() {
@@ -189,17 +188,14 @@ public class DetailActivity extends AppCompatActivity {
                 if (e == null && images.size() > 0) {
                     flipper.removeAllViews();
                     for (ParseObject image : images) {
-                        String url = image.getParseFile("image").getUrl();
+                        ParseFile imageFile = image.getParseFile("image");
 
-                        RatioImageView imageView = (RatioImageView) View.inflate(
+                        ParseImageView imageView = (ParseImageView) View.inflate(
                                 DetailActivity.this,
                                 R.layout.gallery_image,
                                 null);
-                        Picasso.with(DetailActivity.this)
-                                .load(url)
-                                .fit()
-                                .centerCrop()
-                                .into(imageView);
+                        imageView.setParseFile(imageFile);
+                        imageView.loadInBackground();
                         flipper.addView(imageView);
                     }
                 } else {
