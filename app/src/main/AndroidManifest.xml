@@ -52,6 +52,7 @@
         <activity
             android:name=".ContactActivity"
             android:label="@string/title_activity_contact"
+            android:launchMode="singleTop"
             android:parentActivityName=".DetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light.DarkActionBar"

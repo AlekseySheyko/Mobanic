@@ -19,6 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobanic.utils.Mail;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 
 public class ContactActivity extends ActionBarActivity {
@@ -33,10 +37,28 @@ public class ContactActivity extends ActionBarActivity {
 
     private SharedPreferences mSharedPrefs;
 
+    private String mMake;
+    private String mModel;
+    private int mPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
+
+        String carId = getIntent().getStringExtra("car_id");
+        final int carPosition = getIntent().getIntExtra("car_position", -1);
+
+        ParseQuery<ParseObject> query = new ParseQuery<>("Car");
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        query.getInBackground(carId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject car, ParseException e) {
+                mMake = car.getString("make");
+                mModel = car.getString("model");
+                mPosition = carPosition;
+            }
+        });
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -71,9 +93,6 @@ public class ContactActivity extends ActionBarActivity {
     }
 
     private void sendMessage() {
-        String make = mSharedPrefs.getString("car_make", "");
-        String model = mSharedPrefs.getString("car_model", "");
-        int position = mSharedPrefs.getInt("car_position", -1);
 
         String name = mNameEditText.getText().toString();
         String emailAddress = mEmailEditText.getText().toString();
@@ -82,7 +101,7 @@ public class ContactActivity extends ActionBarActivity {
                 + "Name: " + name + "\n"
                 + "Email: " + emailAddress + "\n"
                 + "Phone: " + "+" + phone + "\n"
-                + "About: " + make + " " + model + ", #" + position;
+                + "About: " + mMake + " " + mModel + ", #" + mPosition;
         String subject = mSubjectSpinner.getSelectedItem().toString();
 
         if (name.isEmpty()) {

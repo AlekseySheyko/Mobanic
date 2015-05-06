@@ -40,6 +40,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private ParseObject mCar;
     private String mCarId;
+    private int mCarPosition;
 
     private Intent mShareIntent;
     private Uri mImageUri;
@@ -51,8 +52,10 @@ public class DetailActivity extends AppCompatActivity {
 
         if (getIntent() != null) {
             mCarId = getIntent().getStringExtra("car_id");
+            mCarPosition = getIntent().getIntExtra("car_position", -1);
         } else if (savedInstanceState != null) {
             mCarId = savedInstanceState.getString("car_id");
+            mCarPosition = savedInstanceState.getInt("car_position");
         }
 
         updateCarDetails();
@@ -60,7 +63,10 @@ public class DetailActivity extends AppCompatActivity {
         findViewById(R.id.fab_contact).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(DetailActivity.this, ContactActivity.class));
+                Intent i = new Intent(DetailActivity.this, ContactActivity.class);
+                i.putExtra("car_id", mCarId);
+                i.putExtra("car_position", mCarPosition);
+                startActivity(i);
             }
         });
     }
@@ -68,6 +74,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         outState.putString("car_id", mCarId);
+        outState.putInt("car_position", mCarPosition);
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
