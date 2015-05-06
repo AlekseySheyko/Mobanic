@@ -5,11 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.mobanic.MainActivity;
 import com.mobanic.R;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class CarsQueryAdapter extends ParseQueryAdapter<ParseObject> {
@@ -17,6 +19,22 @@ public class CarsQueryAdapter extends ParseQueryAdapter<ParseObject> {
     public CarsQueryAdapter(Context context, QueryFactory<ParseObject> queryFactory) {
         super(context, queryFactory);
         setImageKey("coverImage");
+        addOnQueryLoadListener(new OnQueryLoadListener<ParseObject>() {
+            @Override
+            public void onLoading() {
+            }
+
+            @Override
+            public void onLoaded(List<ParseObject> cars, Exception e) {
+                MainActivity activity = (MainActivity) getContext();
+                activity.findViewById(android.R.id.progress)
+                        .setVisibility(View.GONE);
+                if (e != null) {
+                    View emptyText = activity.findViewById(android.R.id.empty);
+                    emptyText.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override

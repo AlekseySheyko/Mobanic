@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobanic.utils.AgeSpinnerAdapter;
@@ -38,6 +37,8 @@ import static com.mobanic.utils.MultiSpinner.SearchFiltersListener;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
 
     private SharedPreferences mSharedPrefs;
@@ -48,17 +49,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupNavigationDrawer();
+        setupNavDrawer();
+        setupAgeSpinner();
 
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         updateCars();
 
         ListView listView = (ListView) findViewById(R.id.cars_listview);
         listView.setAdapter(mCarsAdapter);
-
-        TextView emptyText = (TextView) findViewById(android.R.id.empty);
-        listView.setEmptyView(emptyText);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -78,34 +75,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             }
         });
 
-        mContext = this;
-
-
-        ArrayAdapter<String> adapter = new AgeSpinnerAdapter(
-                this, getResources().getStringArray(R.array.car_ages));
-
-        Spinner s = (Spinner) findViewById(R.id.age_spinner);
-        s.setAdapter(adapter);
-        s.setSelection(adapter.getCount());
-        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view,
-                                       int position, long id) {
-                if (position != 10) {
-                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
-                }
-                updateCars();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
+
+        mContext = this;
     }
 
-    private void setupNavigationDrawer() {
+    private void setupNavDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -120,20 +96,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         toggle.syncState();
     }
 
-    private void updateCars() {
+    public void updateCars() {
         mCarsAdapter = new CarsQueryAdapter(this, getQueryFactory());
     }
 
-    private ParseQueryAdapter.QueryFactory<ParseObject> getQueryFactory() {
-        return new ParseQueryAdapter.QueryFactory<ParseObject>() {
-            public ParseQuery<ParseObject> create() {
-                return getQuery();
-            }
-        };
-    }
-
     public ParseQuery<ParseObject> getQuery() {
-
         Set<String> makes = mSharedPrefs.getStringSet("Make", new HashSet<String>());
         Set<String> models = mSharedPrefs.getStringSet("Model", new HashSet<String>());
         Set<String> colors = mSharedPrefs.getStringSet("Color", new HashSet<String>());
@@ -145,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
         if (makes.size() > 0) {
             query.whereContainedIn("make", makes);
@@ -206,20 +174,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {
             modelSpinner.setItems(modelsList);
-            if (!filtersSet) {
-                modelSpinner.setSelection(modelsList.size() + 1);
-            }
-            if (filtersSet) {
-                modelSpinner.refresh();
-                modelSpinner.setSelection(modelsList.size() + 1);
-            }
+            modelSpinner.setSelection(modelsList.size() + 1);
         } else {
             mSharedPrefs.edit().putBoolean("doNotSetModels", false).apply();
         }
 
         if (mSharedPrefs.getBoolean("forceUpdate", false)) {
             modelSpinner.setItems(modelsList);
-            modelSpinner.refresh();
             modelSpinner.setSelection(modelsList.size() + 1);
             mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
         }
@@ -276,6 +237,39 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         updateCars();
     }
 
+    private ParseQueryAdapter.QueryFactory<ParseObject> getQueryFactory() {
+        return new ParseQueryAdapter.QueryFactory<ParseObject>() {
+            public ParseQuery<ParseObject> create() {
+                return getQuery();
+            }
+        };
+    }
+
+    private void setupAgeSpinner() {
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        ArrayAdapter<String> adapter = new AgeSpinnerAdapter(
+                this, getResources().getStringArray(R.array.car_ages));
+
+        Spinner s = (Spinner) findViewById(R.id.age_spinner);
+        s.setAdapter(adapter);
+        s.setSelection(adapter.getCount());
+        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                if (position != 10) {
+                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                }
+                updateCars();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -303,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             try {
                 ((MainActivity) MainActivity.getContext()).updateCars();
             } catch (Exception e) {
-                Log.w("MainActivity", "Can't get activity context to update content");
+                Log.w("PushReceiver//Main", "Can't get activity context to update content");
             }
         }
     }

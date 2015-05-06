@@ -29,6 +29,8 @@ public class MultiSpinner extends Spinner
 
     public MultiSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (isInEditMode()) return;
+
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.SearchSpinner,
@@ -58,13 +60,6 @@ public class MultiSpinner extends Spinner
         mAdapter.clear();
         mAdapter.addAll(choicesList);
         mAdapter.add(mSearchKey);
-    }
-
-    public void refresh() {
-        mAdapter.clear();
-        mAdapter.addAll(mChoicesList);
-        mAdapter.add(mSearchKey);
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override

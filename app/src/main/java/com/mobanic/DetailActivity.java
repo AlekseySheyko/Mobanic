@@ -280,7 +280,7 @@ public class DetailActivity extends ActionBarActivity {
             try {
                 ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
             } catch (Exception e) {
-                Log.d("DetailActivity", "Can't get activity context to update content");
+                Log.d("PushReceiver//Detail", "Can't get activity context to update content");
             }
         }
     }

@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
@@ -681,6 +682,31 @@ public class RangeSeekBar<T extends Number> extends ImageView {
             }
             throw new InstantiationError("can't convert " + this + " to a Number object");
         }
+    }
+
+    /**
+     * Util class for converting between dp, px and other magical pixel units
+     */
+    private static class PixelUtil {
+
+        private PixelUtil() {
+        }
+
+        public static int dpToPx(Context context, int dp) {
+            int px = Math.round(dp * getPixelScaleFactor(context));
+            return px;
+        }
+
+        public static int pxToDp(Context context, int px) {
+            int dp = Math.round(px / getPixelScaleFactor(context));
+            return dp;
+        }
+
+        private static float getPixelScaleFactor(Context context) {
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+            return (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT);
+        }
+
     }
 
 }
