@@ -22,7 +22,9 @@ import com.mobanic.utils.AgeSpinnerAdapter;
 import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
+import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mFiltersNotSet;
+    private boolean mForceUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,10 +88,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,
                                        int position, long id) {
-                if (position <= 10) {
+                if (position < 11) {
                     mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                    updateCarsAdapter();
                 }
-                updateCarsAdapter();
             }
 
             @Override
@@ -105,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             public void onLoaded(List<ParseObject> cars, Exception e) {
                 if (e == null) {
                     updateSearchPanel();
+                    findViewById(R.id.empty).setVisibility(View.GONE);
                 } else {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
@@ -186,13 +190,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice);
         }
-        if (maxAge != -1) {
+        if (maxAge != -1 && maxAge < 11) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
 
         mFiltersNotSet = (makes.size() == 0 && models.size() == 0 && colors.size() == 0
                 && transTypes.size() == 0 && fuelTypes.size() == 0 && minPrice == -1
-                && maxPrice == -1 && maxAge == -1);
+                && maxPrice == -1 && (maxAge == -1 || maxAge == 11));
 
         return query;
     }
@@ -200,70 +204,80 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     @SuppressWarnings("unchecked")
     private void updateSearchPanel() {
 
-        Set<String> makes = new TreeSet<>();
-        Set<String> models = new TreeSet<>();
-        Set<Integer> prices = new TreeSet<>();
-        Set<String> colors = new TreeSet<>();
-        Set<String> transTypes = new TreeSet<>();
-        Set<String> fuelTypes = new TreeSet<>();
-
-        for (int i = 0; i < mCarsAdapter.getCount(); i++) {
-            ParseObject car = mCarsAdapter.getItem(i);
-
-            makes.add(car.getString("make"));
-            models.add(car.getString("model"));
-            prices.add(car.getInt("price"));
-            colors.add(car.getString("color"));
-            transTypes.add(car.getString("transmission"));
-            fuelTypes.add(car.getString("fuelType"));
-        }
-
-        if (mFiltersNotSet) {
-            MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-            makeSpinner.setItems(makes);
-        }
-
-        MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-        modelSpinner.setItems(models);
-
-        MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-        colorSpinner.setItems(colors);
-
-        MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-        transSpinner.setItems(transTypes);
-
-        MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
-        fuelTypeSpinner.setItems(fuelTypes);
-
-        Integer minPrice;
-        Integer maxPrice;
-        try {
-            minPrice = Collections.min(prices);
-            maxPrice = Collections.max(prices);
-        } catch (NoSuchElementException e) {
-            minPrice = 0;
-            maxPrice = 99999;
-        }
-
-        RangeSeekBar<Integer> priceSeekBar =
-                (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
-        priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
-                .OnRangeSeekBarChangeListener<Integer>() {
+        getQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice,
-                                                    Integer maxPrice) {
-                mSharedPrefs.edit()
-                        .putInt("minPrice", minPrice)
-                        .putInt("maxPrice", maxPrice)
-                        .apply();
-                updateCarsAdapter();
+            public void done(List<ParseObject> cars, ParseException e) {
+                if (e != null) return;
+
+                Set<String> makes = new TreeSet<>();
+                Set<String> models = new TreeSet<>();
+                Set<Integer> prices = new TreeSet<>();
+                Set<String> colors = new TreeSet<>();
+                Set<String> transTypes = new TreeSet<>();
+                Set<String> fuelTypes = new TreeSet<>();
+
+                for (ParseObject car : cars) {
+                    makes.add(car.getString("make"));
+                    models.add(car.getString("model"));
+                    prices.add(car.getInt("price"));
+                    colors.add(car.getString("color"));
+                    transTypes.add(car.getString("transmission"));
+                    fuelTypes.add(car.getString("fuelType"));
+                }
+
+                if (mFiltersNotSet) {
+                    MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+                    makeSpinner.setItems(makes);
+                }
+
+                MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+                modelSpinner.setItems(models);
+
+                MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+                colorSpinner.setItems(colors);
+
+                MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+                transSpinner.setItems(transTypes);
+
+                MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
+                fuelTypeSpinner.setItems(fuelTypes);
+
+                Integer minPrice;
+                Integer maxPrice;
+                try {
+                    minPrice = Collections.min(prices);
+                    maxPrice = Collections.max(prices);
+                } catch (NoSuchElementException ne) {
+                    minPrice = 0;
+                    maxPrice = 99999;
+                }
+
+                RangeSeekBar<Integer> priceSeekBar =
+                        (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
+                if (mFiltersNotSet || mForceUpdate) { // TODO: Or if makes were updated
+                    priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
+                    mForceUpdate = false;
+                }
+                priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
+                        .OnRangeSeekBarChangeListener<Integer>() {
+                    @Override
+                    public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice,
+                                                            Integer maxPrice) {
+                        mSharedPrefs.edit()
+                                .putInt("minPrice", minPrice)
+                                .putInt("maxPrice", maxPrice)
+                                .apply();
+                        updateCarsAdapter();
+                    }
+                });
             }
         });
     }
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
+        mForceUpdate = filterKey.equals("Make");
+
         mSharedPrefs.edit().putStringSet(filterKey, selectedValues).apply();
         updateCarsAdapter();
     }
