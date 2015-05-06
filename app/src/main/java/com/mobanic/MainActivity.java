@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
                 if (mFiltersNotSet || mForceUpdate) { // TODO: Or if makes were updated
                     priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
-                    mForceUpdate = false;
                 }
                 priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
                         .OnRangeSeekBarChangeListener<Integer>() {
@@ -270,6 +269,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         updateCarsAdapter();
                     }
                 });
+
+                mForceUpdate = false;
             }
         });
     }
