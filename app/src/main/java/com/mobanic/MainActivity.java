@@ -30,6 +30,7 @@ import com.parse.ParseQueryAdapter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -168,9 +169,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             query.whereContainedIn("make", makes);
         }
         if (models.size() > 0) {
-            if (!mSharedPrefs.getBoolean("forceUpdate", false)) {
-                query.whereContainedIn("model", models);
-            }
+            query.whereContainedIn("model", models);
         }
         if (colors.size() > 0) {
             query.whereContainedIn("color", colors);
@@ -182,10 +181,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             query.whereContainedIn("fuelType", fuelTypes);
         }
         if (minPrice != -1) {
-            query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
+            query.whereGreaterThanOrEqualTo("price", minPrice);
         }
         if (maxPrice != -1) {
-            query.whereLessThanOrEqualTo("price", maxPrice * 1000);
+            query.whereLessThanOrEqualTo("price", maxPrice);
         }
         if (maxAge != -1) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
@@ -198,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         return query;
     }
 
+    @SuppressWarnings("unchecked")
     private void updateSearchPanel() {
 
         Set<String> makes = new TreeSet<>();
@@ -235,15 +235,24 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
         fuelTypeSpinner.setItems(fuelTypes);
 
-        Integer minPrice = Collections.min(prices) / 1000;
-        Integer maxPrice = Collections.max(prices) / 1000 + 1;
+        Integer minPrice;
+        Integer maxPrice;
+        try {
+            minPrice = Collections.min(prices);
+            maxPrice = Collections.max(prices);
+        } catch (NoSuchElementException e) {
+            minPrice = 0;
+            maxPrice = 99999;
+        }
 
         RangeSeekBar<Integer> priceSeekBar =
                 (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        priceSeekBar.setRangeValues(minPrice, maxPrice);
-        priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
+        priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
+        priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
+                .OnRangeSeekBarChangeListener<Integer>() {
             @Override
-            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
+            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice,
+                                                    Integer maxPrice) {
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice)
