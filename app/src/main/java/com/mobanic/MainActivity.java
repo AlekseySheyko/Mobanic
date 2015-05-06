@@ -23,10 +23,12 @@ import android.widget.Toast;
 import com.mobanic.utils.AgeSpinnerAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
+import com.mobanic.utils.RatioImageView;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -116,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 TextView priceTextView = (TextView) v.findViewById(R.id.price);
                 priceTextView.setText(formatPrice(car.getInt("price")));
 
+                RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
+                Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl()).fit().centerCrop().into(imageView);
+
                 if (car.getBoolean("isSold")) {
                     v.findViewById(R.id.sold_mark).setVisibility(View.VISIBLE);
                 }
@@ -125,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 return v;
             }
         };
-        mCarsAdapter.setImageKey("coverImage");
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParseObject>() {
             @Override
             public void onLoading() {
@@ -191,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
+        // TODO: Fix crash when first start
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
         if (makes.size() > 0) {
@@ -242,10 +247,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             fuelTypes.add(car.getString("fuelType"));
         }
 
-        if (makes.size() == mCarsAdapter.getCount()) {
-            MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-            makeSpinner.setItems(makes);
-        }
+        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+        makeSpinner.setItems(makes);
 
         MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
         if (!mSharedPrefs.getBoolean("doNotSetModels", false)) {

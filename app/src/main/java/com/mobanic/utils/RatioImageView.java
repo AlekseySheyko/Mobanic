@@ -2,10 +2,9 @@ package com.mobanic.utils;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
-import com.parse.ParseImageView;
-
-public class RatioImageView extends ParseImageView {
+public class RatioImageView extends ImageView {
 
     public RatioImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
