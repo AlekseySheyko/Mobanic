@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
 
     private SharedPreferences mSharedPrefs;
-    private static Context mContext;
+    private static Context sContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
-        mContext = this;
+        sContext = this;
     }
 
     private void setupNavDrawer() {
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     public void updateCars() {
+        Log.d(TAG, "Update cars");
         mCarsAdapter = new CarsQueryAdapter(this, getQueryFactory());
     }
 
@@ -265,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
         });
     }
@@ -288,16 +288,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     public static Context getContext() {
-        return mContext;
+        return sContext;
     }
 
     public static class PushReceiver extends BroadcastReceiver {
+        private static final String TAG = PushReceiver.class.getSimpleName();
+
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
                 ((MainActivity) MainActivity.getContext()).updateCars();
             } catch (Exception e) {
-                Log.w("PushReceiver//Main", "Can't get activity context to update content");
+                Log.w(TAG, "Can't get activity context to update content");
             }
         }
     }

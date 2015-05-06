@@ -1,7 +1,5 @@
 package com.mobanic;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -44,8 +42,6 @@ public class DetailActivity extends ActionBarActivity {
     private ParseObject mCar;
     private String mCarId;
 
-    public static Context mContext;
-
     private ShareActionProvider mShareActionProvider;
     private Intent mShareIntent;
     private Uri mImageUri;
@@ -54,8 +50,6 @@ public class DetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        mContext = this;
 
         SharedPreferences sharedPrefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
@@ -268,20 +262,5 @@ public class DetailActivity extends ActionBarActivity {
                 return(true);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public static Context getContext() {
-        return mContext;
-    }
-
-    public static class PushReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
-            } catch (Exception e) {
-                Log.d("PushReceiver//Detail", "Can't get activity context to update content");
-            }
-        }
     }
 }
