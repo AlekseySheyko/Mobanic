@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             public void onLoaded(List<ParseObject> cars, Exception e) {
                 findViewById(android.R.id.progress).setVisibility(View.GONE);
 
-                if (e == null) {
+                if (e != null) {
                     View emptyText = findViewById(android.R.id.empty);
                     emptyText.setVisibility(View.VISIBLE);
                 }
