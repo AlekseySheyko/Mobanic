@@ -60,6 +60,8 @@ public class MultiSpinner extends Spinner
         mAdapter.clear();
         mAdapter.addAll(choicesList);
         mAdapter.add(mSearchKey);
+        // TODO: Maybe set getCount() + 1
+        setSelection(mAdapter.getCount());
     }
 
     @Override

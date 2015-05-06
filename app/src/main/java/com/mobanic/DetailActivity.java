@@ -1,16 +1,15 @@
 package com.mobanic;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.Menu;
@@ -37,12 +36,11 @@ import java.net.URL;
 import java.util.List;
 
 
-public class DetailActivity extends ActionBarActivity {
+public class DetailActivity extends AppCompatActivity {
 
     private ParseObject mCar;
     private String mCarId;
 
-    private ShareActionProvider mShareActionProvider;
     private Intent mShareIntent;
     private Uri mImageUri;
 
@@ -51,13 +49,15 @@ public class DetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        mCarId = sharedPrefs.getString("car_id", "");
+        if (getIntent() != null) {
+            mCarId = getIntent().getStringExtra("car_id");
+        } else if (savedInstanceState != null) {
+            mCarId = savedInstanceState.getString("car_id");
+        }
 
-        updateCarsList(false);
+        updateCarDetails();
 
-        findViewById(R.id.button_contact).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_contact).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(DetailActivity.this, ContactActivity.class));
@@ -65,13 +65,15 @@ public class DetailActivity extends ActionBarActivity {
         });
     }
 
-    private void updateCarsList(boolean fromNetwork) {
-        if (mCarId == null) return;
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putString("car_id", mCarId);
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
 
+    private void updateCarDetails() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        if (!fromNetwork) {
-            query.fromLocalDatastore();
-        }
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
@@ -245,10 +247,11 @@ public class DetailActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
 
         MenuItem item = menu.findItem(R.id.menu_item_share);
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        ShareActionProvider shareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(item);
 
-        if (mShareActionProvider != null & mShareIntent != null) {
-            mShareActionProvider.setShareIntent(mShareIntent);
+        if (shareActionProvider != null & mShareIntent != null) {
+            shareActionProvider.setShareIntent(mShareIntent);
         }
 
         return true;
