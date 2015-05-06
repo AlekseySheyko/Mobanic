@@ -21,21 +21,14 @@
             android:layout_height="match_parent"
             android:divider="@null"/>
 
-        <ProgressBar
-            android:id="@+id/spinner"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"/>
-
         <TextView
-            android:id="@+id/search_empty"
+            android:id="@android:id/empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="128dp"
             android:fontFamily="sans-serif-light"
             android:gravity="center_horizontal"
-            android:text="No cars found"
+            android:text="@string/empty"
             android:textColor="#36ffffff"
             android:textSize="24sp"
             android:visibility="gone"/>

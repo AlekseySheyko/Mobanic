@@ -81,10 +81,9 @@ public class DetailActivity extends ActionBarActivity {
         query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {
-                if (car == null) {
-                    Toast.makeText(DetailActivity.this,
-                            "This car no longer exists", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(DetailActivity.this, MainActivity.class));
+                if (e != null) {
+                    Toast.makeText(DetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
                     return;
                 }
 
@@ -236,7 +235,7 @@ public class DetailActivity extends ActionBarActivity {
             for (String feature : features) {
                 TextView textView = (TextView) View.inflate(
                         DetailActivity.this,
-                        R.layout.feature_list_item,
+                        R.layout.list_item_feature,
                         null);
                 textView.setText(feature);
                 featuresContainer.addView(textView);
@@ -279,21 +278,9 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-                query.fromLocalDatastore();
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> cars, ParseException e) {
-                        for (ParseObject car : cars) {
-                            car.unpinInBackground();
-                        }
-                    }
-                });
-
                 ((DetailActivity) DetailActivity.getContext()).updateCarsList(true);
             } catch (Exception e) {
-                Log.d("DetailActivity", "Can't get activity context to update content. " +
-                        "Just skip, will be updated in a moment.");
+                Log.d("DetailActivity", "Can't get activity context to update content");
             }
         }
     }
