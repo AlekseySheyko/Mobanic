@@ -12,29 +12,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobanic.utils.AgeSpinnerAdapter;
+import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
-import com.mobanic.utils.RatioImageView;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
-import com.squareup.picasso.Picasso;
 
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -103,27 +98,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     public void updateCarsAdapter() {
-        mCarsAdapter = new ParseQueryAdapter<ParseObject>(this, getQueryFactory()) {
-            @Override
-            public View getItemView(ParseObject car, View v, ViewGroup parent) {
-                v = View.inflate(getContext(), R.layout.list_item_car, null);
-
-                ((TextView) v.findViewById(R.id.make)).setText(car.getString("make"));
-                ((TextView) v.findViewById(R.id.model)).setText(car.getString("model"));
-                ((TextView) v.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
-
-                RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-                Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl())
-                        .fit().centerCrop().into(imageView);
-
-                if (car.getBoolean("isSold")) {
-                    v.findViewById(R.id.sold_label).setVisibility(View.VISIBLE);
-                }
-                super.getItemView(car, v, parent);
-
-                return v;
-            }
-        };
+        mCarsAdapter = new CarsAdapter(this, getQueryFactory());
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParseObject>() {
             @Override
             public void onLoaded(List<ParseObject> cars, Exception e) {
@@ -139,12 +114,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             }
         });
         populateList();
-    }
-
-    public String formatPrice(int price) {
-        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
-        f.setMaximumFractionDigits(0);
-        return f.format(price);
     }
 
     private void populateList() {
