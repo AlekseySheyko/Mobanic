@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         if (!mSharedPrefs.getBoolean("forceUpdate", false)) {
             query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         } else {
+            query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
             mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
         }
 
