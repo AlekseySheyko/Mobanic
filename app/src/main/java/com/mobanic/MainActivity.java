@@ -119,7 +119,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 priceTextView.setText(formatPrice(car.getInt("price")));
 
                 RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-                Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl()).fit().centerCrop().into(imageView);
+                Picasso.with(getContext())
+                        .load(car.getParseFile("coverImage").getUrl())
+                        .fit().centerCrop().into(imageView);
 
                 if (car.getBoolean("isSold")) {
                     v.findViewById(R.id.sold_mark).setVisibility(View.VISIBLE);
@@ -197,7 +199,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        if (!mSharedPrefs.getBoolean("forceUpdate", false)) {
+            query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        } else {
+            mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
+        }
 
         if (makes.size() > 0) {
             query.whereContainedIn("make", makes);
@@ -334,7 +340,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Receive update");
             try {
-                ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
+                SharedPreferences sharedPrefs =
+                        PreferenceManager.getDefaultSharedPreferences(getContext());
+                sharedPrefs.edit().putBoolean("forceUpdate", true).apply();
+                        ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }
