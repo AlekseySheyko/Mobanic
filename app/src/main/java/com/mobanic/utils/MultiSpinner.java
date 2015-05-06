@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MultiSpinner extends Spinner
-        implements OnMultiChoiceClickListener {
+public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener {
 
     private SearchFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
@@ -60,6 +59,7 @@ public class MultiSpinner extends Spinner
         mAdapter.clear();
         mAdapter.addAll(mChoicesList);
         mAdapter.add(mSearchKey);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
         setSelection(mAdapter.getCount());
     }
@@ -67,35 +67,6 @@ public class MultiSpinner extends Spinner
     @Override
     public void onClick(DialogInterface dialog, int position, boolean isChecked) {
         mCheckboxes[position] = isChecked;
-    }
-
-    private void updateSelectedItems() {
-        String shownValue = null;
-
-        Set<String> selectedItems = new HashSet<>();
-        for (int i = 0; i < mCheckboxes.length; i++) {
-            if (mCheckboxes[i]) {
-                shownValue = mAdapter.getItem(i);
-                selectedItems.add(shownValue);
-            }
-        }
-
-        mAdapter.clear();
-        mAdapter.addAll(mChoicesList);
-        if (selectedItems.size() == 0) {
-            mAdapter.add(mSearchKey);
-        } else if (selectedItems.size() == 1) {
-            mAdapter.add(shownValue);
-        } else {
-            if (!mSearchKey.contains("Trans")) {
-                mAdapter.add(selectedItems.size() + " " + mSearchKey.toLowerCase() + "s");
-            } else {
-                mAdapter.add(selectedItems.size() + " trans. types");
-            }
-        }
-        setSelection(mAdapter.getCount());
-
-        mListener.onFilterSet(mSearchKey, selectedItems);
     }
 
     @Override
@@ -121,6 +92,34 @@ public class MultiSpinner extends Spinner
             builder.show();
         }
         return true;
+    }
+
+    private void updateSelectedItems() {
+        String shownValue = null;
+
+        Set<String> selectedItems = new HashSet<>();
+        for (int i = 0; i < mCheckboxes.length; i++) {
+            if (mCheckboxes[i]) {
+                shownValue = mAdapter.getItem(i);
+                selectedItems.add(shownValue);
+            }
+        }
+        mAdapter.clear();
+        mAdapter.addAll(mChoicesList);
+        if (selectedItems.size() == 0) {
+            mAdapter.add(mSearchKey);
+        } else if (selectedItems.size() == 1) {
+            mAdapter.add(shownValue);
+        } else {
+            if (!mSearchKey.contains("Trans")) {
+                mAdapter.add(selectedItems.size() + " " + mSearchKey.toLowerCase() + "s");
+            } else {
+                mAdapter.add(selectedItems.size() + " trans. types");
+            }
+        }
+        setSelection(mAdapter.getCount());
+
+        mListener.onFilterSet(mSearchKey, selectedItems);
     }
 
     public interface SearchFiltersListener {
