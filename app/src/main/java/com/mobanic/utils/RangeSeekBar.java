@@ -129,6 +129,9 @@ public class RangeSeekBar<T extends Number> extends ImageView {
         this.absoluteMinValue = minValue;
         this.absoluteMaxValue = maxValue;
         setValuePrimAndNumberType();
+
+        setNormalizedMinValue(valueToNormalized(minValue));
+        setNormalizedMaxValue(valueToNormalized(maxValue));
     }
 
     @SuppressWarnings("unchecked")

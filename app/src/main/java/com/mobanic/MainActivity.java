@@ -44,11 +44,16 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        sContext = this;
+
+        setContentView(R.layout.activity_main);
         setupNavigationDrawer();
 
         updateCarsAdapter();
+
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
     private void setupNavigationDrawer() {
@@ -69,8 +74,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void setupAgeSpinner() {
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         ArrayAdapter<String> adapter = new AgeSpinnerAdapter(
                 this, getResources().getStringArray(R.array.ages));
 
@@ -92,9 +95,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 // Do not support reset
             }
         });
-
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
-        sContext = this;
     }
 
     public void updateCarsAdapter() {
@@ -240,12 +240,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         RangeSeekBar<Integer> priceSeekBar =
                 (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-        if (models.size() > 1) {
-            priceSeekBar.setRangeValues(minPrice, maxPrice);
-            priceSeekBar.setSelectedMinValue(minPrice);
-            priceSeekBar.setSelectedMaxValue(maxPrice + 1);
-        }
-
+        priceSeekBar.setRangeValues(minPrice, maxPrice);
         priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice, Integer maxPrice) {
