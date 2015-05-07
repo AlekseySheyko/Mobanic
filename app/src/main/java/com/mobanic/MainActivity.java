@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     public ParseQuery<ParseObject> getQuery() {
         Set<String> makes = mSharedPrefs.getStringSet("Make", new HashSet<String>());
         Set<String> models = mSharedPrefs.getStringSet("Model", new HashSet<String>());
-        Set<String> colors = mSharedPrefs.getStringSet("Color", new HashSet<String>());
+        Set<String> colors = mSharedPrefs.getStringSet("Colour", new HashSet<String>());
         Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", new HashSet<String>());
         Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", new HashSet<String>());
         int minPrice = mSharedPrefs.getInt("minPrice", -1);
@@ -163,11 +163,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
-        if (!mSharedPrefs.getBoolean("forceUpdate", false)) {
+        if (!mSharedPrefs.getBoolean("forceNetwork", false)) {
             query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+            // TODO: Set ONLY_NETWORK policy on initial launch
         } else {
             query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
-            mSharedPrefs.edit().putBoolean("forceUpdate", false).apply();
+            mSharedPrefs.edit().putBoolean("forceNetwork", false).apply();
         }
 
         if (makes.size() > 0) {
@@ -255,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
                 RangeSeekBar<Integer> priceSeekBar =
                         (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-                if (mFiltersNotSet || mForceUpdate) { // TODO: Or if makes were updated
+                if (mFiltersNotSet || mForceUpdate) {
                     priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
                 }
                 priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
@@ -305,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             try {
                 SharedPreferences sharedPrefs =
                         PreferenceManager.getDefaultSharedPreferences(getContext());
-                sharedPrefs.edit().putBoolean("forceUpdate", true).apply();
+                sharedPrefs.edit().putBoolean("forceNetwork", true).apply();
                 ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");

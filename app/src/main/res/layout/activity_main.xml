@@ -101,7 +101,7 @@
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/color_spinner"
                     style="@style/DrawerListItem"
-                    custom:searchKey="Color"/>
+                    custom:searchKey="Colour"/>
 
                 <com.mobanic.utils.MultiSpinner
                     android:id="@+id/fuel_type_spinner"
