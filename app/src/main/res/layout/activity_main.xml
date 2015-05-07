@@ -2,6 +2,7 @@
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,12 +16,20 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"/>
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            tools:visibility="gone"/>
+
         <TextView
             android:id="@+id/empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
             android:layout_centerInParent="true"
+            android:fontFamily="sans-serif-light"
             android:text="@string/empty"
             android:textColor="#36ffffff"
             android:textSize="24sp"
@@ -30,8 +39,8 @@
             android:id="@+id/cars_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@null"
-            android:layout_below="@+id/toolbar"/>
+            android:layout_below="@+id/toolbar"
+            android:divider="@null"/>
 
     </RelativeLayout>
 
@@ -55,9 +64,9 @@
             android:layout_weight="1"
             android:background="@color/nav_drawer_background"
             android:fillViewport="true"
-            android:scrollbars="none"
             android:paddingLeft="4dp"
-            android:paddingRight="14dp">
+            android:paddingRight="14dp"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"

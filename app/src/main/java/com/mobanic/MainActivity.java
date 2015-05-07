@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 } else {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
+                findViewById(R.id.progressBar).setVisibility(View.GONE);
             }
 
             @Override
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         mFiltersNotSet = (makes.size() == 0 && models.size() == 0 && colors.size() == 0
                 && transTypes.size() == 0 && fuelTypes.size() == 0 && minPrice == -1
-                && maxPrice == -1 && maxAge == 0);
+                && maxPrice == -1 && maxAge == -1);
 
         return query;
     }
@@ -248,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                     minPrice = Collections.min(prices);
                     maxPrice = Collections.max(prices);
                 } catch (NoSuchElementException ne) {
-                    minPrice = 0;
+                    minPrice = 10000;
                     maxPrice = 99999;
                 }
 
