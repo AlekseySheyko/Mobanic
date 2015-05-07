@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 if (e == null && !(mDoNotUpdateModels && cars.size() == 0)) {
                     mCars = cars;
                     updateSearchPanel();
-                    findViewById(R.id.empty).setVisibility(View.GONE);
                 } else {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
@@ -121,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
             @Override
             public void onLoading() {
+                findViewById(R.id.empty).setVisibility(View.GONE);
+                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
             }
         });
         populateList();
