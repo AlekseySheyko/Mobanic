@@ -22,9 +22,7 @@ import com.mobanic.utils.AgeSpinnerAdapter;
 import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
-import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -40,11 +38,14 @@ import static com.mobanic.utils.MultiSpinner.SearchFiltersListener;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private ParseQueryAdapter<ParseObject> mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mFiltersNotSet;
     private boolean mForceUpdate;
     private boolean mDoNotSetModels;
+    private List<ParseObject> mCars;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             @Override
             public void onLoaded(List<ParseObject> cars, Exception e) {
                 if (e == null) {
+                    mCars = cars;
                     updateSearchPanel();
                     findViewById(R.id.empty).setVisibility(View.GONE);
                 } else {
@@ -195,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice);
         }
+        Log.d(TAG, String.format("Min price: %d, max price: %d", minPrice, maxAge));
         if (maxAge > 0 && maxAge < 11) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
@@ -209,79 +212,72 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     @SuppressWarnings("unchecked")
     private void updateSearchPanel() {
 
-        getQuery().findInBackground(new FindCallback<ParseObject>() {
+        Set<String> makes = new TreeSet<>();
+        Set<String> models = new TreeSet<>();
+        Set<Integer> prices = new TreeSet<>();
+        Set<String> colors = new TreeSet<>();
+        Set<String> transTypes = new TreeSet<>();
+        Set<String> fuelTypes = new TreeSet<>();
+
+        for (ParseObject car : mCars) {
+            makes.add(car.getString("make"));
+            models.add(car.getString("model"));
+            prices.add(car.getInt("price"));
+            colors.add(car.getString("color"));
+            transTypes.add(car.getString("transmission"));
+            fuelTypes.add(car.getString("fuelType"));
+        }
+
+        if (mFiltersNotSet) {
+            MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+            makeSpinner.setItems(makes);
+        }
+
+        if (!mDoNotSetModels) {
+            MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+            modelSpinner.setItems(models);
+        } else {
+            mDoNotSetModels = false;
+        }
+
+        MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
+        colorSpinner.setItems(colors);
+
+        MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
+        transSpinner.setItems(transTypes);
+
+        MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
+        fuelTypeSpinner.setItems(fuelTypes);
+
+        Integer minPrice;
+        Integer maxPrice;
+        try {
+            minPrice = Collections.min(prices);
+            maxPrice = Collections.max(prices);
+        } catch (NoSuchElementException ne) {
+            minPrice = 10000;
+            maxPrice = 99999;
+        }
+
+        RangeSeekBar<Integer> priceSeekBar =
+                (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
+        if (mFiltersNotSet || mForceUpdate) {
+            priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
+        }
+        priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
+                .OnRangeSeekBarChangeListener<Integer>() {
             @Override
-            public void done(List<ParseObject> cars, ParseException e) {
-                if (e != null) return;
-
-                Set<String> makes = new TreeSet<>();
-                Set<String> models = new TreeSet<>();
-                Set<Integer> prices = new TreeSet<>();
-                Set<String> colors = new TreeSet<>();
-                Set<String> transTypes = new TreeSet<>();
-                Set<String> fuelTypes = new TreeSet<>();
-
-                for (ParseObject car : cars) {
-                    makes.add(car.getString("make"));
-                    models.add(car.getString("model"));
-                    prices.add(car.getInt("price"));
-                    colors.add(car.getString("color"));
-                    transTypes.add(car.getString("transmission"));
-                    fuelTypes.add(car.getString("fuelType"));
-                }
-
-                if (mFiltersNotSet) {
-                    MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-                    makeSpinner.setItems(makes);
-                }
-
-                if (!mDoNotSetModels) {
-                    MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-                    modelSpinner.setItems(models);
-                } else {
-                    mDoNotSetModels = false;
-                }
-
-                MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
-                colorSpinner.setItems(colors);
-
-                MultiSpinner transSpinner = (MultiSpinner) findViewById(R.id.trans_spinner);
-                transSpinner.setItems(transTypes);
-
-                MultiSpinner fuelTypeSpinner = (MultiSpinner) findViewById(R.id.fuel_type_spinner);
-                fuelTypeSpinner.setItems(fuelTypes);
-
-                Integer minPrice;
-                Integer maxPrice;
-                try {
-                    minPrice = Collections.min(prices);
-                    maxPrice = Collections.max(prices);
-                } catch (NoSuchElementException ne) {
-                    minPrice = 10000;
-                    maxPrice = 99999;
-                }
-
-                RangeSeekBar<Integer> priceSeekBar =
-                        (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
-                if (mFiltersNotSet || mForceUpdate) {
-                    priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
-                }
-                priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
-                        .OnRangeSeekBarChangeListener<Integer>() {
-                    @Override
-                    public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice,
-                                                            Integer maxPrice) {
-                        mSharedPrefs.edit()
-                                .putInt("minPrice", minPrice)
-                                .putInt("maxPrice", maxPrice)
-                                .apply();
-                        updateCarsAdapter();
-                    }
-                });
-
-                mForceUpdate = false;
+            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minPrice,
+                                                    Integer maxPrice) {
+                mSharedPrefs.edit()
+                        .putInt("minPrice", minPrice)
+                        .putInt("maxPrice", maxPrice)
+                        .apply();
+                updateCarsAdapter();
             }
         });
+
+        mForceUpdate = false;
     }
 
     @Override
