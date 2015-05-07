@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private SharedPreferences mSharedPrefs;
     private boolean mFiltersNotSet;
     private boolean mForceUpdate;
-    private boolean mDoNotSetModels;
+    private boolean mDoNotUpdateModels;
     private List<ParseObject> mCars;
 
     @Override
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         super.onCreate(savedInstanceState);
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPrefs.edit().clear().apply();
         sContext = this;
 
         setContentView(R.layout.activity_main);
@@ -192,12 +193,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             query.whereContainedIn("fuelType", fuelTypes);
         }
         if (minPrice != -1) {
-            query.whereGreaterThanOrEqualTo("price", minPrice);
+            query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
         }
         if (maxPrice != -1) {
-            query.whereLessThanOrEqualTo("price", maxPrice);
+            query.whereLessThanOrEqualTo("price", maxPrice * 1000);
         }
-        Log.d(TAG, String.format("Min price: %d, max price: %d", minPrice, maxAge));
         if (maxAge > 0 && maxAge < 11) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
@@ -233,11 +233,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             makeSpinner.setItems(makes);
         }
 
-        if (!mDoNotSetModels) {
+        if (!mDoNotUpdateModels) {
             MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
             modelSpinner.setItems(models);
         } else {
-            mDoNotSetModels = false;
+            mDoNotUpdateModels = false;
         }
 
         MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 (RangeSeekBar<Integer>) findViewById(R.id.price_selector);
         if (mFiltersNotSet || mForceUpdate) {
             priceSeekBar.setRangeValues(minPrice / 1000, maxPrice / 1000 + 1);
+            mForceUpdate = false;
         }
         priceSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar
                 .OnRangeSeekBarChangeListener<Integer>() {
@@ -274,25 +275,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         .putInt("maxPrice", maxPrice)
                         .apply();
                 updateCarsAdapter();
+                mDoNotUpdateModels = true;
             }
         });
-
-        mForceUpdate = false;
     }
 
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
         mForceUpdate = filterKey.equals("Make");
-        mDoNotSetModels = filterKey.equals("Model");
+        mDoNotUpdateModels = filterKey.equals("Model");
 
         mSharedPrefs.edit().putStringSet(filterKey, selectedValues).apply();
         updateCarsAdapter();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mSharedPrefs.edit().clear().apply();
     }
 
 
