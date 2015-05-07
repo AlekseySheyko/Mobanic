@@ -109,15 +109,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParseObject>() {
             @Override
             public void onLoaded(List<ParseObject> cars, Exception e) {
-                if (e == null) {
-                    Toast.makeText(MainActivity.this, "Cars count: " + cars.size(),
-                            Toast.LENGTH_SHORT).show();
+                if (e == null && !(mDoNotUpdateModels && cars.size() == 0)) {
                     mCars = cars;
                     updateSearchPanel();
                     findViewById(R.id.empty).setVisibility(View.GONE);
                 } else {
-                    Toast.makeText(MainActivity.this, "Exception: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
