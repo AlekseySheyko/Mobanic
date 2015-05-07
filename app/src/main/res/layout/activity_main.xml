@@ -64,7 +64,7 @@
             android:layout_weight="1"
             android:background="@color/nav_drawer_background"
             android:fillViewport="true"
-            android:paddingLeft="4dp"
+            android:paddingLeft="14dp"
             android:paddingRight="14dp"
             android:scrollbars="none">
 
@@ -90,7 +90,7 @@
                 <com.mobanic.utils.RangeSeekBar
                     android:id="@+id/price_selector"
                     style="@style/DrawerListItem"
-                    android:layout_marginLeft="16dp"
+                    android:layout_marginLeft="11dp"
                     android:layout_marginRight="5dp"/>
 
                 <Spinner
