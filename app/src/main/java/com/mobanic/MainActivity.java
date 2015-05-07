@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private SharedPreferences mSharedPrefs;
     private boolean mFiltersNotSet;
     private boolean mForceUpdate;
+    private boolean mDoNotSetModels;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +176,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             query.whereContainedIn("make", makes);
         }
         if (models.size() > 0) {
-            query.whereContainedIn("model", models);
+            if (!mForceUpdate) {
+                query.whereContainedIn("model", models);
+            }
         }
         if (colors.size() > 0) {
             query.whereContainedIn("color", colors);
@@ -232,8 +235,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                     makeSpinner.setItems(makes);
                 }
 
-                MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
-                modelSpinner.setItems(models);
+                if (!mDoNotSetModels) {
+                    MultiSpinner modelSpinner = (MultiSpinner) findViewById(R.id.model_spinner);
+                    modelSpinner.setItems(models);
+                } else {
+                    mDoNotSetModels = false;
+                }
 
                 MultiSpinner colorSpinner = (MultiSpinner) findViewById(R.id.color_spinner);
                 colorSpinner.setItems(colors);
@@ -280,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     @Override
     public void onFilterSet(String filterKey, Set<String> selectedValues) {
         mForceUpdate = filterKey.equals("Make");
+        mDoNotSetModels = filterKey.equals("Model");
 
         mSharedPrefs.edit().putStringSet(filterKey, selectedValues).apply();
         updateCarsAdapter();
