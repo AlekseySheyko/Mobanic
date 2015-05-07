@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             public void onItemSelected(AdapterView<?> adapterView, View view,
                                        int position, long id) {
                 if (position < 11) {
-                    mSharedPrefs.edit().putInt("maxAge", position + 1).apply();
+                    mSharedPrefs.edit().putInt("maxAge", position).apply();
                     updateCarsAdapter();
                 }
             }
@@ -190,13 +190,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice);
         }
-        if (maxAge != -1 && maxAge < 11) {
+        if (maxAge > 0 && maxAge < 11) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
 
         mFiltersNotSet = (makes.size() == 0 && models.size() == 0 && colors.size() == 0
                 && transTypes.size() == 0 && fuelTypes.size() == 0 && minPrice == -1
-                && maxPrice == -1 && (maxAge == -1 || maxAge == 11));
+                && maxPrice == -1 && maxAge == 0);
 
         return query;
     }
