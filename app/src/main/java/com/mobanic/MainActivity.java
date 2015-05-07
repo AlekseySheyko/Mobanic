@@ -110,10 +110,14 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             @Override
             public void onLoaded(List<ParseObject> cars, Exception e) {
                 if (e == null) {
+                    Toast.makeText(MainActivity.this, "Cars count: " + cars.size(),
+                            Toast.LENGTH_SHORT).show();
                     mCars = cars;
                     updateSearchPanel();
                     findViewById(R.id.empty).setVisibility(View.GONE);
                 } else {
+                    Toast.makeText(MainActivity.this, "Exception: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
@@ -274,8 +278,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice)
                         .apply();
-                updateCarsAdapter();
                 mDoNotUpdateModels = true;
+                updateCarsAdapter();
             }
         });
     }
