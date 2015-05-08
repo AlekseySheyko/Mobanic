@@ -23,7 +23,9 @@ import com.mobanic.utils.AgeSpinnerAdapter;
 import com.mobanic.utils.CarsAdapter;
 import com.mobanic.utils.MultiSpinner;
 import com.mobanic.utils.RangeSeekBar;
+import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -319,7 +321,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 SharedPreferences sharedPrefs =
                         PreferenceManager.getDefaultSharedPreferences(getContext());
                 sharedPrefs.edit().putBoolean("forceNetwork", true).apply();
-                ((MainActivity) MainActivity.getContext()).updateCarsAdapter(true);
+
+                ParseQuery<ParseObject> query = new ParseQuery<>("Car");
+                query.fromLocalDatastore();
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> cars, ParseException e) {
+                        for (ParseObject car : cars) {
+                            car.unpinInBackground();
+                        }
+                        ((MainActivity) MainActivity.getContext()).updateCarsAdapter(true);
+                    }
+                });
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }

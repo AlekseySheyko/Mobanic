@@ -209,6 +209,10 @@ public class DetailActivity extends AppCompatActivity {
                                 .into(imageView);
                         flipper.addView(imageView);
                     }
+                    if (images.size() == 1) {
+                        flipper.setOnClickListener(null);
+                        flipper.stopFlipping();
+                    }
                 } else {
                     findViewById(R.id.gallery_header).setVisibility(View.GONE);
                     findViewById(R.id.flipper).setVisibility(View.GONE);

@@ -19,7 +19,7 @@
             android:id="@+id/sold_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_sold_mark"
+            android:src="@drawable/ic_sold"
             android:visibility="gone"/>
 
         <FrameLayout
