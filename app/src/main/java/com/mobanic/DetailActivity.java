@@ -80,7 +80,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void updateCarDetails() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        query.fromLocalDatastore();
         query.getInBackground(mCarId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject car, ParseException e) {

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
@@ -105,13 +106,24 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     public void updateCarsAdapter() {
-        mCarsAdapter = new CarsAdapter(this, getQueryFactory());
+        updateCarsAdapter(false);
+    }
+
+    public void updateCarsAdapter(boolean fromNetwork) {
+        mCarsAdapter = new CarsAdapter(this, getQueryFactory(fromNetwork));
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParseObject>() {
             @Override
             public void onLoaded(List<ParseObject> cars, Exception e) {
-                if (e == null && !(mDoNotUpdateModels && cars.size() == 0)) {
+                if (e == null && cars.size() > 0) {
                     mCars = cars;
+                    for (ParseObject car : cars) {
+                        car.pinInBackground();
+                    }
                     updateSearchPanel();
+                } else if (mDoNotUpdateModels) {
+                    findViewById(R.id.empty).setVisibility(View.VISIBLE);
+                } else if (isOnline()) {
+                    updateCarsAdapter(true);
                 } else {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
@@ -125,6 +137,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             }
         });
         populateList();
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
     private void populateList() {
@@ -148,15 +165,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         });
     }
 
-    private ParseQueryAdapter.QueryFactory<ParseObject> getQueryFactory() {
+    private ParseQueryAdapter.QueryFactory<ParseObject> getQueryFactory(final boolean fromNetwork) {
         return new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
-                return getQuery();
+                return getQuery(fromNetwork);
             }
         };
     }
 
-    public ParseQuery<ParseObject> getQuery() {
+    public ParseQuery<ParseObject> getQuery(boolean fromNetwork) {
         Set<String> makes = mSharedPrefs.getStringSet("Make", new HashSet<String>());
         Set<String> models = mSharedPrefs.getStringSet("Model", new HashSet<String>());
         Set<String> colors = mSharedPrefs.getStringSet("Colour", new HashSet<String>());
@@ -168,12 +185,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         ParseQuery<ParseObject> query = new ParseQuery<>("Car");
         query.orderByDescending("createdAt");
-        if (!mSharedPrefs.getBoolean("forceNetwork", false)) {
-            query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-            // TODO: Set ONLY_NETWORK policy on initial launch
-        } else {
-            query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
-            mSharedPrefs.edit().putBoolean("forceNetwork", false).apply();
+        if (!fromNetwork) {
+            query.fromLocalDatastore();
         }
 
         if (makes.size() > 0) {
@@ -306,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 SharedPreferences sharedPrefs =
                         PreferenceManager.getDefaultSharedPreferences(getContext());
                 sharedPrefs.edit().putBoolean("forceNetwork", true).apply();
-                ((MainActivity) MainActivity.getContext()).updateCarsAdapter();
+                ((MainActivity) MainActivity.getContext()).updateCarsAdapter(true);
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }
