@@ -1,7 +1,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/detail_window_background"
@@ -13,48 +13,35 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <FrameLayout
+            <com.mobanic.utils.RatioImageView
+                android:id="@+id/image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ProgressBar
-                    android:id="@+id/spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    style="?android:attr/progressBarStyleLarge"/>
-
-                <com.mobanic.utils.RatioImageView
-                    android:id="@+id/image"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-            </FrameLayout>
+                android:layout_height="wrap_content"/>
 
             <TextView
-                android:text="@string/specs_header"
-                style="@style/HeaderTextView"/>
+                style="@style/HeaderTextView"
+                android:text="@string/specs_header"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:background="@android:color/white">
+                android:paddingTop="8dp">
 
                 <LinearLayout
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Make"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Make"/>
 
                     <TextView
                         android:id="@+id/make"
@@ -67,8 +54,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Model"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Model"/>
 
                     <TextView
                         android:id="@+id/model"
@@ -81,8 +68,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Year"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Year"/>
 
                     <TextView
                         android:id="@+id/year"
@@ -95,8 +82,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Mileage"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Mileage"/>
 
                     <TextView
                         android:id="@+id/mileage"
@@ -109,8 +96,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Previous Owners"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Previous Owners"/>
 
                     <TextView
                         android:id="@+id/previousOwners"
@@ -123,8 +110,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Engine"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Engine"/>
 
                     <TextView
                         android:id="@+id/engine"
@@ -137,8 +124,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Transmission"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Transmission"/>
 
                     <TextView
                         android:id="@+id/transmission"
@@ -151,8 +138,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Fuel Type"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Fuel Type"/>
 
                     <TextView
                         android:id="@+id/fuelType"
@@ -165,8 +152,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Color"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Color"/>
 
                     <TextView
                         android:id="@+id/color"
@@ -179,8 +166,8 @@
                     style="@style/SpecsContainer">
 
                     <TextView
-                        android:text="Location"
-                        style="@style/SpecsKey"/>
+                        style="@style/SpecsKey"
+                        android:text="Location"/>
 
                     <TextView
                         android:id="@+id/location"
@@ -193,8 +180,8 @@
 
             <TextView
                 android:id="@+id/gallery_header"
-                android:text="@string/gallery_header"
-                style="@style/HeaderTextView"/>
+                style="@style/HeaderTextView"
+                android:text="@string/gallery_header"/>
 
             <ViewFlipper
                 android:id="@+id/flipper"
@@ -213,19 +200,19 @@
 
             <TextView
                 android:id="@+id/features_header"
-                android:text="@string/features_header"
-                style="@style/HeaderTextView"/>
+                style="@style/HeaderTextView"
+                android:text="@string/features_header"/>
 
             <LinearLayout
                 android:id="@+id/features_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
                 android:orientation="vertical"
-                android:paddingTop="12dp"
                 android:paddingBottom="16dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:background="@android:color/white"/>
+                android:paddingTop="12dp"/>
 
         </LinearLayout>
 
@@ -235,10 +222,10 @@
         android:id="@+id/fab_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_contact"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
         android:layout_gravity="bottom|right"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_contact"
         fab:fab_colorNormal="#ff4081"
         fab:fab_colorPressed="#ffd03568"/>
 
