@@ -81,8 +81,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
-
-        setupAgeSpinner();
     }
 
     private void setupAgeSpinner() {
@@ -131,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             public void onLoaded(List<ParseObject> cars, Exception e) {
                 if (e == null && cars.size() > 0) {
                     mCars = cars;
+
                     for (ParseObject car : cars) {
                         car.pinInBackground();
                     }
@@ -148,6 +147,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
+
+                if (mFiltersNotSet) {
+                    setupAgeSpinner();
+                }
             }
 
             @Override
