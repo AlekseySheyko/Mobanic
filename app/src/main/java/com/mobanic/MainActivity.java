@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private boolean mForceUpdate;
     private boolean mDoNotUpdateModels;
     private List<ParseObject> mCars;
+    private boolean mForceNetworkAlready;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,17 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
         spinner.setAdapter(adapter);
         spinner.setSelection(adapter.getCount());
+        if (mCars == null) {
+            spinner.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    Toast.makeText(MainActivity.this, "No cars to choose from", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+        } else {
+            spinner.setOnTouchListener(null);
+        }
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,
@@ -125,7 +138,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 } else if (mDoNotUpdateModels) {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 } else if (isOnline()) {
-                    updateCarsAdapter(true);
+                    if (!mForceNetworkAlready) {
+                        updateCarsAdapter(true);
+                    } else {
+                        findViewById(R.id.empty).setVisibility(View.VISIBLE);
+                    }
+                    mForceNetworkAlready = true;
                 } else {
                     findViewById(R.id.empty).setVisibility(View.VISIBLE);
                 }
