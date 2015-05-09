@@ -6,42 +6,36 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mobanic.views.RatioImageView;
-import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
 import com.squareup.picasso.Picasso;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+public class CarsAdapter extends ParseQueryAdapter<Car> {
 
-public class CarsAdapter extends ParseQueryAdapter<ParseObject> {
-
-    public CarsAdapter(Context context, QueryFactory<ParseObject> queryFactory) {
+    public CarsAdapter(Context context, QueryFactory<Car> queryFactory) {
         super(context, queryFactory);
     }
 
     @Override
-    public View getItemView(ParseObject car, View v, ViewGroup parent) {
-        v = View.inflate(getContext(), R.layout.list_item_car, null);
+    public View getItemView(Car car, View v, ViewGroup parent) {
+        if (v == null) {
+            v = View.inflate(getContext(), R.layout.list_item_car, null);
+        }
 
-        ((TextView) v.findViewById(R.id.make)).setText(car.getString("make"));
-        ((TextView) v.findViewById(R.id.model)).setText(car.getString("model"));
-        ((TextView) v.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
+        ((TextView) v.findViewById(R.id.make)).setText(car.getMake());
+        ((TextView) v.findViewById(R.id.model)).setText(car.getModel());
+        ((TextView) v.findViewById(R.id.price)).setText(car.getPrice());
 
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-        Picasso.with(getContext()).load(car.getParseFile("coverImage").getUrl())
-                .fit().centerCrop().into(imageView);
+        Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
 
-        if (car.getBoolean("isSold")) {
-            v.findViewById(R.id.sold_label).setVisibility(View.VISIBLE);
+        if (car.isSold()) {
+            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
         }
-        super.getItemView(car, v, parent);
-
         return v;
     }
 
-    public String formatPrice(int price) {
-        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
-        f.setMaximumFractionDigits(0);
-        return f.format(price);
+    @Override
+    public void loadObjects() {
+        super.loadObjects();
     }
 }

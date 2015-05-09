@@ -4,6 +4,7 @@
         <item>Request full details</item>
     </string-array>
     <string-array name="ages">
+        <item>Age</item>
         <item>Up to 1 year old</item>
         <item>Up to 2 years old</item>
         <item>Up to 3 years old</item>
@@ -15,6 +16,5 @@
         <item>Up to 9 years old</item>
         <item>Up to 10 years old</item>
         <item>Over 10 years old</item>
-        <item>Age</item>
     </string-array>
 </resources>
