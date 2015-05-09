@@ -1,4 +1,4 @@
-package com.mobanic.utils;
+package com.mobanic.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -1,4 +1,4 @@
-package com.mobanic.utils;
+package com.mobanic.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -41,7 +41,7 @@ import java.math.BigDecimal;
  * @author Alex Florescu (florescu@yahoo-inc.com)
  * @author Michael Keppler (bananeweizen@gmx.de)
  */
-public class RangeSeekBar<T extends Number> extends ImageView {
+public class PriceSeekBar<T extends Number> extends ImageView {
 
     public static final Integer DEFAULT_MINIMUM = 0;
     public static final Integer DEFAULT_MAXIMUM = 100;
@@ -96,7 +96,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
     private static final int DEFAULT_TEXT_DISTANCE_TO_TOP_IN_DP = 8;
     private boolean mSingleThumb;
 
-    public RangeSeekBar(Context context, AttributeSet attrs) {
+    public PriceSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -621,7 +621,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
      */
     public interface OnRangeSeekBarChangeListener<T> {
 
-        public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, T minValue, T maxValue);
+        public void onRangeSeekBarValuesChanged(PriceSeekBar<?> bar, T minValue, T maxValue);
     }
 
     /**

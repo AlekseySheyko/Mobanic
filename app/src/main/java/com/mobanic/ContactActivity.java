@@ -18,7 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mobanic.utils.Mail;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -134,7 +133,7 @@ public class ContactActivity extends ActionBarActivity {
             String subject = strings[1];
             String message = strings[2];
 
-            Mail m = new Mail("mobanic.user@gmail.com", "mob12345");
+            CustomEmailClient m = new CustomEmailClient("mobanic.user@gmail.com", "mob12345");
 
             String[] toArr = {MOBANIC_EMAIL_ADDRESS};
             m.setTo(toArr);

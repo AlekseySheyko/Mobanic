@@ -21,7 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mobanic.utils.RatioImageView;
+import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -49,6 +49,8 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        // TODO Check and return if car was sold
 
         if (getIntent() != null) {
             mCarId = getIntent().getStringExtra("car_id");

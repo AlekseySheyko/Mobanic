@@ -22,7 +22,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            tools:visibility="gone"/>
+            android:visibility="gone"/>
+
+        <ListView
+            android:id="@+id/cars_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar"
+            android:divider="@null"/>
 
         <TextView
             android:id="@+id/empty"
@@ -35,13 +42,6 @@
             android:textSize="24sp"
             android:visibility="gone"/>
 
-        <ListView
-            android:id="@+id/cars_listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar"
-            android:divider="@null"/>
-
     </RelativeLayout>
 
     <LinearLayout
@@ -51,12 +51,8 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="#ff131313"
-            android:paddingLeft="40dp"
-            android:paddingRight="46dp"
-            android:src="@drawable/ic_logo"/>
+            android:src="@drawable/ic_logo"
+            style="@style/SearchHeader"/>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -77,17 +73,17 @@
                 android:paddingTop="16dp"
                 android:showDividers="middle">
 
-                <com.mobanic.utils.MultiSpinner
+                <com.mobanic.views.MultiSpinner
                     android:id="@+id/make_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Make"/>
 
-                <com.mobanic.utils.MultiSpinner
+                <com.mobanic.views.MultiSpinner
                     android:id="@+id/model_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Model"/>
 
-                <com.mobanic.utils.RangeSeekBar
+                <com.mobanic.views.PriceSeekBar
                     android:id="@+id/price_selector"
                     style="@style/DrawerListItem"
                     android:layout_marginLeft="11dp"
@@ -96,19 +92,20 @@
                 <Spinner
                     android:id="@+id/age_spinner"
                     style="@style/DrawerListItem"
-                    android:spinnerMode="dialog"/>
+                    android:spinnerMode="dialog"
+                    android:entries="@array/ages"/>
 
-                <com.mobanic.utils.MultiSpinner
+                <com.mobanic.views.MultiSpinner
                     android:id="@+id/color_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Colour"/>
 
-                <com.mobanic.utils.MultiSpinner
+                <com.mobanic.views.MultiSpinner
                     android:id="@+id/fuel_type_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Fuel Type"/>
 
-                <com.mobanic.utils.MultiSpinner
+                <com.mobanic.views.MultiSpinner
                     android:id="@+id/trans_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Transmission"/>

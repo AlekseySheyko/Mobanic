@@ -1,11 +1,11 @@
-package com.mobanic.utils;
+package com.mobanic;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.mobanic.R;
+import com.mobanic.views.RatioImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
 import com.squareup.picasso.Picasso;
