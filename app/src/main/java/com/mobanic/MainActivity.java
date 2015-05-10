@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     private CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mForcedNetwork;
+    private boolean mInitialLaunch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +68,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                             ParseObject.pinAllInBackground(CARS_LABEL, carList);
                         }
                     });
-                    updateSearchPanel(carList);
-                } else if (e == null && carList.size() == 0) {
+                    if (mInitialLaunch) {
+                        updateSearchPanel(carList);
+                        mInitialLaunch = false;
+                    }
+                } else if (e == null && carList.size() == 0 && mInitialLaunch) {
                     if (isOnline() && !mForcedNetwork) {
                         mForcedNetwork = true;
                         mCarsAdapter.loadObjects();
@@ -128,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
                 int minPrice = mSharedPrefs.getInt("minPrice", -1);
                 int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
+                int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
                 ParseQuery<Car> query = ParseQuery.getQuery(Car.class);
                 query.orderByDescending("createdAt");
@@ -155,13 +161,12 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                     query.whereGreaterThanOrEqualTo("price", minPrice);
                 }
                 if (maxPrice != -1) {
-                    query.whereLessThanOrEqualTo("price", maxPrice);
+                    query.whereGreaterThanOrEqualTo("price", maxPrice);
                 }
-                    /*
-                    if (maxAge > 0 && maxAge < 11) {
-                        query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
-                    }
-                    */
+                if (maxAge != -1) {
+                    query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
+                    Toast.makeText(MainActivity.this, "Max year: " + (2015 - maxAge), Toast.LENGTH_SHORT).show();
+                }
                 return query;
             }
         };
@@ -184,6 +189,12 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     }
 
     @Override
+    public void onAgeSelected(int maxAge) {
+        mSharedPrefs.edit().putInt("maxAge", maxAge).apply();
+        mCarsAdapter.loadObjects();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         mSharedPrefs.edit().clear().apply();
@@ -194,4 +205,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
+
+    // TODO Implement push receiver
 }

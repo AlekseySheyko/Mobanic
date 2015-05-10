@@ -15,13 +15,12 @@ import com.mobanic.Car;
 import com.mobanic.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SingleSpinner extends Spinner implements DialogInterface.OnMultiChoiceClickListener {
+public class SingleSpinner extends Spinner {
 
     private AgeFilterListener mListener;
     private ArrayAdapter<String> mAdapter;
@@ -72,14 +71,12 @@ public class SingleSpinner extends Spinner implements DialogInterface.OnMultiCho
         mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
         setSelection(mAdapter.getCount());
+
+        mSelectedValue = mAgeCategoriesList.size();
     }
 
     private int extractDigits(String s) {
-        return Integer.parseInt(s.replaceAll("\\D+",""));
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int position, boolean isChecked) {
+        return Integer.parseInt(s.replaceAll("\\D+", ""));
     }
 
     @Override
@@ -88,7 +85,7 @@ public class SingleSpinner extends Spinner implements DialogInterface.OnMultiCho
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mAgeCategoriesList.size() == 0) {
+        if (mAgeCategoriesList == null || mAgeCategoriesList.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
         } else if (makes == null || makes.size() == 0) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
@@ -97,13 +94,14 @@ public class SingleSpinner extends Spinner implements DialogInterface.OnMultiCho
                     new CharSequence[mAgeCategoriesList.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setSingleChoiceItems(choices, mSelectedValue, this);
-            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+            builder.setSingleChoiceItems(choices, mSelectedValue, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialogInterface, int position) {
+                    mSelectedValue = position;
                     updateSelectedItems();
                 }
             });
+            builder.setPositiveButton("Set", this);
             builder.show();
         }
         return true;
@@ -111,17 +109,17 @@ public class SingleSpinner extends Spinner implements DialogInterface.OnMultiCho
 
     private void updateSelectedItems() {
         mAdapter.clear();
-        mAdapter.addAll(mAgeCategoriesList);
         if (mSelectedValue == 0) {
             mAdapter.add(mSearchKey);
         } else {
-            mAdapter.add(mSelectedValue + "");
+            for (String ageStr : mAgeCategoriesList) {
+                mAdapter.add(ageStr);
+                mListener.onAgeSelected(extractDigits(ageStr));
+            }
         }
-
-        mListener.onFilterSet(mSearchKey, (Set<String>) Arrays.asList(mSelectedValue + ""));
     }
 
     public interface AgeFilterListener {
-        void onFilterSet(String filterKey, Set<String> selectedItems);
+        void onAgeSelected(int maxAge);
     }
 }
