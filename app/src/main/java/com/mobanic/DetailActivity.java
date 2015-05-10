@@ -81,21 +81,27 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateCarDetails() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Car");
+        ParseQuery<Car> query = ParseQuery.getQuery("Car");
         query.fromLocalDatastore();
-        query.getInBackground(mCarId, new GetCallback<ParseObject>() {
+        query.getInBackground(mCarId, new GetCallback<Car>() {
             @Override
-            public void done(ParseObject car, ParseException e) {
+            public void done(Car car, ParseException e) {
                 if (e != null) {
-                    Toast.makeText(DetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetailActivity.this, e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                } else if (car.isSold()) {
+                    Toast.makeText(DetailActivity.this, getString(R.string.sold),
+                            Toast.LENGTH_SHORT).show();
                     finish();
                     return;
                 }
 
                 mCar = car;
 
-                String make = car.getString("make");
-                String model = car.getString("model");
+                String make = car.getMake();
+                String model = car.getModel();
 
                 String title = make + " " + model;
                 if (title.length() > 20) {

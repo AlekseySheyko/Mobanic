@@ -22,9 +22,9 @@ import java.util.TreeSet;
 
 public class SingleSpinner extends Spinner {
 
-    private AgeFilterListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private Set<String> mAgeCategoriesList;
+    private Set<String> mAgeSet;
+    private ArrayList<String> mAgeList;
     private int mSelectedValue;
     private String mSearchKey;
 
@@ -43,8 +43,6 @@ public class SingleSpinner extends Spinner {
             a.recycle();
         }
 
-        mListener = (AgeFilterListener) context;
-
         mAdapter = new ArrayAdapter<>(
                 getContext(),
                 android.R.layout.simple_spinner_item,
@@ -55,24 +53,28 @@ public class SingleSpinner extends Spinner {
     }
 
     public void setItems(List<Car> carList) {
-        mAgeCategoriesList = new TreeSet<>(new Comparator<String>() {
+        mAgeSet = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String s, String t1) {
                 return extractDigits(s) - extractDigits(t1);
             }
         });
         for (Car car : carList) {
-            mAgeCategoriesList.add(car.getAgeCategory());
+            mAgeSet.add(car.getAgeCategory());
+        }
+        mAgeList = new ArrayList<>();
+        for (String age : mAgeSet) {
+            mAgeList.add(age);
         }
 
         mAdapter.clear();
-        mAdapter.addAll(mAgeCategoriesList);
+        mAdapter.addAll(mAgeSet);
         mAdapter.add(mSearchKey);
         mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
         setSelection(mAdapter.getCount());
 
-        mSelectedValue = mAgeCategoriesList.size();
+        mSelectedValue = mAgeSet.size();
     }
 
     private int extractDigits(String s) {
@@ -85,19 +87,20 @@ public class SingleSpinner extends Spinner {
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mAgeCategoriesList == null || mAgeCategoriesList.size() == 0) {
+        if (mAgeSet == null || mAgeSet.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
         } else if (makes == null || makes.size() == 0) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
         } else {
-            CharSequence[] choices = mAgeCategoriesList.toArray(
-                    new CharSequence[mAgeCategoriesList.size()]);
+            CharSequence[] choices = mAgeSet.toArray(
+                    new CharSequence[mAgeSet.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setSingleChoiceItems(choices, mSelectedValue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int position) {
-                    // TODO
+                    Toast.makeText(getContext(), position + "", Toast.LENGTH_SHORT).show();
+                    mSelectedValue = position;
                     updateSelectedItems();
                 }
             });
@@ -112,7 +115,7 @@ public class SingleSpinner extends Spinner {
         if (mSelectedValue == 0) {
             mAdapter.add(mSearchKey);
         } else {
-            // TODO
+            mAdapter.add(mAgeList.get(mSelectedValue));
         }
     }
 
