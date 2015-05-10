@@ -36,6 +36,10 @@ public class Car extends ParseObject {
         return getBoolean("isSold");
     }
 
+    public String getValueForKey(String key) {
+        return getString(key.toLowerCase().replace("colour", "color").replace("fuel type", "fuelType"));
+    }
+
     public String formatPrice(int price) {
         NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
         f.setMaximumFractionDigits(0);

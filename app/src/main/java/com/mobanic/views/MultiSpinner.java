@@ -61,10 +61,14 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
     public void setItems(List<Car> carList) {
         mCarList = new TreeSet<>();
         for (Car car : carList) {
-            mCarList.add(car.getString(mSearchKey.toLowerCase()));
-            Log.d(TAG, String.format("Found %d items for key %s",
-                    mCarList.size(), mSearchKey.toLowerCase()));
+            try {
+                mCarList.add(car.getValueForKey(mSearchKey));
+            } catch (NullPointerException e) {
+                Log.e(TAG, "Not found items for key: " + mSearchKey.toLowerCase());
+            }
         }
+        Log.d(TAG, String.format("Found %d items for key %s",
+                mCarList.size(), mSearchKey.toLowerCase()));
         mCheckboxes = new boolean[mCarList.size()];
 
         mAdapter.clear();

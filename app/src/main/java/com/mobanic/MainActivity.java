@@ -18,8 +18,6 @@ import com.mobanic.views.PriceSeekBar;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -133,22 +131,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         };
     }
 
+    public void updateSearchPanel(List<Car> carList) {
+        ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
+        ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
+        ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
+        ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
+        ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
+        ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);
+    }
+
     @Override
     public void onFilterSet(String key, Set<String> values) {
         mSharedPrefs.edit().putStringSet(key, values).apply();
         mCarsAdapter.loadObjects();
-    }
-
-    public void updateSearchPanel(List<Car> carList) {
-        List<Integer> prices = new ArrayList<>();
-        for (Car car : carList) {
-            prices.add(car.getPrice());
-        }
-        PriceSeekBar<Integer> bar = (PriceSeekBar<Integer>) findViewById(R.id.price_seekbar);
-        bar.setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);
-
-        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
-        makeSpinner.setItems(carList);
     }
 
     @Override

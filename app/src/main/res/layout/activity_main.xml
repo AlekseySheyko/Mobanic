@@ -98,12 +98,12 @@
                     android:entries="@array/ages"/>
 
                 <com.mobanic.views.MultiSpinner
-                    android:id="@+id/color_spinner"
+                    android:id="@+id/colour_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Colour"/>
 
                 <com.mobanic.views.MultiSpinner
-                    android:id="@+id/fuel_type_spinner"
+                    android:id="@+id/fuel_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Fuel Type"/>
 

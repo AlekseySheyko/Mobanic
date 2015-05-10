@@ -16,9 +16,13 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
+import com.mobanic.Car;
 import com.mobanic.R;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Widget that lets users select a minimum and maximum value on a given numerical range.
@@ -57,7 +61,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
     private final float thumbHalfWidth = 0.5f * thumbWidth;
     private final float thumbHalfHeight = 0.5f * thumbImage.getHeight();
     private float padding;
-    private T absoluteMinValue, absoluteMaxValue;
+    private Integer absoluteMinValue, absoluteMaxValue;
     private NumberType numberType;
     private double absoluteMinValuePrim, absoluteMaxValuePrim;
     private double normalizedMinValue = 0d;
@@ -125,7 +129,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
         mScaledTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
-    public void setRangeValues(T minValue, T maxValue) {
+    public void setRangeValues(Integer minValue, Integer maxValue) {
         this.absoluteMinValue = minValue;
         this.absoluteMaxValue = maxValue;
         setValuePrimAndNumberType();
@@ -137,8 +141,8 @@ public class PriceSeekBar<T extends Number> extends ImageView {
     @SuppressWarnings("unchecked")
     // only used to set default values when initialised from XML without any values specified
     private void setRangeToDefaultValues() {
-        this.absoluteMinValue = (T) DEFAULT_MINIMUM;
-        this.absoluteMaxValue = (T) DEFAULT_MAXIMUM;
+        this.absoluteMinValue = (Integer) DEFAULT_MINIMUM;
+        this.absoluteMaxValue = (Integer) DEFAULT_MAXIMUM;
         setValuePrimAndNumberType();
     }
 
@@ -171,7 +175,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @return The absolute minimum value of the range.
      */
-    public T getAbsoluteMinValue() {
+    public Integer getAbsoluteMinValue() {
         return absoluteMinValue;
     }
 
@@ -180,7 +184,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @return The absolute maximum value of the range.
      */
-    public T getAbsoluteMaxValue() {
+    public Integer getAbsoluteMaxValue() {
         return absoluteMaxValue;
     }
 
@@ -198,7 +202,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @param value The Number value to set the minimum value to. Will be clamped to given absolute minimum/maximum range.
      */
-    public void setSelectedMinValue(T value) {
+    public void setSelectedMinValue(Integer value) {
         // in case absoluteMinValue == absoluteMaxValue, avoid division by zero when normalizing.
         if (0 == (absoluteMaxValuePrim - absoluteMinValuePrim)) {
             setNormalizedMinValue(0d);
@@ -221,7 +225,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @param value The Number value to set the maximum value to. Will be clamped to given absolute minimum/maximum range.
      */
-    public void setSelectedMaxValue(T value) {
+    public void setSelectedMaxValue(Integer value) {
         // in case absoluteMinValue == absoluteMaxValue, avoid division by zero when normalizing.
         if (0 == (absoluteMaxValuePrim - absoluteMinValuePrim)) {
             setNormalizedMaxValue(1d);
@@ -578,7 +582,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      * @param value The Number value to normalize.
      * @return The normalized double.
      */
-    private double valueToNormalized(T value) {
+    private double valueToNormalized(Integer value) {
         if (0 == absoluteMaxValuePrim - absoluteMinValuePrim) {
             // prevent division by zero, simply return 0.
             return 0d;
@@ -611,6 +615,14 @@ public class PriceSeekBar<T extends Number> extends ImageView {
             double result = (screenCoord - padding) / (width - 2 * padding);
             return Math.min(1d, Math.max(0d, result));
         }
+    }
+
+    public void setItems(List<Car> carList) {
+        List<Integer> prices = new ArrayList<>();
+        for (Car car : carList) {
+            prices.add(car.getPrice());
+        }
+        setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);
     }
 
     /**
