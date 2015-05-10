@@ -188,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
     @Override
     public void onFilterSet(String key, Set<String> values) {
-        mSharedPrefs.edit().putStringSet(key, values).apply();
-        mCarsAdapter.loadObjects();
-
         if (key.equals("Make")) {
             mMakesUpdated = true;
+            mSharedPrefs.edit().clear().apply();
         }
+        mSharedPrefs.edit().putStringSet(key, values).apply();
+        mCarsAdapter.loadObjects();
     }
 
     @Override
@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         mSharedPrefs.edit().clear().apply();
     }
 

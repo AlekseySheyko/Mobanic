@@ -27,7 +27,7 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
 
     private MultipleFiltersListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private Set<String> mCarList;
+    private Set<String> mChoices;
     private boolean[] mCheckboxes;
     private String mSearchKey;
 
@@ -58,14 +58,14 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
     }
 
     public void setItems(List<Car> carList) {
-        mCarList = new TreeSet<>();
+        mChoices = new TreeSet<>();
         for (Car car : carList) {
-            mCarList.add(car.getValueForKey(mSearchKey));
+            mChoices.add(car.getValueForKey(mSearchKey));
         }
-        mCheckboxes = new boolean[mCarList.size()];
+        mCheckboxes = new boolean[mChoices.size()];
 
         mAdapter.clear();
-        mAdapter.addAll(mCarList);
+        mAdapter.addAll(mChoices);
         mAdapter.add(mSearchKey);
         mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
@@ -83,13 +83,13 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mCarList == null || mCarList.size() == 0) {
+        if (mChoices == null || mChoices.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
         } else if (!mSearchKey.equals("Make") && (makes == null || makes.size() == 0)) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
         } else {
-            CharSequence[] choices = mCarList.toArray(
-                    new CharSequence[mCarList.size()]);
+            CharSequence[] choices = mChoices.toArray(
+                    new CharSequence[mChoices.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setMultiChoiceItems(choices, mCheckboxes, this);
@@ -115,7 +115,7 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
             }
         }
         mAdapter.clear();
-        mAdapter.addAll(mCarList);
+        mAdapter.addAll(mChoices);
         if (selectedItems.size() == 0) {
             mAdapter.add(mSearchKey);
         } else if (selectedItems.size() == 1) {
