@@ -202,6 +202,9 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseObject> images, ParseException e) {
                 if (e == null && images.size() > 0) {
+                    findViewById(R.id.gallery_header).setVisibility(View.VISIBLE);
+                    findViewById(R.id.flipper).setVisibility(View.VISIBLE);
+
                     flipper.removeAllViews();
                     for (ParseObject image : images) {
                         String url = image.getParseFile("image").getUrl();
@@ -221,9 +224,6 @@ public class DetailActivity extends AppCompatActivity {
                         flipper.setOnClickListener(null);
                         flipper.stopFlipping();
                     }
-                } else {
-                    findViewById(R.id.gallery_header).setVisibility(View.GONE);
-                    findViewById(R.id.flipper).setVisibility(View.GONE);
                 }
             }
         });
