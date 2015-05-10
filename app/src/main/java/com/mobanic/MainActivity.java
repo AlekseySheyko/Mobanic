@@ -35,7 +35,7 @@ import static com.mobanic.views.SingleSpinner.AgeFilterListener;
 public class MainActivity extends AppCompatActivity implements MultipleFiltersListener,
         AgeFilterListener {
 
-    final String CARS_LABEL = "cars";
+    private final String CARS_LABEL = "cars";
     private CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mForcedNetwork;
@@ -72,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                         }
                     });
                     updateSearchPanel(carList);
-                } else if (e == null && carList.size() == 0 && mMakesUpdated) {
+
+                    mForcedNetwork = false;
+                } else if (e == null && carList.size() == 0) {
                     if (isOnline() && !mForcedNetwork) {
                         mForcedNetwork = true;
                         mCarsAdapter.loadObjects();
@@ -145,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 if (!mForcedNetwork) {
                     query.fromLocalDatastore();
                 }
-                mForcedNetwork = false;
 
                 if (makes != null && makes.size() > 0) {
                     query.whereContainedIn("make", makes);
