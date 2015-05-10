@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     private CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mForcedNetwork;
-    private boolean mInitialLaunch = true;
+    private boolean mInitialStart = true;
+    private boolean mMakesUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,16 +69,15 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                             ParseObject.pinAllInBackground(CARS_LABEL, carList);
                         }
                     });
-                    if (mInitialLaunch) {
-                        updateSearchPanel(carList);
-                    }
-                } else if (e == null && carList.size() == 0 && mInitialLaunch) {
+                    updateSearchPanel(carList);
+                } else if (e == null && carList.size() == 0 && mMakesUpdated) {
                     if (isOnline() && !mForcedNetwork) {
                         mForcedNetwork = true;
                         mCarsAdapter.loadObjects();
                     }
                 }
-                mInitialLaunch = false;
+                mInitialStart = false;
+                mMakesUpdated = false;
             }
         });
 
@@ -173,19 +173,27 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     }
 
     public void updateSearchPanel(List<Car> carList) {
-        ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
-        ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
-        ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
-        ((SingleSpinner) findViewById(R.id.age_spinner)).setItems(carList);
-        ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
-        ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
-        ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);
+        if (!mMakesUpdated || mInitialStart) {
+            ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
+        }
+        if (mMakesUpdated || mInitialStart) {
+            ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
+            ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
+            ((SingleSpinner) findViewById(R.id.age_spinner)).setItems(carList);
+            ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
+            ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
+            ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);
+        }
     }
 
     @Override
     public void onFilterSet(String key, Set<String> values) {
         mSharedPrefs.edit().putStringSet(key, values).apply();
         mCarsAdapter.loadObjects();
+
+        if (key.equals("Make")) {
+            mMakesUpdated = true;
+        }
     }
 
     @Override
@@ -195,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         mSharedPrefs.edit().clear().apply();
     }
 

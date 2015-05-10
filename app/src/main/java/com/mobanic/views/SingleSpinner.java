@@ -97,7 +97,7 @@ public class SingleSpinner extends Spinner {
             builder.setSingleChoiceItems(choices, mSelectedValue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int position) {
-                    mSelectedValue = position;
+                    // TODO
                     updateSelectedItems();
                 }
             });
@@ -112,10 +112,7 @@ public class SingleSpinner extends Spinner {
         if (mSelectedValue == 0) {
             mAdapter.add(mSearchKey);
         } else {
-            for (String ageStr : mAgeCategoriesList) {
-                mAdapter.add(ageStr);
-                mListener.onAgeSelected(extractDigits(ageStr));
-            }
+            // TODO
         }
     }
 
