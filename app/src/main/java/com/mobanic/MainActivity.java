@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     }
 
     public void updateSearchPanel(List<Car> carList) {
-        if (!mMakesUpdated || mInitialStart) {
+        if (mInitialStart) {
             ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         }
         if (mMakesUpdated || mInitialStart) {
