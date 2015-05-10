@@ -17,11 +17,13 @@
             android:background="@color/primary"/>
 
         <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/spinner"
+            style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="170dp"
+            android:background="#303030"
             android:visibility="gone"/>
 
         <ListView
@@ -38,7 +40,7 @@
             android:layout_centerInParent="true"
             android:fontFamily="sans-serif-light"
             android:text="@string/empty"
-            android:textColor="#36ffffff"
+            android:textColor="#28ffffff"
             android:textSize="24sp"
             android:visibility="gone"/>
 
@@ -84,7 +86,7 @@
                     custom:searchKey="Model"/>
 
                 <com.mobanic.views.PriceSeekBar
-                    android:id="@+id/price_selector"
+                    android:id="@+id/price_seekbar"
                     style="@style/DrawerListItem"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="5dp"/>

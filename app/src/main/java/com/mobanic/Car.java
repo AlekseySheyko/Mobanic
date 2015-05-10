@@ -20,7 +20,11 @@ public class Car extends ParseObject {
         return getString("model");
     }
 
-    public String getPrice() {
+    public int getPrice() {
+        return getInt("price");
+    }
+
+    public String getFormattedPrice() {
         return formatPrice(getInt("price"));
     }
 

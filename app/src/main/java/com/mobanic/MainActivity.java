@@ -11,10 +11,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.mobanic.views.MultiSpinner;
+import com.mobanic.views.PriceSeekBar;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static com.mobanic.views.MultiSpinner.SearchFiltersListener;
@@ -32,7 +38,26 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         // Add button to open search
         setupActionBar();
 
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mCarsAdapter = new CarsAdapter(this, getQueryFactory());
+        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<Car>() {
+            @Override
+            public void onLoading() {
+                findViewById(R.id.spinner).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onLoaded(List<Car> carList, Exception e) {
+                findViewById(R.id.spinner).setVisibility(View.GONE);
+                if (e == null) {
+                    updateSearchPanel(carList);
+                } else {
+                    TextView emptyTextView = (TextView) findViewById(R.id.empty);
+                    emptyTextView.setText(e.getMessage());
+                }
+            }
+        });
 
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
@@ -48,8 +73,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 startActivity(i);
             }
         });
-
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     private void setupActionBar() {
@@ -70,30 +93,30 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     public ParseQueryAdapter.QueryFactory<Car> getQueryFactory() {
         return new ParseQueryAdapter.QueryFactory<Car>() {
             public ParseQuery<Car> create() {
+                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+                Set<String> models = mSharedPrefs.getStringSet("Model", null);
+                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
+                Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
+                Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
+
                 ParseQuery<Car> query = ParseQuery.getQuery(Car.class);
                 query.orderByDescending("createdAt");
-                try {
-                    Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-                    Set<String> models = mSharedPrefs.getStringSet("Model", null);
-                    Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
-                    Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
-                    Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
 
-                    if (makes != null && makes.size() > 0) {
-                        query.whereContainedIn("make", makes);
-                    }
-                    if (models != null && models.size() > 0) {
-                        query.whereContainedIn("model", models);
-                    }
-                    if (colors != null && colors.size() > 0) {
-                        query.whereContainedIn("color", colors);
-                    }
-                    if (transTypes != null && transTypes.size() > 0) {
-                        query.whereContainedIn("transmission", transTypes);
-                    }
-                    if (fuelTypes != null && fuelTypes.size() > 0) {
-                        query.whereContainedIn("fuelType", fuelTypes);
-                    }
+                if (makes != null && makes.size() > 0) {
+                    query.whereContainedIn("make", makes);
+                }
+                if (models != null && models.size() > 0) {
+                    query.whereContainedIn("model", models);
+                }
+                if (colors != null && colors.size() > 0) {
+                    query.whereContainedIn("color", colors);
+                }
+                if (transTypes != null && transTypes.size() > 0) {
+                    query.whereContainedIn("transmission", transTypes);
+                }
+                if (fuelTypes != null && fuelTypes.size() > 0) {
+                    query.whereContainedIn("fuelType", fuelTypes);
+                }
                     /*
                     if (minPrice != -1) {
                         query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
@@ -105,9 +128,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                         query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
                     }
                     */
-                } catch (NullPointerException e) {
-                    // filters not set, just continue
-                }
                 return query;
             }
         };
@@ -117,6 +137,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     public void onFilterSet(String key, Set<String> values) {
         mSharedPrefs.edit().putStringSet(key, values).apply();
         mCarsAdapter.loadObjects();
+    }
+
+    public void updateSearchPanel(List<Car> carList) {
+        List<Integer> prices = new ArrayList<>();
+        for (Car car : carList) {
+            prices.add(car.getPrice());
+        }
+        PriceSeekBar<Integer> bar = (PriceSeekBar<Integer>) findViewById(R.id.price_seekbar);
+        bar.setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);
+
+        MultiSpinner makeSpinner = (MultiSpinner) findViewById(R.id.make_spinner);
+        makeSpinner.setItems(carList);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class CarsAdapter extends ParseQueryAdapter<Car> {
 
         ((TextView) v.findViewById(R.id.make)).setText(car.getMake());
         ((TextView) v.findViewById(R.id.model)).setText(car.getModel());
-        ((TextView) v.findViewById(R.id.price)).setText(car.getPrice());
+        ((TextView) v.findViewById(R.id.price)).setText(car.getFormattedPrice());
 
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
         Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
