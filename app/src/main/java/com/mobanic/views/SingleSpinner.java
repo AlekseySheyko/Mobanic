@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 public class SingleSpinner extends Spinner {
 
+    private AgeFilterListener mListener;
     private ArrayAdapter<String> mAdapter;
     private Set<String> mAgeSet;
     private ArrayList<String> mAgeList;
@@ -42,6 +43,8 @@ public class SingleSpinner extends Spinner {
         } finally {
             a.recycle();
         }
+
+        mListener = (AgeFilterListener) context;
 
         mAdapter = new ArrayAdapter<>(
                 getContext(),
@@ -77,10 +80,6 @@ public class SingleSpinner extends Spinner {
         mSelectedValue = mAgeSet.size();
     }
 
-    private int extractDigits(String s) {
-        return Integer.parseInt(s.replaceAll("\\D+", ""));
-    }
-
     @Override
     public boolean performClick() {
         SharedPreferences sharedPrefs =
@@ -99,27 +98,34 @@ public class SingleSpinner extends Spinner {
             builder.setSingleChoiceItems(choices, mSelectedValue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int position) {
-                    Toast.makeText(getContext(), position + "", Toast.LENGTH_SHORT).show();
                     mSelectedValue = position;
+                }
+            });
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
                     updateSelectedItems();
                 }
             });
-            builder.setPositiveButton("Set", this);
             builder.show();
         }
         return true;
     }
 
     private void updateSelectedItems() {
+        String ageStr = mAgeList.get(mSelectedValue);
+
         mAdapter.clear();
-        if (mSelectedValue == 0) {
-            mAdapter.add(mSearchKey);
-        } else {
-            mAdapter.add(mAgeList.get(mSelectedValue));
-        }
+        mAdapter.add(ageStr);
+
+        mListener.onAgeSelected(extractDigits(ageStr));
     }
 
     public interface AgeFilterListener {
         void onAgeSelected(int maxAge);
+    }
+
+    private int extractDigits(String s) {
+        return Integer.parseInt(s.replaceAll("\\D+", ""));
     }
 }
