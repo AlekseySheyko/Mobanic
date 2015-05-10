@@ -17,9 +17,7 @@ public class CarsAdapter extends ParseQueryAdapter<Car> {
 
     @Override
     public View getItemView(Car car, View v, ViewGroup parent) {
-        if (v == null) {
-            v = View.inflate(getContext(), R.layout.list_item_car, null);
-        }
+        v = View.inflate(getContext(), R.layout.list_item_car, null);
 
         ((TextView) v.findViewById(R.id.make)).setText(car.getMake());
         ((TextView) v.findViewById(R.id.model)).setText(car.getModel());

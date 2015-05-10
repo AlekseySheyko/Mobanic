@@ -1,5 +1,6 @@
 package com.mobanic;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +12,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
@@ -121,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+
+        sContext = this;
     }
 
     public ParseQueryAdapter.QueryFactory<Car> getQueryFactory() {
@@ -148,15 +151,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 if (models != null && models.size() > 0) {
                     query.whereContainedIn("model", models);
                 }
-                if (colors != null && colors.size() > 0) {
-                    query.whereContainedIn("color", colors);
-                }
-                if (transTypes != null && transTypes.size() > 0) {
-                    query.whereContainedIn("transmission", transTypes);
-                }
-                if (fuelTypes != null && fuelTypes.size() > 0) {
-                    query.whereContainedIn("fuelType", fuelTypes);
-                }
                 if (minPrice != -1) {
                     query.whereGreaterThanOrEqualTo("price", minPrice);
                 }
@@ -165,7 +159,15 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 }
                 if (maxAge != -1) {
                     query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
-                    Toast.makeText(MainActivity.this, "Max year: " + (2015 - maxAge), Toast.LENGTH_SHORT).show();
+                }
+                if (colors != null && colors.size() > 0) {
+                    query.whereContainedIn("color", colors);
+                }
+                if (fuelTypes != null && fuelTypes.size() > 0) {
+                    query.whereContainedIn("fuelType", fuelTypes);
+                }
+                if (transTypes != null && transTypes.size() > 0) {
+                    query.whereContainedIn("transmission", transTypes);
                 }
                 return query;
             }
@@ -214,5 +216,26 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    // TODO Implement push receiver
+    private static Context sContext;
+
+    public static Context getContext() {
+        return sContext;
+    }
+
+    public static class PushReceiver extends BroadcastReceiver {
+
+        private static final String TAG = PushReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Receive update");
+            try {
+                MainActivity a = (MainActivity) MainActivity.getContext();
+                a.mForcedNetwork = true;
+                a.mCarsAdapter.loadObjects();
+            } catch (NullPointerException e) {
+                Log.w(TAG, "Can't get activity context to update content");
+            }
+        }
+    }
 }
