@@ -76,11 +76,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                     mForcedNetwork = false;
                 } else if (e == null && carList.size() == 0) {
                     if (isOnline() && !mForcedNetwork) {
+                        mInitialStart = true;
                         mForcedNetwork = true;
                         mCarsAdapter.loadObjects();
                     }
                 }
-                mInitialStart = false;
                 mMakesUpdated = false;
                 mModelsUpdated = false;
             }
@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
             ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);
         }
+        mInitialStart = false;
     }
 
     @Override
