@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
+import com.mobanic.views.SingleSpinner;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -26,9 +27,11 @@ import com.parse.ParseQueryAdapter;
 import java.util.List;
 import java.util.Set;
 
-import static com.mobanic.views.MultiSpinner.SearchFiltersListener;
+import static com.mobanic.views.MultiSpinner.MultipleFiltersListener;
+import static com.mobanic.views.SingleSpinner.AgeFilterListener;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersListener {
+public class MainActivity extends AppCompatActivity implements MultipleFiltersListener,
+        AgeFilterListener {
 
     final String CARS_LABEL = "cars";
     private CarsAdapter mCarsAdapter;
@@ -168,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
         ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
+        ((SingleSpinner) findViewById(R.id.age_spinner)).setItems(carList);
         ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
         ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
         ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);

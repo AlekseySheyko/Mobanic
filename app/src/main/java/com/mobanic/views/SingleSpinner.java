@@ -3,7 +3,6 @@ package com.mobanic.views;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
@@ -16,22 +15,21 @@ import com.mobanic.Car;
 import com.mobanic.R;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener {
+public class SingleSpinner extends Spinner implements DialogInterface.OnMultiChoiceClickListener {
 
-    private static final String TAG = MultiSpinner.class.getSimpleName();
-
-    private MultipleFiltersListener mListener;
+    private AgeFilterListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private Set<String> mCarList;
-    private boolean[] mCheckboxes;
+    private Set<String> mAgeCategoriesList;
+    private int mSelectedValue;
     private String mSearchKey;
 
-    public MultiSpinner(Context context, AttributeSet attrs) {
+    public SingleSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (isInEditMode()) return;
 
@@ -46,7 +44,7 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
             a.recycle();
         }
 
-        mListener = (MultipleFiltersListener) context;
+        mListener = (AgeFilterListener) context;
 
         mAdapter = new ArrayAdapter<>(
                 getContext(),
@@ -58,23 +56,30 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
     }
 
     public void setItems(List<Car> carList) {
-        mCarList = new TreeSet<>();
+        mAgeCategoriesList = new TreeSet<>(new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return extractDigits(s) - extractDigits(t1);
+            }
+        });
         for (Car car : carList) {
-            mCarList.add(car.getValueForKey(mSearchKey));
+            mAgeCategoriesList.add(car.getAgeCategory());
         }
-        mCheckboxes = new boolean[mCarList.size()];
 
         mAdapter.clear();
-        mAdapter.addAll(mCarList);
+        mAdapter.addAll(mAgeCategoriesList);
         mAdapter.add(mSearchKey);
         mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
         setSelection(mAdapter.getCount());
     }
 
+    private int extractDigits(String s) {
+        return Integer.parseInt(s.replaceAll("\\D+",""));
+    }
+
     @Override
     public void onClick(DialogInterface dialog, int position, boolean isChecked) {
-        mCheckboxes[position] = isChecked;
     }
 
     @Override
@@ -83,16 +88,16 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mCarList.size() == 0) {
+        if (mAgeCategoriesList.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
-        } else if (!mSearchKey.equals("Make") && makes == null || makes.size() == 0) {
+        } else if (makes == null || makes.size() == 0) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
         } else {
-            CharSequence[] choices = mCarList.toArray(
-                    new CharSequence[mCarList.size()]);
+            CharSequence[] choices = mAgeCategoriesList.toArray(
+                    new CharSequence[mAgeCategoriesList.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMultiChoiceItems(choices, mCheckboxes, this);
+            builder.setSingleChoiceItems(choices, mSelectedValue, this);
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -105,33 +110,18 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
     }
 
     private void updateSelectedItems() {
-        String shownValue = null;
-
-        Set<String> selectedItems = new HashSet<>();
-        for (int i = 0; i < mCheckboxes.length; i++) {
-            if (mCheckboxes[i]) {
-                shownValue = mAdapter.getItem(i);
-                selectedItems.add(shownValue);
-            }
-        }
         mAdapter.clear();
-        mAdapter.addAll(mCarList);
-        if (selectedItems.size() == 0) {
+        mAdapter.addAll(mAgeCategoriesList);
+        if (mSelectedValue == 0) {
             mAdapter.add(mSearchKey);
-        } else if (selectedItems.size() == 1) {
-            mAdapter.add(shownValue);
         } else {
-            if (!mSearchKey.contains("Trans")) {
-                mAdapter.add(selectedItems.size() + " " + mSearchKey.toLowerCase() + "s");
-            } else {
-                mAdapter.add(selectedItems.size() + " trans. types");
-            }
+            mAdapter.add(mSelectedValue + "");
         }
 
-        mListener.onFilterSet(mSearchKey, selectedItems);
+        mListener.onFilterSet(mSearchKey, (Set<String>) Arrays.asList(mSelectedValue + ""));
     }
 
-    public interface MultipleFiltersListener {
+    public interface AgeFilterListener {
         void onFilterSet(String filterKey, Set<String> selectedItems);
     }
 }

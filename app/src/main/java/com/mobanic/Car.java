@@ -40,6 +40,17 @@ public class Car extends ParseObject {
         return getString(key.toLowerCase().replace("colour", "color").replace("fuel type", "fuelType"));
     }
 
+    public String getAgeCategory() {
+        int age = 2015 - getInt("year");
+        if (age <= 1) {
+            return "Up to 1 year old";
+        } else if (age <= 10) {
+            return "Up to " + age + " years old";
+        } else {
+            return "Over 10 years old";
+        }
+    }
+
     public String formatPrice(int price) {
         NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
         f.setMaximumFractionDigits(0);

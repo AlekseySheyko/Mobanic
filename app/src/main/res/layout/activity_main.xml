@@ -89,11 +89,10 @@
                     android:id="@+id/price_seekbar"
                     style="@style/SearchSeekBar"/>
 
-                <Spinner
+                <com.mobanic.views.SingleSpinner
                     android:id="@+id/age_spinner"
                     style="@style/DrawerListItem"
-                    android:spinnerMode="dialog"
-                    android:entries="@array/ages"/>
+                    custom:searchKey="Age"/>
 
                 <com.mobanic.views.MultiSpinner
                     android:id="@+id/colour_spinner"
