@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     private boolean mForcedNetwork;
     private boolean mInitialStart = true;
     private boolean mMakesUpdated;
+    private boolean mModelsUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 }
                 mInitialStart = false;
                 mMakesUpdated = false;
+                mModelsUpdated = false;
             }
         });
 
@@ -178,8 +180,10 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         if (mInitialStart) {
             ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         }
-        if (mMakesUpdated || mInitialStart) {
+        if (mInitialStart || mMakesUpdated) {
             ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
+        }
+        if (mInitialStart || mMakesUpdated || mModelsUpdated) {
             ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
             ((SingleSpinner) findViewById(R.id.age_spinner)).setItems(carList);
             ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
@@ -193,6 +197,13 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         if (key.equals("Make")) {
             mMakesUpdated = true;
             mSharedPrefs.edit().clear().apply();
+        } else if (key.equals("Model")) {
+            Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+            mSharedPrefs.edit()
+                    .clear()
+                    .putStringSet("Make", makes)
+                    .apply();
+            mModelsUpdated = true;
         }
         mSharedPrefs.edit().putStringSet(key, values).apply();
         mCarsAdapter.loadObjects();
