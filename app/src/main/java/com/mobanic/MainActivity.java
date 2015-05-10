@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                     });
                     if (mInitialLaunch) {
                         updateSearchPanel(carList);
-                        mInitialLaunch = false;
                     }
                 } else if (e == null && carList.size() == 0 && mInitialLaunch) {
                     if (isOnline() && !mForcedNetwork) {
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                         mCarsAdapter.loadObjects();
                     }
                 }
+                mInitialLaunch = false;
             }
         });
 
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                     query.whereGreaterThanOrEqualTo("price", minPrice);
                 }
                 if (maxPrice != -1) {
-                    query.whereGreaterThanOrEqualTo("price", maxPrice);
+                    query.whereLessThanOrEqualTo("price", maxPrice);
                 }
                 if (maxAge != -1) {
                     query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
