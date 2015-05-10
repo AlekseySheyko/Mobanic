@@ -90,7 +90,7 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mCarList == null) {
+        if (mCarList.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
         } else if (mSearchKey.equals("Model") && (makes == null || makes.size() == 0)) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();

@@ -1,7 +1,10 @@
 package com.mobanic;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
@@ -11,10 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
+import com.parse.DeleteCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -25,8 +30,10 @@ import static com.mobanic.views.MultiSpinner.SearchFiltersListener;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersListener {
 
+    final String CARS_LABEL = "cars";
     private CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
+    private boolean mForcedNetwork;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +53,22 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
             }
 
             @Override
-            public void onLoaded(List<Car> carList, Exception e) {
+            public void onLoaded(final List<Car> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
-                if (e == null) {
+                if (e == null && carList.size() > 0) {
+                    ParseObject.unpinAllInBackground(CARS_LABEL, carList, new DeleteCallback() {
+                        public void done(ParseException e) {
+                            if (e != null) return;
+
+                            ParseObject.pinAllInBackground(CARS_LABEL, carList);
+                        }
+                    });
                     updateSearchPanel(carList);
-                } else {
-                    TextView emptyTextView = (TextView) findViewById(R.id.empty);
-                    emptyTextView.setText(e.getMessage());
+                } else if (e == null && carList.size() == 0) {
+                    if (isOnline() && !mForcedNetwork) {
+                        mForcedNetwork = true;
+                        mCarsAdapter.loadObjects();
+                    }
                 }
             }
         });
@@ -69,6 +85,17 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 i.putExtra("car_id", car.getObjectId());
                 i.putExtra("car_position", position + 1);
                 startActivity(i);
+            }
+        });
+
+        PriceSeekBar bar = (PriceSeekBar) findViewById(R.id.price_seekbar);
+        bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
+            @Override
+            public void onPriceChanged(PriceSeekBar bar, Integer minPrice, Integer maxPrice) {
+                mSharedPrefs.edit()
+                        .putInt("minPrice", minPrice)
+                        .putInt("maxPrice", maxPrice).apply();
+                mCarsAdapter.loadObjects();
             }
         });
     }
@@ -96,9 +123,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
                 Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
                 Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
+                int minPrice = mSharedPrefs.getInt("minPrice", -1);
+                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 
                 ParseQuery<Car> query = ParseQuery.getQuery(Car.class);
                 query.orderByDescending("createdAt");
+                if (!mForcedNetwork) {
+                    query.fromLocalDatastore();
+                }
+                mForcedNetwork = false;
 
                 if (makes != null && makes.size() > 0) {
                     query.whereContainedIn("make", makes);
@@ -115,13 +148,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 if (fuelTypes != null && fuelTypes.size() > 0) {
                     query.whereContainedIn("fuelType", fuelTypes);
                 }
+                if (minPrice != -1) {
+                    query.whereGreaterThanOrEqualTo("price", minPrice);
+                }
+                if (maxPrice != -1) {
+                    query.whereLessThanOrEqualTo("price", maxPrice);
+                }
                     /*
-                    if (minPrice != -1) {
-                        query.whereGreaterThanOrEqualTo("price", minPrice * 1000);
-                    }
-                    if (maxPrice != -1) {
-                        query.whereLessThanOrEqualTo("price", maxPrice * 1000);
-                    }
                     if (maxAge > 0 && maxAge < 11) {
                         query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
                     }
@@ -150,5 +183,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     protected void onStop() {
         super.onStop();
         mSharedPrefs.edit().clear().apply();
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }

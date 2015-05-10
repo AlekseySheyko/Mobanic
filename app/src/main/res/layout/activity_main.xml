@@ -40,7 +40,7 @@
             android:layout_centerInParent="true"
             android:fontFamily="sans-serif-light"
             android:text="@string/empty"
-            android:textColor="#28ffffff"
+            android:textColor="#32ffffff"
             android:textSize="24sp"
             android:visibility="gone"/>
 
@@ -87,9 +87,7 @@
 
                 <com.mobanic.views.PriceSeekBar
                     android:id="@+id/price_seekbar"
-                    style="@style/DrawerListItem"
-                    android:layout_marginLeft="11dp"
-                    android:layout_marginRight="5dp"/>
+                    style="@style/SearchSeekBar"/>
 
                 <Spinner
                     android:id="@+id/age_spinner"

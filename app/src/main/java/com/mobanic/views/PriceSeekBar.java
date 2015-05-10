@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Widget that lets users select a minimum and maximum value on a given numerical range.
@@ -68,7 +69,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
     private double normalizedMaxValue = 1d;
     private Thumb pressedThumb = null;
     private boolean notifyWhileDragging = false;
-    private OnRangeSeekBarChangeListener<T> listener;
+    private OnPriceChangeListener<Integer> listener;
     /**
      * Default color of a RangeSeekBar, #FF33B5E5. This is also known as "Ice Cream Sandwich" blue.
      */
@@ -193,7 +194,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @return The currently selected min value.
      */
-    public T getSelectedMinValue() {
+    public Integer getSelectedMinValue() {
         return normalizedToValue(normalizedMinValue);
     }
 
@@ -216,7 +217,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @return The currently selected max value.
      */
-    public T getSelectedMaxValue() {
+    public Integer getSelectedMaxValue() {
         return normalizedToValue(normalizedMaxValue);
     }
 
@@ -239,7 +240,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      *
      * @param listener The listener to notify about changed selected values.
      */
-    public void setOnRangeSeekBarChangeListener(OnRangeSeekBarChangeListener<T> listener) {
+    public void setOnPriceChangeListener(OnPriceChangeListener<Integer> listener) {
         this.listener = listener;
     }
 
@@ -294,7 +295,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
                     }
 
                     if (notifyWhileDragging && listener != null) {
-                        listener.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue());
+                        listener.onPriceChanged(this, getSelectedMinValue(), getSelectedMaxValue());
                     }
                 }
                 break;
@@ -314,7 +315,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
                 pressedThumb = null;
                 invalidate();
                 if (listener != null) {
-                    listener.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue());
+                    listener.onPriceChanged(this, getSelectedMinValue() * 1000, getSelectedMaxValue() * 1000);
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: {
@@ -571,9 +572,9 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private T normalizedToValue(double normalized) {
+    private Integer normalizedToValue(double normalized) {
         double v = absoluteMinValuePrim + normalized * (absoluteMaxValuePrim - absoluteMinValuePrim);
-        return (T) numberType.toNumber(Math.round(v * 100) / 100d);
+        return (Integer) numberType.toNumber(Math.round(v * 100) / 100d);
     }
 
     /**
@@ -622,7 +623,11 @@ public class PriceSeekBar<T extends Number> extends ImageView {
         for (Car car : carList) {
             prices.add(car.getPrice());
         }
-        setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);
+        try {
+            setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);
+        } catch (NoSuchElementException e) {
+            setRangeValues(0, 100);
+        }
     }
 
     /**
@@ -631,9 +636,9 @@ public class PriceSeekBar<T extends Number> extends ImageView {
      * @param <T> The Number type the RangeSeekBar has been declared with.
      * @author Stephan Tittel (stephan.tittel@kom.tu-darmstadt.de)
      */
-    public interface OnRangeSeekBarChangeListener<T> {
+    public interface OnPriceChangeListener<T> {
 
-        public void onRangeSeekBarValuesChanged(PriceSeekBar<?> bar, T minValue, T maxValue);
+        public void onPriceChanged(PriceSeekBar<?> bar, Integer minValue, Integer maxValue);
     }
 
     /**
