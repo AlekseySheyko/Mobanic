@@ -112,7 +112,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
 
-        new DownloadCarsTask().execute();
+        try {
+            new DownloadCarsTask().execute();
+        } catch (Exception e) {
+            Log.e("MainActivity", "Exception caught while parsing", e);
+        }
     }
 
     private void setupActionBar() {

@@ -25,9 +25,8 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
             for (Element row : rows) {
                 Elements cards = row.getElementsByClass("foureightcol");
                 for (Element card : cards) {
-                    Elements entries = card.children();
-                    String detailsUrl = entries.attr("href");
-                    String price = entries.select(".redText").text();
+                    String detailsUrl = card.children().attr("href");
+                    String price = card.textNodes().get(2).text().replace(".00", "");
                     Log.d(TAG, "Price: " + price);
                 }
             }
@@ -35,9 +34,5 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private void parseRows() {
-
     }
 }
