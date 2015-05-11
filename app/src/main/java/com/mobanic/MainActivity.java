@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 mCarsAdapter.loadObjects();
             }
         });
+
+        new DownloadCarsTask().execute();
     }
 
     private void setupActionBar() {
