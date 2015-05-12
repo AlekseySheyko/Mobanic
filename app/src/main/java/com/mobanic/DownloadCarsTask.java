@@ -14,42 +14,29 @@ import java.util.List;
 public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
 
     private static final String TAG = DownloadCarsTask.class.getSimpleName();
-    private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available.php?m1=&m2=&n1=All&n2=&classic=N&steering";
+    private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available.php";
 
     @Override
     protected Void doInBackground(Void... voids) {
+        List<String> titleList = new ArrayList<>();
+        List<Integer> priceList = new ArrayList<>();
+        List<String> imageList = new ArrayList<>();
+
         try {
-            List<String> titleList = new ArrayList<>();
-            List<Integer> priceList = new ArrayList<>();
-
             Document doc = Jsoup.connect(BASE_URL).get();
+            Elements cards = doc.select("#ajax-content-container .row .stockBack .centre")
+                    .not(".midGreyText");
+            for (Element card : cards) {
+            }
 
-            Element container = doc.getElementById("ajax-content-container");
-            Elements rows = container.getElementsByClass("row");
-            for (Element row : rows) {
-                Elements headers = row.getElementsByTag("h4");
-                for (Element header : headers) {
-                    titleList.add(header.text());
-                }
-                Elements dataEntries = row.getElementsByClass("thirteencol");
-                for (Element entry : dataEntries) {
-                    String entryText = entry.text();
-                    if (entryText.contains(".00")) {
-                        int price = Integer.parseInt(
-                                entryText.substring(2).replace(",", "").replace(".00", ""));
-                        priceList.add(price);
-                    } else if (entryText.contains("Under Offer") || entryText.contains("on Application")) {
-                        priceList.add(0);
-                    }
-                }
-            }
-            for (int i = 0; i < titleList.size(); i++) {
-                ParsedCar car = new ParsedCar();
-                car.setTitle(titleList.get(i));
-                car.setPrice(priceList.get(i));
-//                Log.d(TAG, titleList.get(i) + " \u2014 " + priceList.get(i));
-                car.pinInBackground();
-            }
+
+//            for (int i = 0; i < titleList.size(); i++) {
+//                ParsedCar car = new ParsedCar();
+//                car.setTitle(titleList.get(i));
+//                car.setPrice(priceList.get(i));
+//                car.setCoverImage(imageList.get(i));
+//                car.pinInBackground();
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }

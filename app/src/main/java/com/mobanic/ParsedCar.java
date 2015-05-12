@@ -32,6 +32,14 @@ public class ParsedCar extends ParseObject {
         put("price", price);
     }
 
+    public String getCoverImage() {
+        return getString("coverImage");
+    }
+
+    public void setCoverImage(String url) {
+        put("coverImage", url);
+    }
+
     public String formatPrice(int price) {
         NumberFormat f = NumberFormat.getCurrencyInstance(Locale.UK);
         f.setMaximumFractionDigits(0);

@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
         // TODO Load new dataset automatically on scroll
+        mCarsAdapter.setPaginationEnabled(false);
 
         PriceSeekBar bar = (PriceSeekBar) findViewById(R.id.price_seekbar);
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
