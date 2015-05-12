@@ -1,7 +1,6 @@
 package com.mobanic;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,12 +33,10 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
                 }
                 Elements dataEntries = row.getElementsByClass("thirteencol");
                 for (Element entry : dataEntries) {
-                    final String priceSuffix = ".00";
                     String entryText = entry.text();
-                    Log.d(TAG, entryText);
-                    if (entryText.contains(priceSuffix)) {
+                    if (entryText.contains(".00")) {
                         int price = Integer.parseInt(
-                                entryText.substring(2, entryText.length() - 3).replace(",", ""));
+                                entryText.substring(2).replace(",", "").replace(".00", ""));
                         priceList.add(price);
                     } else if (entryText.contains("Under Offer") || entryText.contains("on Application")) {
                         priceList.add(0);
@@ -50,6 +47,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
                 ParsedCar car = new ParsedCar();
                 car.setTitle(titleList.get(i));
                 car.setPrice(priceList.get(i));
+//                Log.d(TAG, titleList.get(i) + " \u2014 " + priceList.get(i));
                 car.pinInBackground();
             }
         } catch (IOException e) {
