@@ -52,7 +52,7 @@ public class Car extends ParseObject {
     }
 
     public String formatPrice(int price) {
-        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.US);
+        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.UK);
         f.setMaximumFractionDigits(0);
         return f.format(price);
     }
