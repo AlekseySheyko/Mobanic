@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         AgeFilterListener {
 
     private final String CARS_LABEL = "cars";
-    private CarsAdapter mCarsAdapter;
+    public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mForcedNetwork;
     private boolean mInitialStart = true;
@@ -112,11 +112,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
 
-        try {
-            new DownloadCarsTask().execute();
-        } catch (Exception e) {
-            Log.e("MainActivity", "Exception caught while parsing", e);
-        }
+        new DownloadCarsTask().execute();
     }
 
     private void setupActionBar() {
