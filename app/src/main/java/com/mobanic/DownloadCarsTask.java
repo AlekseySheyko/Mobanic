@@ -1,6 +1,7 @@
 package com.mobanic;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,7 +20,8 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            List<String> titles = new ArrayList<>();
+            List<String> titleList = new ArrayList<>();
+            List<Integer> priceList = new ArrayList<>();
 
             Document doc = Jsoup.connect(BASE_URL).get();
 
@@ -28,12 +30,26 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, Void> {
             for (Element row : rows) {
                 Elements headers = row.getElementsByTag("h4");
                 for (Element header : headers) {
-                    titles.add(header.text());
+                    titleList.add(header.text());
+                }
+                Elements dataEntries = row.getElementsByClass("thirteencol");
+                for (Element entry : dataEntries) {
+                    final String priceSuffix = ".00";
+                    String entryText = entry.text();
+                    Log.d(TAG, entryText);
+                    if (entryText.contains(priceSuffix)) {
+                        int price = Integer.parseInt(
+                                entryText.substring(2, entryText.length() - 3).replace(",", ""));
+                        priceList.add(price);
+                    } else if (entryText.contains("Under Offer") || entryText.contains("on Application")) {
+                        priceList.add(0);
+                    }
                 }
             }
-            for (int i = 0; i < titles.size(); i++) {
+            for (int i = 0; i < titleList.size(); i++) {
                 ParsedCar car = new ParsedCar();
-                car.setTitle(titles.get(i));
+                car.setTitle(titleList.get(i));
+                car.setPrice(priceList.get(i));
                 car.pinInBackground();
             }
         } catch (IOException e) {

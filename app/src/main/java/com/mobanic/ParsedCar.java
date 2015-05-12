@@ -3,6 +3,9 @@ package com.mobanic;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 @ParseClassName("ParsedCar")
 public class ParsedCar extends ParseObject {
 
@@ -17,11 +20,21 @@ public class ParsedCar extends ParseObject {
         put("title", title);
     }
 
-    public int getPrice() {
-        return getInt("price");
+    public String getFormattedPrice() {
+        if (getInt("price") != 0) {
+            return formatPrice(getInt("price"));
+        } else {
+            return "Under offer";
+        }
     }
 
     public void setPrice(int price) {
         put("price", price);
+    }
+
+    public String formatPrice(int price) {
+        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.UK);
+        f.setMaximumFractionDigits(0);
+        return f.format(price);
     }
 }

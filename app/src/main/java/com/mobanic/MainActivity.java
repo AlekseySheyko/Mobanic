@@ -1,6 +1,5 @@
 package com.mobanic;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     private final String CARS_LABEL = "cars";
     public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
-    private boolean mForcedNetwork;
     private boolean mInitialStart = true;
     private boolean mMakesUpdated;
     private boolean mModelsUpdated;
@@ -54,14 +51,15 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mCarsAdapter = new CarsAdapter(this, getQueryFactory());
-        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<Car>() {
+        mCarsAdapter.setAutoload(false);
+        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParsedCar>() {
             @Override
             public void onLoading() {
                 findViewById(R.id.spinner).setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onLoaded(final List<Car> carList, Exception e) {
+            public void onLoaded(final List<ParsedCar> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null && carList.size() > 0) {
                     ParseObject.unpinAllInBackground(CARS_LABEL, carList, new DeleteCallback() {
@@ -71,13 +69,10 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                             ParseObject.pinAllInBackground(CARS_LABEL, carList);
                         }
                     });
-                    updateSearchPanel(carList);
-
-                    mForcedNetwork = false;
+//                    updateSearchPanel(carList);
                 } else if (e == null && carList.size() == 0) {
-                    if (isOnline() && !mForcedNetwork) {
+                    if (isOnline()) {
                         mInitialStart = true;
-                        mForcedNetwork = true;
                         mCarsAdapter.loadObjects();
                     }
                 }
@@ -92,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Car car = mCarsAdapter.getItem(position);
+                ParsedCar car = mCarsAdapter.getItem(position);
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
                 i.putExtra("car_id", car.getObjectId());
@@ -100,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 startActivity(i);
             }
         });
+        // TODO Load new dataset automatically on scroll
 
         PriceSeekBar bar = (PriceSeekBar) findViewById(R.id.price_seekbar);
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
@@ -132,48 +128,46 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         sContext = this;
     }
 
-    public ParseQueryAdapter.QueryFactory<Car> getQueryFactory() {
-        return new ParseQueryAdapter.QueryFactory<Car>() {
-            public ParseQuery<Car> create() {
-                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-                Set<String> models = mSharedPrefs.getStringSet("Model", null);
-                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
-                Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
-                Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
-                int minPrice = mSharedPrefs.getInt("minPrice", -1);
-                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
-                int maxAge = mSharedPrefs.getInt("maxAge", -1);
+    public ParseQueryAdapter.QueryFactory<ParsedCar> getQueryFactory() {
+        return new ParseQueryAdapter.QueryFactory<ParsedCar>() {
+            public ParseQuery<ParsedCar> create() {
+//                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+//                Set<String> models = mSharedPrefs.getStringSet("Model", null);
+//                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
+//                Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
+//                Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
+//                int minPrice = mSharedPrefs.getInt("minPrice", -1);
+//                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
+//                int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
-                ParseQuery<Car> query = ParseQuery.getQuery(Car.class);
+                ParseQuery<ParsedCar> query = ParseQuery.getQuery(ParsedCar.class);
                 query.orderByDescending("createdAt");
-                if (!mForcedNetwork) {
-                    query.fromLocalDatastore();
-                }
+                query.fromLocalDatastore();
 
-                if (makes != null && makes.size() > 0) {
-                    query.whereContainedIn("make", makes);
-                }
-                if (models != null && models.size() > 0) {
-                    query.whereContainedIn("model", models);
-                }
-                if (minPrice != -1) {
-                    query.whereGreaterThanOrEqualTo("price", minPrice);
-                }
-                if (maxPrice != -1) {
-                    query.whereLessThanOrEqualTo("price", maxPrice);
-                }
-                if (maxAge != -1) {
-                    query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
-                }
-                if (colors != null && colors.size() > 0) {
-                    query.whereContainedIn("color", colors);
-                }
-                if (fuelTypes != null && fuelTypes.size() > 0) {
-                    query.whereContainedIn("fuelType", fuelTypes);
-                }
-                if (transTypes != null && transTypes.size() > 0) {
-                    query.whereContainedIn("transmission", transTypes);
-                }
+//                if (makes != null && makes.size() > 0) {
+//                    query.whereContainedIn("make", makes);
+//                }
+//                if (models != null && models.size() > 0) {
+//                    query.whereContainedIn("model", models);
+//                }
+//                if (minPrice != -1) {
+//                    query.whereGreaterThanOrEqualTo("price", minPrice);
+//                }
+//                if (maxPrice != -1) {
+//                    query.whereLessThanOrEqualTo("price", maxPrice);
+//                }
+//                if (maxAge != -1) {
+//                    query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
+//                }
+//                if (colors != null && colors.size() > 0) {
+//                    query.whereContainedIn("color", colors);
+//                }
+//                if (fuelTypes != null && fuelTypes.size() > 0) {
+//                    query.whereContainedIn("fuelType", fuelTypes);
+//                }
+//                if (transTypes != null && transTypes.size() > 0) {
+//                    query.whereContainedIn("transmission", transTypes);
+//                }
                 return query;
             }
         };
@@ -235,22 +229,5 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
     public static Context getContext() {
         return sContext;
-    }
-
-    public static class PushReceiver extends BroadcastReceiver {
-
-        private static final String TAG = PushReceiver.class.getSimpleName();
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Receive update");
-            try {
-                MainActivity a = (MainActivity) MainActivity.getContext();
-                a.mForcedNetwork = true;
-                a.mCarsAdapter.loadObjects();
-            } catch (NullPointerException e) {
-                Log.w(TAG, "Can't get activity context to update content");
-            }
-        }
     }
 }
