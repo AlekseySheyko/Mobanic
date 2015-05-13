@@ -37,8 +37,8 @@ public class ParsedCar extends ParseObject {
             if (header.contains(possibleMake)) {
                 make = possibleMake;
                 String[] parts = header.split(" - ");
-                String fragmentToRemove = " - " + parts[parts.length-1];
-                model = header.substring(make.length()).replaceFirst(" ", "").replace(fragmentToRemove, "");
+                String fragmentToRemove = parts[parts.length-1];
+                model = header.substring(make.length()).replaceFirst(" ", "").replace(fragmentToRemove, "").replace("- ", "");
             }
         }
         try {
