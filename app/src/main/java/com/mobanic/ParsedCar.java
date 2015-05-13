@@ -41,7 +41,8 @@ public class ParsedCar extends ParseObject {
                 model = header.substring(make.length()).replaceFirst(" ", "").replace(fragmentToRemove, "").replace("- ", "");
                 if (model.contains("(")) {
                     fragmentToRemove = model.substring(model.indexOf("(") - 1, model.indexOf(")") + 1);
-                    model = model.replace(fragmentToRemove, "").replace("(LHD)", "").replace("Turbo Wide Body", "");
+                    // TODO Go thought the other models and remove redundant prefixes from models
+                    model = model.replace(fragmentToRemove, "").replace("(LHD)", "").replace(" (Turbo Wide Body)", "");
                 }
             }
         }

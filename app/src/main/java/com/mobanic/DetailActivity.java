@@ -110,6 +110,7 @@ public class DetailActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(make);
 
                 setCoverImage();
+                // TODO Open separate connection to download gallery images for a specific page
                 setGalleryImages();
                 fillOutSpecs();
                 fillOutFeatures();

@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParsedCar>() {
             @Override
             public void onLoading() {
+                // TODO Show loading spiner right from the start
                 findViewById(R.id.spinner).setVisibility(View.VISIBLE);
             }
 
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             public void onLoaded(List<ParsedCar> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null) {
+                    // TODO: Populate search panel with new full amount of cars data
 //                    updateSearchPanel(carList);
                 }
                 mMakesUpdated = false;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                // TODO: Pass all pinned details to the next page
                 ParsedCar car = mCarsAdapter.getItem(position);
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
