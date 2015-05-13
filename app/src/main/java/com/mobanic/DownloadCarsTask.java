@@ -2,7 +2,6 @@ package com.mobanic;
 
 import android.os.AsyncTask;
 
-import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
@@ -70,21 +69,15 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
     }
 
     @Override
-    protected void onPostExecute(final List<ParsedCar> carList) {
+    protected void onPostExecute(List<ParsedCar> carList) {
         super.onPostExecute(carList);
-        // TODO: Remove unpin part before production
-        ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
+        ParseObject.pinAllInBackground(carList, new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                ParseObject.pinAllInBackground(carList, new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            MainActivity a = (MainActivity) MainActivity.getContext();
-                            a.mCarsAdapter.loadObjects();
-                        }
-                    }
-                });
+                if (e == null) {
+                    MainActivity a = (MainActivity) MainActivity.getContext();
+                    a.mCarsAdapter.loadObjects();
+                }
             }
         });
     }
