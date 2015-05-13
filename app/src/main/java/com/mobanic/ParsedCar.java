@@ -50,10 +50,12 @@ public class ParsedCar extends ParseObject {
     }
 
     public String getFormattedPrice() {
-        if (getInt("price") != 0) {
-            return formatPrice(getInt("price"));
-        } else {
+        if (getInt("price") == 0) {
             return "Under offer";
+        } else if (getInt("price") == 1) {
+            return "POA";
+        } else {
+            return formatPrice(getInt("price"));
         }
     }
 
@@ -62,6 +64,8 @@ public class ParsedCar extends ParseObject {
             int price = Integer.parseInt(
                     priceStr.replace(".00", "").replaceAll("\\D+", ""));
             put("price", price);
+        } else if (priceStr.contains("on Application")){
+            put("price", 1);
         } else {
             put("price", 0);
         }
