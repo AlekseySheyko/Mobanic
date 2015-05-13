@@ -14,13 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SingleSpinner;
-import com.parse.DeleteCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -59,22 +57,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
 
             @Override
-            public void onLoaded(final List<ParsedCar> carList, Exception e) {
+            public void onLoaded(List<ParsedCar> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
-                if (e == null && carList.size() > 0) {
-                    ParseObject.unpinAllInBackground(CARS_LABEL, carList, new DeleteCallback() {
-                        public void done(ParseException e) {
-                            if (e != null) return;
-
-                            ParseObject.pinAllInBackground(CARS_LABEL, carList);
-                        }
-                    });
+                if (e == null) {
+                    Toast.makeText(MainActivity.this, carList.size() + "", Toast.LENGTH_SHORT).show();
 //                    updateSearchPanel(carList);
-                } else if (e == null && carList.size() == 0) {
-                    if (isOnline()) {
-                        mInitialStart = true;
-                        mCarsAdapter.loadObjects();
-                    }
                 }
                 mMakesUpdated = false;
                 mModelsUpdated = false;
@@ -95,8 +82,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 startActivity(i);
             }
         });
-        // TODO Load new dataset automatically on scroll
-        mCarsAdapter.setPaginationEnabled(false);
 
         PriceSeekBar bar = (PriceSeekBar) findViewById(R.id.price_seekbar);
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
@@ -109,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
 
+        mInitialStart = true;
         new DownloadCarsTask().execute();
     }
 

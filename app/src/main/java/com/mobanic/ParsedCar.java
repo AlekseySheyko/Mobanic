@@ -28,8 +28,14 @@ public class ParsedCar extends ParseObject {
         }
     }
 
-    public void setPrice(int price) {
-        put("price", price);
+    public void setPrice(String priceStr) {
+        if (priceStr.contains(".00")) {
+            int price = Integer.parseInt(
+                    priceStr.replace(".00", "").replaceAll("\\D+", ""));
+            put("price", price);
+        } else {
+            put("price", 0);
+        }
     }
 
     public String getCoverImage() {
@@ -37,7 +43,61 @@ public class ParsedCar extends ParseObject {
     }
 
     public void setCoverImage(String url) {
-        put("coverImage", url);
+        if (url != null) {
+            put("coverImage", url.replace("../", "http://www.kahndesign.com/"));
+        } else {
+            put("coverImage", "http://www.kahndesign.com/images/AwaitingImage.png");
+        }
+    }
+
+    public int getYear() {
+        return getInt("year");
+    }
+
+    public void setYear(String yearStr) {
+        int year = Integer.parseInt(
+                yearStr.split("/")[0]);
+        put("year", year);
+    }
+
+    public String getColor() {
+        return getString("color");
+    }
+
+    public void setColor(String color) {
+        put("color", color);
+    }
+
+    public int getMileage() {
+        return getInt("Mileage");
+    }
+
+    public void setMileage(String mileageStr) {
+        int mileage = Integer.parseInt(
+                mileageStr.replaceAll(",", ""));
+        put("mileage", mileage);
+    }
+
+    public String getFuelType() {
+        return getString("fuelType");
+    }
+
+    public String getTransType() {
+        return getString("transType");
+    }
+
+    public void setFuelAndTrans(String fuelAndTrans) {
+        String[] params = fuelAndTrans.split(" : ");
+        put("fuelType", params[0]);
+        put("transType", params[1]);
+    }
+
+    public String getLocation() {
+        return getString("location");
+    }
+
+    public void setLocation(String location) {
+        put("location", location);
     }
 
     public String formatPrice(int price) {
