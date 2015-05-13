@@ -28,9 +28,11 @@ public class CarsAdapter extends ParseQueryAdapter<ParsedCar> {
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
         Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
 
-//        if (car.isSold()) {
-//            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
-//        }
+        if (car.getFormattedPrice().equals("Under offer")) {
+            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
+        } else {
+            v.findViewById(R.id.sold).setVisibility(View.GONE);
+        }
         return v;
     }
 }

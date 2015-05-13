@@ -18,6 +18,8 @@ import android.widget.ListView;
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SingleSpinner;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -94,7 +96,18 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         });
 
         mInitialStart = true;
-        new DownloadCarsTask().execute();
+        ParseQuery<ParsedCar> query = ParseQuery.getQuery(ParsedCar.class);
+        query.fromLocalDatastore();
+        query.findInBackground(new FindCallback<ParsedCar>() {
+            @Override
+            public void done(List<ParsedCar> carList, ParseException e) {
+                if (e == null && carList.size() == 0) {
+                    new DownloadCarsTask().execute();
+                } else {
+                    mCarsAdapter.loadObjects();
+                }
+            }
+        });
     }
 
     private void setupActionBar() {
