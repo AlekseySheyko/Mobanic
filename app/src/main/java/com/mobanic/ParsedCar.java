@@ -37,16 +37,16 @@ public class ParsedCar extends ParseObject {
             if (header.contains(possibleMake)) {
                 make = possibleMake;
                 String[] parts = header.split(" - ");
-                String fragmentToRemove = parts[parts.length-1];
+                String fragmentToRemove = parts[parts.length - 1];
                 model = header.substring(make.length()).replaceFirst(" ", "").replace(fragmentToRemove, "").replace("- ", "");
+                if (model.contains("(")) {
+                    fragmentToRemove = model.substring(model.indexOf("(") - 1, model.indexOf(")") + 1);
+                    model = model.replace(fragmentToRemove, "").replace("(LHD)", "").replace("Turbo Wide Body", "");
+                }
             }
         }
-        try {
-            put("make", make);
-            put("model", model);
-        } catch (Exception e) {
-            Log.e("Download", "Not found possible make for " + header);
-        }
+        put("make", make);
+        put("model", model);
     }
 
     public String getFormattedPrice() {
@@ -71,10 +71,10 @@ public class ParsedCar extends ParseObject {
         return getString("coverImage");
     }
 
-    public void setCoverImage(String url) {
-        if (url != null) {
-            put("coverImage", url.replace("Medium", "Large")
-                    .replace("../", "https://www.kahndesign.com/"));
+    public void setCoverImage(String imageId) {
+        if (!imageId.isEmpty()) {
+            put("coverImage", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
+            Log.d("Download", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
         } else {
             put("coverImage", "https://www.kahndesign.com/images/AwaitingImage.png");
         }

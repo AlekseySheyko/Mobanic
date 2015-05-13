@@ -2,6 +2,7 @@ package com.mobanic;
 
 import android.os.AsyncTask;
 
+import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
@@ -40,17 +41,20 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
                 String location = specs.get(5).text();
                 String price = specs.get(6).text();
 
-                Element coverImage = card.select("[src*=.jpg]").first();
-                String imageUrl = null;
-                if (coverImage != null) {
-                    imageUrl = coverImage.attr("src");
+                String linkContents = card.select("a").html();
+                String imageId;
+                try {
+                    imageId = linkContents.substring(linkContents.indexOf(".jpg") - 5,
+                            linkContents.indexOf(".jpg"));
+                } catch (StringIndexOutOfBoundsException e) {
+                    imageId = "";
                 }
 
 
                 ParsedCar car = new ParsedCar();
                 car.setTitleAndMake(title);
                 car.setYear(year);
-                car.setCoverImage(imageUrl);
+                car.setCoverImage(imageId);
                 car.setPrice(price);
                 car.setColor(color);
                 car.setMileage(mileage);
@@ -66,15 +70,21 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
     }
 
     @Override
-    protected void onPostExecute(List<ParsedCar> carList) {
+    protected void onPostExecute(final List<ParsedCar> carList) {
         super.onPostExecute(carList);
-        ParseObject.pinAllInBackground(carList, new SaveCallback() {
+        // TODO: Remove unpin part before production
+        ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null) {
-                    MainActivity a = (MainActivity) MainActivity.getContext();
-                    a.mCarsAdapter.loadObjects();
-                }
+                ParseObject.pinAllInBackground(carList, new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            MainActivity a = (MainActivity) MainActivity.getContext();
+                            a.mCarsAdapter.loadObjects();
+                        }
+                    }
+                });
             }
         });
     }
