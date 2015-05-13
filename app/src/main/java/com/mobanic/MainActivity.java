@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             public void onLoaded(List<ParsedCar> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null) {
-                    Toast.makeText(MainActivity.this, carList.size() + "", Toast.LENGTH_SHORT).show();
 //                    updateSearchPanel(carList);
                 }
                 mMakesUpdated = false;

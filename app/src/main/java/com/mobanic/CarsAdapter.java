@@ -1,6 +1,7 @@
 package com.mobanic;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ public class CarsAdapter extends ParseQueryAdapter<ParsedCar> {
 
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
         Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
+        Log.d("Download", car.getCoverImage());
 
 //        if (car.isSold()) {
 //            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);

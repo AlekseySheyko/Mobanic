@@ -44,9 +44,10 @@ public class ParsedCar extends ParseObject {
 
     public void setCoverImage(String url) {
         if (url != null) {
-            put("coverImage", url.replace("../", "http://www.kahndesign.com/"));
+            put("coverImage", url.replace("Medium", "Large")
+                    .replace("../", "https://www.kahndesign.com/"));
         } else {
-            put("coverImage", "http://www.kahndesign.com/images/AwaitingImage.png");
+            put("coverImage", "https://www.kahndesign.com/images/AwaitingImage.png");
         }
     }
 
