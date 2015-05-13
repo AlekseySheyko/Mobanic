@@ -1,5 +1,7 @@
 package com.mobanic;
 
+import android.util.Log;
+
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
@@ -9,15 +11,40 @@ import java.util.Locale;
 @ParseClassName("ParsedCar")
 public class ParsedCar extends ParseObject {
 
+    private String[] mPossibleMakes = new String[]{
+            "Aston Martin", "BMW", "Bentley",
+            "Bugatti", "Defender", "Discovery", "Ferrari",
+            "Jaguar", "Jeep", "Lamborghini",
+            "Range Rover", "Maybach", "Mercedes-Benz",
+            "Porsche", "Rolls Royce"
+    };
+
     public ParsedCar() {
     }
 
-    public String getTitle() {
-        return getString("title");
+    public String getMake() {
+        return getString("make");
     }
 
-    public void setTitle(String title) {
-        put("title", title);
+    public String getModel() {
+        return getString("model");
+    }
+
+    public void setTitleAndMake(String header) {
+        String make = null;
+        String model = null;
+        for (String possibleMake : mPossibleMakes) {
+            if (header.contains(possibleMake)) {
+                make = possibleMake;
+                model = header.split(" - ")[0].substring(possibleMake.length()).replaceFirst(" ", "");
+            }
+        }
+        try {
+            put("make", make);
+            put("model", model);
+        } catch (Exception e) {
+            Log.e("Download", "Not found possible make for " + header);
+        }
     }
 
     public String getFormattedPrice() {

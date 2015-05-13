@@ -48,7 +48,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
 
 
                 ParsedCar car = new ParsedCar();
-                car.setTitle(title);
+                car.setTitleAndMake(title);
                 car.setYear(year);
                 car.setCoverImage(imageUrl);
                 car.setPrice(price);
