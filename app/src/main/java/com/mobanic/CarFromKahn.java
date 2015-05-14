@@ -53,11 +53,16 @@ public class CarFromKahn extends ParseObject {
                     fragmentToRemove = model.substring(model.indexOf("(") - 1, model.indexOf(")") + 1);
                     model = model.replace(fragmentToRemove, "").trim();
                 }
-                model = model.replace("(LHD)", "")
+                model = model.replace("(LHD)", "").replace("2+2", "")
                         .replace(" (Turbo Wide Body)", "").replace("Fiorano Handling Pack", "")
                         .replace("Koenig Specials", "").replace("Auto", "").replace("Sport", "")
                         .replace("5.0 2dr", "").replace("TWR", "").replace("4.0", "")
                         .replace("2.8 Diesel", "").replace("2DR", "").replace("4DR", "")
+                        .replace("7 Series 730 Ld M", "730Ld").replace("16.4", "")
+                        .replace("LHD", "").replace("LE", "").replace("3.6 Petrol", "")
+                        .replace(" Double Cab", "").replace(" 5 Door", "").replace(" Tiptronic", "")
+                        .replace("Vanquish", "Vanquish V12").replace("Mulliner", "")
+                        .replace("Vanquish V12 S", "Vanquish S").replace("Diesel PDK", "")
                         .trim();
             }
         }
