@@ -26,7 +26,7 @@ public class CarsAdapter extends ParseQueryAdapter<CarFromKahn> {
         ((TextView) v.findViewById(R.id.price)).setText(car.getFormattedPrice());
 
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-        Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
+        Picasso.with(getContext()).load(car.getCoverImageUrl()).fit().centerCrop().into(imageView);
 
         if (car.isLeftHanded()) {
             v.findViewById(R.id.leftHanded).setVisibility(View.VISIBLE);

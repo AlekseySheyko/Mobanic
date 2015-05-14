@@ -40,8 +40,8 @@ import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private ParseObject mCar;
-    private String mCarId;
+    private CarFromKahn mCar;
+    private int mCarId;
     private int mCarPosition;
 
     private Intent mShareIntent;
@@ -53,10 +53,10 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if (getIntent() != null) {
-            mCarId = getIntent().getStringExtra("car_id");
+            mCarId = getIntent().getIntExtra("car_id", -1);
             mCarPosition = getIntent().getIntExtra("car_position", -1);
         } else if (savedInstanceState != null) {
-            mCarId = savedInstanceState.getString("car_id");
+            mCarId = savedInstanceState.getInt("car_id");
             mCarPosition = savedInstanceState.getInt("car_position");
         }
 
@@ -76,7 +76,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putString("car_id", mCarId);
+        outState.putInt("car_id", mCarId);
         outState.putInt("car_position", mCarPosition);
         super.onSaveInstanceState(outState, outPersistentState);
     }
@@ -84,7 +84,8 @@ public class DetailActivity extends AppCompatActivity {
     private void updateCarDetails() {
         ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
         query.fromLocalDatastore();
-        query.getInBackground(mCarId, new GetCallback<CarFromKahn>() {
+        query.whereEqualTo("id", mCarId);
+        query.getFirstInBackground(new GetCallback<CarFromKahn>() {
             @Override
             public void done(CarFromKahn car, ParseException e) {
                 if (e != null) {
@@ -116,7 +117,7 @@ public class DetailActivity extends AppCompatActivity {
                 fillOutSpecs();
                 fillOutFeatures();
 
-                String url = mCar.getParseFile("coverImage").getUrl();
+                String url = mCar.getCoverImageUrl();
                 if (url != null) {
                     new SetShareIntentTask().execute(title, url);
                 }
@@ -178,7 +179,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setCoverImage() {
-        String url = mCar.getParseFile("coverImage").getUrl();
+        String url = mCar.getCoverImageUrl();
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this).load(url).fit().centerCrop().into(imageView);

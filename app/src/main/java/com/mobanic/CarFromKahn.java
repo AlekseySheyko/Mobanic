@@ -118,7 +118,7 @@ public class CarFromKahn extends ParseObject {
         }
     }
 
-    public String getCoverImage() {
+    public String getCoverImageUrl() {
         return getString("coverImage");
     }
 
