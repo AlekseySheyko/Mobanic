@@ -211,12 +211,12 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DownloadSpecsTask extends AsyncTask<Void, Void, Void> {
+    private class DownloadSpecsTask extends AsyncTask<Void, Void, Boolean> {
 
         private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Boolean doInBackground(Void... voids) {
             String url = BASE_URL + mCarId;
             mGalleryImageUrls = new ArrayList<>();
             mFeatureList = new ArrayList<>();
@@ -243,16 +243,19 @@ public class DetailActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
-            return null;
+            return true;
         }
 
         @Override
-        protected void onPostExecute(Void voids) {
-            super.onPostExecute(voids);
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
 
-            setGalleryImages();
-            fillOutFeatures();
+            if (success) {
+                setGalleryImages();
+                fillOutFeatures();
+            }
         }
 
     }
