@@ -51,9 +51,14 @@ public class CarFromKahn extends ParseObject {
                 model = header.substring(make.length()).replaceFirst(" ", "").replace(fragmentToRemove, "").replace("- ", "");
                 if (model.contains("(")) {
                     fragmentToRemove = model.substring(model.indexOf("(") - 1, model.indexOf(")") + 1);
-                    // TODO Go thought the other models and remove redundant prefixes from models
-                    model = model.replace(fragmentToRemove, "").replace("(LHD)", "").replace(" (Turbo Wide Body)", "");
+                    model = model.replace(fragmentToRemove, "").trim();
                 }
+                model = model.replace("(LHD)", "")
+                        .replace(" (Turbo Wide Body)", "").replace("Fiorano Handling Pack", "")
+                        .replace("Koenig Specials", "").replace("Auto", "").replace("Sport", "")
+                        .replace("5.0 2dr", "").replace("TWR", "").replace("4.0", "")
+                        .replace("2.8 Diesel", "").replace("2DR", "").replace("4DR", "")
+                        .trim();
             }
         }
         put("make", make);
@@ -79,7 +84,7 @@ public class CarFromKahn extends ParseObject {
             int price = Integer.parseInt(
                     priceStr.replace(".00", "").replaceAll("\\D+", ""));
             put("price", price);
-        } else if (priceStr.contains("on Application")){
+        } else if (priceStr.contains("on Application")) {
             put("price", 1);
         } else {
             put("price", 0);

@@ -28,7 +28,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
         try {
             carList = new ArrayList<>();
 
-            Document doc = Jsoup.connect(BASE_URL).get();
+            Document doc = Jsoup.connect(BASE_URL).timeout(10*1000).get();
             Elements cards = doc.select("#ajax-content-container .row .stockBack .centre")
                     .not(".midGreyText");
             for (Element card : cards) {
