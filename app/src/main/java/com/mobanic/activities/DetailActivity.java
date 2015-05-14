@@ -39,7 +39,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class DetailActivity extends AppCompatActivity {
@@ -50,6 +49,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private Intent mShareIntent;
     private Uri mImageUri;
+
+    private ArrayList<String> mGalleryImageUrls;
+    private ArrayList<String> mFeatureList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +105,9 @@ public class DetailActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
-
                 mCar = car;
+
+                new DownloadSpecsTask().execute();
 
                 String make = car.getMake();
                 String model = car.getModel();
@@ -116,21 +119,15 @@ public class DetailActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(make);
 
                 setCoverImage();
-                // TODO Open separate connection to download gallery images for a specific page
-                setGalleryImages();
                 fillOutSpecs();
-                fillOutFeatures();
 
                 String url = mCar.getCoverImageUrl();
-                if (url != null) {
-                    new SetShareIntentTask().execute(title, url);
-                }
+                new SetShareIntentTask().execute(title, url);
             }
         });
     }
 
     private class SetShareIntentTask extends AsyncTask<String, Void, Intent> {
-
         @Override
         protected Intent doInBackground(String... strings) {
 
@@ -189,43 +186,6 @@ public class DetailActivity extends AppCompatActivity {
         Picasso.with(this).load(url).fit().centerCrop().into(imageView);
     }
 
-    private void setGalleryImages() {
-        new DownloadGalleryImagesTask().execute();
-    }
-
-    private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
-        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
-        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText("Loading...");
-        ((TextView) findViewById(R.id.engine)).setText("Loading...");
-        ((TextView) findViewById(R.id.transmission)).setText("Loading...");
-        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
-        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
-        // TODO Add link to Google Maps on specific location
-        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
-    }
-
-    private void fillOutFeatures() {
-        List<String> features = mCar.getList("features");
-
-        LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
-        if (features != null) {
-            for (String feature : features) {
-                TextView textView = (TextView) View.inflate(
-                        DetailActivity.this,
-                        R.layout.list_item_feature,
-                        null);
-                textView.setText(feature);
-                featuresContainer.addView(textView);
-            }
-        } else {
-            findViewById(R.id.features_header).setVisibility(View.GONE);
-            findViewById(R.id.features_container).setVisibility(View.GONE);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
@@ -251,70 +211,113 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DownloadGalleryImagesTask extends AsyncTask<Void, Void, List<String>> {
+    private class DownloadSpecsTask extends AsyncTask<Void, Void, Void> {
 
         private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
 
         @Override
-        protected List<String> doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             String url = BASE_URL + mCarId;
-            List<String> imageLinks = new ArrayList<>();
+            mGalleryImageUrls = new ArrayList<>();
+            mFeatureList = new ArrayList<>();
             try {
                 Document doc = Jsoup.connect(url).timeout(15 * 1000).get();
                 Elements images = doc.select("[src*=.jpg]");
                 for (Element image : images) {
                     if (image.attr("src").contains("imgMedium")) {
-                        Log.d("Download", image.attr("src"));
                         String imageUrl = image.attr("src")
                                 .replace("../", "https://kahndesign.com/")
                                 .replace("imgMedium", "imgLarge");
-                        imageLinks.add(imageUrl);
+                        mGalleryImageUrls.add(imageUrl);
                     }
                 }
+
+                Elements features = doc.select("#specList");
+                for (Element feature : features) {
+                    mFeatureList.add(feature.text());
+                }
+                mFeatureList.remove(mFeatureList.size()-1);
+                for (String spec : mFeatureList) {
+                    Log.d("Download", spec);
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return imageLinks;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<String> links) {
-            super.onPostExecute(links);
+        protected void onPostExecute(Void voids) {
+            super.onPostExecute(voids);
 
-            final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
-            flipper.setInAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
-                    android.R.anim.fade_in));
-            flipper.setOutAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
-                    android.R.anim.fade_out));
-            flipper.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    flipper.stopFlipping();
-                    flipper.showNext();
-                    flipper.startFlipping();
-                }
-            });
+            setGalleryImages();
+            fillOutFeatures();
+        }
 
-            findViewById(R.id.gallery_header).setVisibility(View.VISIBLE);
-            findViewById(R.id.flipper).setVisibility(View.VISIBLE);
-
-            flipper.removeAllViews();
-            for (String url : links) {
-                RatioImageView imageView = (RatioImageView) View.inflate(
-                        DetailActivity.this,
-                        R.layout.gallery_image,
-                        null);
-                Picasso.with(DetailActivity.this)
-                        .load(url)
-                        .fit()
-                        .centerCrop()
-                        .into(imageView);
-                flipper.addView(imageView);
-            }
-            if (links.size() == 1) {
-                flipper.setOnClickListener(null);
+    }
+    private void setGalleryImages() {
+        final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
+        flipper.setInAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
+                android.R.anim.fade_in));
+        flipper.setOutAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
+                android.R.anim.fade_out));
+        flipper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 flipper.stopFlipping();
+                flipper.showNext();
+                flipper.startFlipping();
             }
+        });
+
+        flipper.removeAllViews();
+        for (String url : mGalleryImageUrls) {
+            RatioImageView imageView = (RatioImageView) View.inflate(
+                    DetailActivity.this,
+                    R.layout.gallery_image,
+                    null);
+            Picasso.with(DetailActivity.this)
+                    .load(url)
+                    .fit()
+                    .centerCrop()
+                    .into(imageView);
+            flipper.addView(imageView);
+        }
+        if (mGalleryImageUrls.size() == 1) {
+            flipper.setOnClickListener(null);
+            flipper.stopFlipping();
+        }
+    }
+
+    private void fillOutSpecs() {
+        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
+        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
+        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
+        ((TextView) findViewById(R.id.previousOwners)).setText("Loading...");
+        ((TextView) findViewById(R.id.engine)).setText("Loading...");
+        ((TextView) findViewById(R.id.transmission)).setText("Loading...");
+        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
+        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        // TODO Add link to Google Maps on specific location
+        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
+    }
+
+    private void fillOutFeatures() {
+        LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
+        if (mFeatureList != null) {
+            for (String feature : mFeatureList) {
+                TextView textView = (TextView) View.inflate(
+                        DetailActivity.this,
+                        R.layout.list_item_feature,
+                        null);
+                textView.setText(feature);
+                featuresContainer.addView(textView);
+            }
+        } else {
+            findViewById(R.id.features_header).setVisibility(View.GONE);
+            findViewById(R.id.features_container).setVisibility(View.GONE);
         }
     }
 }

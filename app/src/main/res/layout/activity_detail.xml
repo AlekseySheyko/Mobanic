@@ -181,7 +181,6 @@
             <TextView
                 android:id="@+id/gallery_header"
                 style="@style/HeaderTextView"
-                android:visibility="gone"
                 android:text="@string/gallery_header"/>
 
             <ViewFlipper
@@ -190,8 +189,7 @@
                 android:layout_height="wrap_content"
                 android:autoStart="true"
                 android:flipInterval="3000"
-                android:foreground="?selectableItemBackground"
-                android:visibility="gone">
+                android:foreground="?selectableItemBackground">
 
                 <com.mobanic.views.RatioImageView
                     android:id="@+id/gallery_placeholder"
