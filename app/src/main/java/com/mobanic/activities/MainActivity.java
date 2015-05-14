@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<CarFromKahn>() {
             @Override
             public void onLoading() {
-                // TODO Show loading spiner right from the start
                 findViewById(R.id.spinner).setVisibility(View.VISIBLE);
             }
 

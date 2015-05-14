@@ -24,7 +24,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="170dp"
             android:background="#303030"
-            android:visibility="gone"/>
+            tools:visibility="gone"/>
 
         <ListView
             android:id="@+id/cars_listview"
