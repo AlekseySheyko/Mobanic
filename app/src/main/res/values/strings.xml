@@ -16,4 +16,6 @@
     <string name="remove_filter">Remove filter</string>
     <string name="empty">No cars found</string>
     <string name="sold">This car has been sold!</string>
+    <string name="error">Connection failed, check\nyour network settings</string>
+    <string name="error_short">Connection failed</string>
 </resources>

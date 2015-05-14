@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
-        lv.setEmptyView(findViewById(R.id.empty));
+        lv.setEmptyView(findViewById(R.id.error));
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {

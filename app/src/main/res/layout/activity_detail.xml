@@ -191,10 +191,24 @@
                 android:flipInterval="3000"
                 android:foreground="?selectableItemBackground">
 
-                <com.mobanic.views.RatioImageView
-                    android:id="@+id/gallery_placeholder"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content">
+
+                    <com.mobanic.views.RatioImageView
+                        android:id="@+id/gallery_placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <ProgressBar
+                        android:id="@+id/spinner"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        tools:visibility="gone"/>
+
+                </FrameLayout>
 
             </ViewFlipper>
 
@@ -203,17 +217,36 @@
                 style="@style/HeaderTextView"
                 android:text="@string/features_header"/>
 
-            <LinearLayout
-                android:id="@+id/features_container"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="100dp"
-                android:background="@android:color/white"
-                android:orientation="vertical"
-                android:paddingBottom="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="12dp"/>
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/features_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:minHeight="100dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="sans-serif-light"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="30dp"
+                    android:text="@string/error_short"
+                    android:textColor="#8d000000"
+                    android:textSize="24sp"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
 
         </LinearLayout>
 

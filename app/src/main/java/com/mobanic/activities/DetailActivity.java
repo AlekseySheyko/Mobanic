@@ -221,7 +221,7 @@ public class DetailActivity extends AppCompatActivity {
             mGalleryImageUrls = new ArrayList<>();
             mFeatureList = new ArrayList<>();
             try {
-                Document doc = Jsoup.connect(url).timeout(15 * 1000).get();
+                Document doc = Jsoup.connect(url).timeout(10 * 1000).get();
                 Elements images = doc.select("[src*=.jpg]");
                 for (Element image : images) {
                     if (image.attr("src").contains("imgMedium")) {
@@ -251,10 +251,13 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
+            findViewById(R.id.spinner).setVisibility(View.GONE);
 
             if (success) {
                 setGalleryImages();
                 fillOutFeatures();
+            } else {
+                findViewById(R.id.error).setVisibility(View.VISIBLE);
             }
         }
 

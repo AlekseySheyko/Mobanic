@@ -94,8 +94,8 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
             });
         } else {
             MainActivity a = (MainActivity) MainActivity.getContext();
-            TextView emptyText = (TextView) a.findViewById(R.id.empty);
-            emptyText.setText("Connection failed, check\nyour network settings");
+            TextView emptyText = (TextView) a.findViewById(R.id.error);
+            emptyText.setText(a.getString(R.string.error));
             a.findViewById(R.id.spinner).setVisibility(View.GONE);
         }
     }
