@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
-import com.mobanic.CarFromMobanic;
+import com.mobanic.CarFromKahn;
 import com.mobanic.R;
 
 import java.math.BigDecimal;
@@ -618,9 +618,9 @@ public class PriceSeekBar<T extends Number> extends ImageView {
         }
     }
 
-    public void setItems(List<CarFromMobanic> carList) {
+    public void setItems(List<CarFromKahn> carList) {
         List<Integer> prices = new ArrayList<>();
-        for (CarFromMobanic car : carList) {
+        for (CarFromKahn car : carList) {
             prices.add(car.getPrice());
         }
         try {

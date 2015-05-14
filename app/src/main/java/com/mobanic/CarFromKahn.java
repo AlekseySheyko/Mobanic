@@ -70,6 +70,10 @@ public class CarFromKahn extends ParseObject {
         }
     }
 
+    public int getPrice() {
+        return getInt("price");
+    }
+
     public void setPrice(String priceStr) {
         if (priceStr.contains(".00")) {
             int price = Integer.parseInt(
@@ -150,6 +154,21 @@ public class CarFromKahn extends ParseObject {
 
     public boolean isLeftHanded() {
         return getBoolean("isLeftHanded");
+    }
+
+    public String getValueForKey(String key) {
+        return getString(key.toLowerCase().replace("colour", "color").replace("fuel type", "fuelType").replace("transmission", "transType"));
+    }
+
+    public String getAgeCategory() {
+        int age = 2015 - getYear();
+        if (age <= 1) {
+            return "Up to 1 year old";
+        } else if (age <= 10) {
+            return "Up to " + age + " years old";
+        } else {
+            return "Over 10 years old";
+        }
     }
 
     public String formatPrice(int price) {

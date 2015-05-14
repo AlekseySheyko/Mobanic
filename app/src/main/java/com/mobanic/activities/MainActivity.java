@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.mobanic.CarFromKahn;
-import com.mobanic.CarFromMobanic;
 import com.mobanic.CarsAdapter;
 import com.mobanic.DownloadCarsTask;
 import com.mobanic.R;
@@ -40,7 +39,6 @@ import static com.mobanic.views.SingleSpinner.AgeFilterListener;
 public class MainActivity extends AppCompatActivity implements MultipleFiltersListener,
         AgeFilterListener {
 
-    private final String CARS_LABEL = "cars";
     public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mInitialStart = true;
@@ -71,8 +69,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             public void onLoaded(List<CarFromKahn> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null) {
-                    // TODO: Populate search panel with new full amount of cars data
-//                    updateSearchPanel(carList);
+                    updateSearchPanel(carList);
                 }
                 mMakesUpdated = false;
                 mModelsUpdated = false;
@@ -106,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
 
-        mInitialStart = true;
         ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
         query.fromLocalDatastore();
         query.findInBackground(new FindCallback<CarFromKahn>() {
@@ -141,49 +137,49 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     public ParseQueryAdapter.QueryFactory<CarFromKahn> getQueryFactory() {
         return new ParseQueryAdapter.QueryFactory<CarFromKahn>() {
             public ParseQuery<CarFromKahn> create() {
-//                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-//                Set<String> models = mSharedPrefs.getStringSet("Model", null);
-//                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
-//                Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
-//                Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
-//                int minPrice = mSharedPrefs.getInt("minPrice", -1);
-//                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
-//                int maxAge = mSharedPrefs.getInt("maxAge", -1);
+                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+                Set<String> models = mSharedPrefs.getStringSet("Model", null);
+                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
+                Set<String> transTypes = mSharedPrefs.getStringSet("Transmission", null);
+                Set<String> fuelTypes = mSharedPrefs.getStringSet("Fuel Type", null);
+                int minPrice = mSharedPrefs.getInt("minPrice", -1);
+                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
+                int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
                 ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
                 query.orderByDescending("createdAt");
                 query.fromLocalDatastore();
 
-//                if (makes != null && makes.size() > 0) {
-//                    query.whereContainedIn("make", makes);
-//                }
-//                if (models != null && models.size() > 0) {
-//                    query.whereContainedIn("model", models);
-//                }
-//                if (minPrice != -1) {
-//                    query.whereGreaterThanOrEqualTo("price", minPrice);
-//                }
-//                if (maxPrice != -1) {
-//                    query.whereLessThanOrEqualTo("price", maxPrice);
-//                }
-//                if (maxAge != -1) {
-//                    query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
-//                }
-//                if (colors != null && colors.size() > 0) {
-//                    query.whereContainedIn("color", colors);
-//                }
-//                if (fuelTypes != null && fuelTypes.size() > 0) {
-//                    query.whereContainedIn("fuelType", fuelTypes);
-//                }
-//                if (transTypes != null && transTypes.size() > 0) {
-//                    query.whereContainedIn("transmission", transTypes);
-//                }
+                if (makes != null && makes.size() > 0) {
+                    query.whereContainedIn("make", makes);
+                }
+                if (models != null && models.size() > 0) {
+                    query.whereContainedIn("model", models);
+                }
+                if (minPrice != -1) {
+                    query.whereGreaterThanOrEqualTo("price", minPrice);
+                }
+                if (maxPrice != -1) {
+                    query.whereLessThanOrEqualTo("price", maxPrice);
+                }
+                if (maxAge != -1) {
+                    query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
+                }
+                if (colors != null && colors.size() > 0) {
+                    query.whereContainedIn("color", colors);
+                }
+                if (fuelTypes != null && fuelTypes.size() > 0) {
+                    query.whereContainedIn("fuelType", fuelTypes);
+                }
+                if (transTypes != null && transTypes.size() > 0) {
+                    query.whereContainedIn("transType", transTypes);
+                }
                 return query;
             }
         };
     }
 
-    public void updateSearchPanel(List<CarFromMobanic> carList) {
+    public void updateSearchPanel(List<CarFromKahn> carList) {
         if (mInitialStart) {
             ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         }

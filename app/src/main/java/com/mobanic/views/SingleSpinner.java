@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.mobanic.CarFromKahn;
 import com.mobanic.CarFromMobanic;
 import com.mobanic.R;
 
@@ -55,14 +56,14 @@ public class SingleSpinner extends Spinner {
         setAdapter(mAdapter);
     }
 
-    public void setItems(List<CarFromMobanic> carList) {
+    public void setItems(List<CarFromKahn> carList) {
         mAgeSet = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String s, String t1) {
                 return extractDigits(s) - extractDigits(t1);
             }
         });
-        for (CarFromMobanic car : carList) {
+        for (CarFromKahn car : carList) {
             mAgeSet.add(car.getAgeCategory());
         }
         mAgeList = new ArrayList<>();
