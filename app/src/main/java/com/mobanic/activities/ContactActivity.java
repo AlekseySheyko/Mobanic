@@ -102,6 +102,7 @@ public class ContactActivity extends ActionBarActivity {
                 + "Name: " + name + "\n"
                 + "Email: " + emailAddress + "\n"
                 + "Phone: " + "+" + phone + "\n"
+                // TODO: Attach url when car is from kahn's site
                 + "About: " + mMake + " " + mModel + ", #" + mPosition;
         String subject = mSubjectSpinner.getSelectedItem().toString();
 

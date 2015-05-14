@@ -63,6 +63,11 @@ public class CarFromKahn extends ParseObject {
                         .replace(" Double Cab", "").replace(" 5 Door", "").replace(" Tiptronic", "")
                         .replace("Vanquish", "Vanquish V12").replace("Mulliner", "")
                         .replace("Vanquish V12 S", "Vanquish S").replace("Diesel PDK", "")
+                        .replace(" Saloon", "").replace("3.0", "").replace("2 Cabrio", "Cabrio")
+                        .replace("Roadster", "").replace("5.5 V12", "").replace("Diesel HSE", "")
+                        .replace("SDV6", "Sport SDV6").replace("2.2 SD4 5DR", "")
+                        .replace("biography", "").replace("SDV6", "").replace("TDV6", "")
+                        .replace("4.4", "").replace("SDV8  ", "").replace("SDV8 ", "")
                         .trim();
             }
         }
