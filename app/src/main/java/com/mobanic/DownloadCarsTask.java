@@ -1,6 +1,9 @@
 package com.mobanic;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.mobanic.activities.MainActivity;
 import com.parse.DeleteCallback;
@@ -28,8 +31,8 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
         try {
             carList = new ArrayList<>();
 
-            Document doc = Jsoup.connect(BASE_URL).timeout(15*1000).get();
-            Elements cards = doc.select("#ajax-content-container .row .stockBack .centre")
+            Document doc = Jsoup.connect(BASE_URL).timeout(15 * 1000).get();
+            Elements cards = doc.select("#ajax-content-container .centre")
                     .not(".midGreyText");
             for (Element card : cards) {
                 String modelAndMake = card.getElementsByTag("h4").first().text();
@@ -55,6 +58,10 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 } catch (StringIndexOutOfBoundsException e) {
                     imageId = "";
                 }
+                Elements links = card.select("a");
+                for (Element link : links) {
+                    Log.d(TAG, link.attr("href"));
+                }
 
                 CarFromKahn car = new CarFromKahn(
                         modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
@@ -62,6 +69,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
         return carList;
     }
@@ -69,21 +77,28 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
     @Override
     protected void onPostExecute(final List<CarFromKahn> carList) {
         super.onPostExecute(carList);
-        ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    ParseObject.pinAllInBackground(carList, new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                MainActivity a = (MainActivity) MainActivity.getContext();
-                                a.mCarsAdapter.loadObjects();
+        if (carList != null) {
+            ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        ParseObject.pinAllInBackground(carList, new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    MainActivity a = (MainActivity) MainActivity.getContext();
+                                    a.mCarsAdapter.loadObjects();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            MainActivity a = (MainActivity) MainActivity.getContext();
+            TextView emptyText = (TextView) a.findViewById(R.id.empty);
+            emptyText.setText("Connection failed, check your network settings");
+            a.findViewById(R.id.spinner).setVisibility(View.GONE);
+        }
     }
 }
