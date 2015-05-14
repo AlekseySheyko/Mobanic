@@ -65,13 +65,20 @@ public class CarFromKahn extends ParseObject {
                         .replace("Vanquish V12 S", "Vanquish S").replace("Diesel PDK", "")
                         .replace(" Saloon", "").replace("3.0", "").replace("2 Cabrio", "Cabrio")
                         .replace("Roadster", "").replace("5.5 V12", "").replace("Diesel HSE", "")
-                        .replace("SDV6", "Sport SDV6").replace("2.2 SD4 5DR", "")
+                        .replace("SDV6", "Range Rover Sport SDV6").replace("2.2 SD4 5DR", "")
                         .replace("biography", "").replace("SDV6", "").replace("TDV6", "")
                         .replace("4.4", "").replace("SDV8  ", "").replace("SDV8 ", "")
+                        .replace("2.2 TDCI SW 90", "Range Rover Defender").replace("6.2 430 BHP", "Range Rover Defender")
+                        .replace("2.2 TDCI 90", "Range Rover Defender").replace("2.2 TDCI XS 110", "Range Rover Defender")
+                        .replace("2.2 TDCI XS 90", "Range Rover Defender").replace("2.2 TDCi SW 90", "Range Rover Defender")
+                        .replace("2.4 TDCI XS 110", "Range Rover Defender").replace("Sport  SE Tech", "Range Rover Discovery Sport")
+                        .replace("2.2 SD4", "Range Rover Discovery").replace("Evoque", "Range Rover Evoque")
+                        .replace("Range Rover Range Rover", "Range Rover").replace("Vogue", "Range Rover Vogue")
+                        .replace("LWB", "Range Rover Vogue")
                         .trim();
             }
         }
-        put("make", make);
+        put("make", make.replace("Range Rover", "Land Rover").replace("Discovery", "Lang Rover").replace("Defender", "Land Rover"));
         put("model", model);
     }
 
@@ -184,6 +191,10 @@ public class CarFromKahn extends ParseObject {
         } else {
             return "Over 10 years old";
         }
+    }
+
+    public boolean isSold() {
+        return false;
     }
 
     public String formatPrice(int price) {
