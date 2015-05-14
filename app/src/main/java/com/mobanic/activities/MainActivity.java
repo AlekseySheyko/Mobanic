@@ -22,8 +22,6 @@ import com.mobanic.R;
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SingleSpinner;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -63,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
             @Override
             public void onLoaded(List<CarFromKahn> carList, Exception e) {
+                if (carList.size() == 0) {
+                    new DownloadCarsTask().execute();
+                    return;
+                }
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null) {
                     updateSearchPanel(carList);
@@ -99,18 +101,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
         });
 
-        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
-        query.fromLocalDatastore();
-        query.findInBackground(new FindCallback<CarFromKahn>() {
-            @Override
-            public void done(List<CarFromKahn> carList, ParseException e) {
-                if (e == null && carList.size() == 0) {
-                    new DownloadCarsTask().execute();
-                } else {
-                    mCarsAdapter.loadObjects();
-                }
-            }
-        });
+        mCarsAdapter.loadObjects();
     }
 
     private void setupActionBar() {

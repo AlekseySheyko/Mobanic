@@ -237,11 +237,12 @@ public class DetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
         ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
         ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
-        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
-        ((TextView) findViewById(R.id.transmission)).setText(mCar.getString("transmission"));
+        ((TextView) findViewById(R.id.previousOwners)).setText("Loading...");
+        ((TextView) findViewById(R.id.engine)).setText("Loading...");
+        ((TextView) findViewById(R.id.transmission)).setText("Loading...");
         ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
         ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        // TODO Add link to Google Maps on specific location
         ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
     }
 

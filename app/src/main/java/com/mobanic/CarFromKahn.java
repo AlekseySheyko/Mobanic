@@ -158,6 +158,14 @@ public class CarFromKahn extends ParseObject {
         put("mileage", mileage);
     }
 
+    public int getPreviousOwners() {
+        return getInt("previousOwners");
+    }
+
+    public void setPrevOwners(int previousOwners) {
+        put("previousOwners", previousOwners);
+    }
+
     public String getFuelType() {
         return getString("fuelType");
     }
@@ -177,6 +185,9 @@ public class CarFromKahn extends ParseObject {
     }
 
     public void setLocation(String location) {
+        if (location.startsWith(" ")) {
+            location = location.replaceFirst(" ", "");
+        }
         put("location", location);
     }
 

@@ -34,6 +34,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">4</item>
         <item name="android:textColor">#cb000000</item>
+        <item name="android:text">Loading...</item>
     </style>
 
     <style name="SpecsContainer">
