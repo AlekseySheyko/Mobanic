@@ -185,8 +185,8 @@ public class CarFromKahn extends ParseObject {
     }
 
     public void setLocation(String location) {
-        if (location.startsWith(" ")) {
-            location = location.replaceFirst(" ", "");
+        if (location.length() > 2) {
+            location = location.substring(1);
         }
         put("location", location);
     }
