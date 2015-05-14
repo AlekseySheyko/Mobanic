@@ -24,17 +24,21 @@ import android.widget.ViewFlipper;
 import com.mobanic.CarFromKahn;
 import com.mobanic.R;
 import com.mobanic.views.RatioImageView;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -186,50 +190,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setGalleryImages() {
-        final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
-        flipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                android.R.anim.fade_in));
-        flipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                android.R.anim.fade_out));
-        flipper.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                flipper.stopFlipping();
-                flipper.showNext();
-                flipper.startFlipping();
-            }
-        });
-
-        ParseQuery<ParseObject> query = mCar.getRelation("galleryImage").getQuery();
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> images, ParseException e) {
-                if (e == null && images.size() > 0) {
-                    findViewById(R.id.gallery_header).setVisibility(View.VISIBLE);
-                    findViewById(R.id.flipper).setVisibility(View.VISIBLE);
-
-                    flipper.removeAllViews();
-                    for (ParseObject image : images) {
-                        String url = image.getParseFile("image").getUrl();
-
-                        RatioImageView imageView = (RatioImageView) View.inflate(
-                                DetailActivity.this,
-                                R.layout.gallery_image,
-                                null);
-                        Picasso.with(DetailActivity.this)
-                                .load(url)
-                                .fit()
-                                .centerCrop()
-                                .into(imageView);
-                        flipper.addView(imageView);
-                    }
-                    if (images.size() == 1) {
-                        flipper.setOnClickListener(null);
-                        flipper.stopFlipping();
-                    }
-                }
-            }
-        });
+        new DownloadGalleryImagesTask().execute();
     }
 
     private void fillOutSpecs() {
@@ -285,8 +246,75 @@ public class DetailActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                return(true);
+                return (true);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class DownloadGalleryImagesTask extends AsyncTask<Void, Void, List<String>> {
+
+        private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
+
+        @Override
+        protected List<String> doInBackground(Void... voids) {
+            String url = BASE_URL + mCarId;
+            List<String> imageLinks = new ArrayList<>();
+            try {
+                Document doc = Jsoup.connect(url).timeout(15 * 1000).get();
+                Elements images = doc.select("[src*=.jpg]");
+                for (Element image : images) {
+                    if (image.attr("src").contains("imgMedium")) {
+                        Log.d("Download", image.attr("src"));
+                        String imageUrl = image.attr("src")
+                                .replace("../", "https://kahndesign.com/")
+                                .replace("imgMedium", "imgLarge");
+                        imageLinks.add(imageUrl);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return imageLinks;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> links) {
+            super.onPostExecute(links);
+
+            final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
+            flipper.setInAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
+                    android.R.anim.fade_in));
+            flipper.setOutAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
+                    android.R.anim.fade_out));
+            flipper.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    flipper.stopFlipping();
+                    flipper.showNext();
+                    flipper.startFlipping();
+                }
+            });
+
+            findViewById(R.id.gallery_header).setVisibility(View.VISIBLE);
+            findViewById(R.id.flipper).setVisibility(View.VISIBLE);
+
+            flipper.removeAllViews();
+            for (String url : links) {
+                RatioImageView imageView = (RatioImageView) View.inflate(
+                        DetailActivity.this,
+                        R.layout.gallery_image,
+                        null);
+                Picasso.with(DetailActivity.this)
+                        .load(url)
+                        .fit()
+                        .centerCrop()
+                        .into(imageView);
+                flipper.addView(imageView);
+            }
+            if (links.size() == 1) {
+                flipper.setOnClickListener(null);
+                flipper.stopFlipping();
+            }
+        }
     }
 }
