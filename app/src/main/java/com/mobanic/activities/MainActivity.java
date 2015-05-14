@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 CarFromKahn car = mCarsAdapter.getItem(position);
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                i.putExtra("car_id", car.getObjectId());
+                i.putExtra("car_id", car.getId());
                 i.putExtra("car_position", position + 1);
                 startActivity(i);
             }

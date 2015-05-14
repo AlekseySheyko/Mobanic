@@ -1,7 +1,6 @@
 package com.mobanic;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -58,13 +57,12 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 } catch (StringIndexOutOfBoundsException e) {
                     imageId = "";
                 }
-                Elements links = card.select("a");
-                for (Element link : links) {
-                    Log.d(TAG, link.attr("href"));
-                }
+                String href = card.select("a").first().attr("href");
+                int id = Integer.parseInt(
+                        href.substring(href.indexOf("?i=") + 3, href.indexOf("&css")));
 
                 CarFromKahn car = new CarFromKahn(
-                        modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
+                        id, modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
                 carList.add(car);
             }
         } catch (IOException e) {
@@ -97,7 +95,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
         } else {
             MainActivity a = (MainActivity) MainActivity.getContext();
             TextView emptyText = (TextView) a.findViewById(R.id.empty);
-            emptyText.setText("Connection failed, check your network settings");
+            emptyText.setText("Connection failed, check\nyour network settings");
             a.findViewById(R.id.spinner).setVisibility(View.GONE);
         }
     }

@@ -21,7 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mobanic.CarFromMobanic;
+import com.mobanic.CarFromKahn;
 import com.mobanic.R;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
@@ -52,8 +52,6 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        // TODO Check and return if car was sold
-
         if (getIntent() != null) {
             mCarId = getIntent().getStringExtra("car_id");
             mCarPosition = getIntent().getIntExtra("car_position", -1);
@@ -61,6 +59,7 @@ public class DetailActivity extends AppCompatActivity {
             mCarId = savedInstanceState.getString("car_id");
             mCarPosition = savedInstanceState.getInt("car_position");
         }
+
 
         updateCarDetails();
 
@@ -83,11 +82,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateCarDetails() {
-        ParseQuery<CarFromMobanic> query = ParseQuery.getQuery("CarFromMobanic");
+        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
         query.fromLocalDatastore();
-        query.getInBackground(mCarId, new GetCallback<CarFromMobanic>() {
+        query.getInBackground(mCarId, new GetCallback<CarFromKahn>() {
             @Override
-            public void done(CarFromMobanic car, ParseException e) {
+            public void done(CarFromKahn car, ParseException e) {
                 if (e != null) {
                     Toast.makeText(DetailActivity.this, e.getMessage(),
                             Toast.LENGTH_SHORT).show();
