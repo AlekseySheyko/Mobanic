@@ -33,7 +33,7 @@ public class CarsAdapter extends ParseQueryAdapter<CarFromKahn> {
         } else {
             v.findViewById(R.id.leftHanded).setVisibility(View.GONE);
         }
-        if (car.getFormattedPrice().equals("Under offer")) {
+        if (car.isSold()) {
             v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
         } else {
             v.findViewById(R.id.sold).setVisibility(View.GONE);
