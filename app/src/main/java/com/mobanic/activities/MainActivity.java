@@ -1,4 +1,4 @@
-package com.mobanic;
+package com.mobanic.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,10 +11,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.mobanic.CarFromKahn;
+import com.mobanic.CarFromMobanic;
+import com.mobanic.CarsAdapter;
+import com.mobanic.DownloadCarsTask;
+import com.mobanic.R;
 import com.mobanic.views.MultiSpinner;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SingleSpinner;
@@ -52,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         mCarsAdapter = new CarsAdapter(this, getQueryFactory());
         mCarsAdapter.setAutoload(false);
         mCarsAdapter.setPaginationEnabled(false);
-        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<ParsedCar>() {
+        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<CarFromKahn>() {
             @Override
             public void onLoading() {
                 // TODO Show loading spiner right from the start
@@ -60,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             }
 
             @Override
-            public void onLoaded(List<ParsedCar> carList, Exception e) {
+            public void onLoaded(List<CarFromKahn> carList, Exception e) {
                 findViewById(R.id.spinner).setVisibility(View.GONE);
                 if (e == null) {
                     // TODO: Populate search panel with new full amount of cars data
@@ -78,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // TODO: Pass all pinned details to the next page
-                ParsedCar car = mCarsAdapter.getItem(position);
+                CarFromKahn car = mCarsAdapter.getItem(position);
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
                 i.putExtra("car_id", car.getObjectId());
@@ -99,11 +107,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         });
 
         mInitialStart = true;
-        ParseQuery<ParsedCar> query = ParseQuery.getQuery(ParsedCar.class);
+        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
         query.fromLocalDatastore();
-        query.findInBackground(new FindCallback<ParsedCar>() {
+        query.findInBackground(new FindCallback<CarFromKahn>() {
             @Override
-            public void done(List<ParsedCar> carList, ParseException e) {
+            public void done(List<CarFromKahn> carList, ParseException e) {
                 if (e == null && carList.size() == 0) {
                     new DownloadCarsTask().execute();
                 } else {
@@ -130,9 +138,9 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         sContext = this;
     }
 
-    public ParseQueryAdapter.QueryFactory<ParsedCar> getQueryFactory() {
-        return new ParseQueryAdapter.QueryFactory<ParsedCar>() {
-            public ParseQuery<ParsedCar> create() {
+    public ParseQueryAdapter.QueryFactory<CarFromKahn> getQueryFactory() {
+        return new ParseQueryAdapter.QueryFactory<CarFromKahn>() {
+            public ParseQuery<CarFromKahn> create() {
 //                Set<String> makes = mSharedPrefs.getStringSet("Make", null);
 //                Set<String> models = mSharedPrefs.getStringSet("Model", null);
 //                Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
@@ -142,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 //                int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
 //                int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
-                ParseQuery<ParsedCar> query = ParseQuery.getQuery(ParsedCar.class);
+                ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
                 query.orderByDescending("createdAt");
                 query.fromLocalDatastore();
 
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         };
     }
 
-    public void updateSearchPanel(List<Car> carList) {
+    public void updateSearchPanel(List<CarFromMobanic> carList) {
         if (mInitialStart) {
             ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         }
@@ -225,6 +233,23 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            new DownloadCarsTask().execute();
+            return true;
+        }
+        return false;
     }
 
     private static Context sContext;

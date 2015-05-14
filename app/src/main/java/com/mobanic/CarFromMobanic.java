@@ -7,9 +7,9 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 @ParseClassName("Car")
-public class Car extends ParseObject {
+public class CarFromMobanic extends ParseObject {
 
-    public Car() {
+    public CarFromMobanic() {
     }
 
     public String getMake() {

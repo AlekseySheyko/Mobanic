@@ -1,15 +1,13 @@
 package com.mobanic;
 
-import android.util.Log;
-
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-@ParseClassName("ParsedCar")
-public class ParsedCar extends ParseObject {
+@ParseClassName("CarFromKahn")
+public class CarFromKahn extends ParseObject {
 
     private String[] mPossibleMakes = new String[]{
             "Aston Martin", "BMW", "Bentley",
@@ -19,7 +17,18 @@ public class ParsedCar extends ParseObject {
             "Porsche", "Rolls Royce"
     };
 
-    public ParsedCar() {
+    public CarFromKahn() {
+    }
+
+    public CarFromKahn(String header, String year, String imageId, String price, String color, String mileage, String fuelAndTrans, String location) {
+        setTitleAndMake(header);
+        setYear(year);
+        setCoverImage(imageId);
+        setPrice(price);
+        setColor(color);
+        setMileage(mileage);
+        setFuelAndTrans(fuelAndTrans);
+        setLocation(location);
     }
 
     public String getMake() {
@@ -79,7 +88,6 @@ public class ParsedCar extends ParseObject {
     public void setCoverImage(String imageId) {
         if (!imageId.isEmpty()) {
             put("coverImage", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
-            Log.d("Download", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
         } else {
             put("coverImage", "https://www.kahndesign.com/images/AwaitingImage.png");
         }

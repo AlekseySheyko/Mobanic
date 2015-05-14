@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.mobanic.Car;
+import com.mobanic.CarFromMobanic;
 import com.mobanic.R;
 
 import java.util.ArrayList;
@@ -57,9 +57,9 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
         setAdapter(mAdapter);
     }
 
-    public void setItems(List<Car> carList) {
+    public void setItems(List<CarFromMobanic> carList) {
         mChoices = new TreeSet<>();
-        for (Car car : carList) {
+        for (CarFromMobanic car : carList) {
             mChoices.add(car.getValueForKey(mSearchKey));
         }
         mCheckboxes = new boolean[mChoices.size()];

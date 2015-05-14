@@ -1,4 +1,4 @@
-package com.mobanic;
+package com.mobanic.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobanic.CustomEmailClient;
+import com.mobanic.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -48,7 +50,7 @@ public class ContactActivity extends ActionBarActivity {
         String carId = getIntent().getStringExtra("car_id");
         final int carPosition = getIntent().getIntExtra("car_position", -1);
 
-        ParseQuery<ParseObject> query = new ParseQuery<>("Car");
+        ParseQuery<ParseObject> query = new ParseQuery<>("CarFromMobanic");
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.getInBackground(carId, new GetCallback<ParseObject>() {
             @Override

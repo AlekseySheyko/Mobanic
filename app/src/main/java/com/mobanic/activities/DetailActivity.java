@@ -1,4 +1,4 @@
-package com.mobanic;
+package com.mobanic.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.mobanic.CarFromMobanic;
+import com.mobanic.R;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -81,11 +83,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateCarDetails() {
-        ParseQuery<Car> query = ParseQuery.getQuery("Car");
+        ParseQuery<CarFromMobanic> query = ParseQuery.getQuery("CarFromMobanic");
         query.fromLocalDatastore();
-        query.getInBackground(mCarId, new GetCallback<Car>() {
+        query.getInBackground(mCarId, new GetCallback<CarFromMobanic>() {
             @Override
-            public void done(Car car, ParseException e) {
+            public void done(CarFromMobanic car, ParseException e) {
                 if (e != null) {
                     Toast.makeText(DetailActivity.this, e.getMessage(),
                             Toast.LENGTH_SHORT).show();

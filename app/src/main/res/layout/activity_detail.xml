@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/detail_window_background"
-    tools:context="com.mobanic.DetailActivity">
+    tools:context="com.mobanic.activities.DetailActivity">
 
     <ScrollView
         android:layout_width="match_parent"

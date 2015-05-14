@@ -15,8 +15,8 @@ public class MobanicApplication extends Application {
 
         Parse.enableLocalDatastore(this);
         ParseCrashReporting.enable(this);
-        ParseObject.registerSubclass(Car.class);
-        ParseObject.registerSubclass(ParsedCar.class);
+        ParseObject.registerSubclass(CarFromMobanic.class);
+        ParseObject.registerSubclass(CarFromKahn.class);
         Parse.initialize(this, "asQfJUeEXdJnbfvG2iefkvjhVpcmIq2GnOp5x5P2", "rsHyNBGIAmo7eFIUfmjvAm5kOMrwlMCDz7d5El6Z");
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }

@@ -2,6 +2,8 @@ package com.mobanic;
 
 import android.os.AsyncTask;
 
+import com.mobanic.activities.MainActivity;
+import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
@@ -15,14 +17,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
+public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
 
     private static final String TAG = DownloadCarsTask.class.getSimpleName();
     private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available.php";
 
     @Override
-    protected List<ParsedCar> doInBackground(Void... voids) {
-        List<ParsedCar> carList = null;
+    protected List<CarFromKahn> doInBackground(Void... voids) {
+        List<CarFromKahn> carList = null;
         try {
             carList = new ArrayList<>();
 
@@ -30,7 +32,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
             Elements cards = doc.select("#ajax-content-container .row .stockBack .centre")
                     .not(".midGreyText");
             for (Element card : cards) {
-                String title = card.getElementsByTag("h4").first().text();
+                String modelAndMake = card.getElementsByTag("h4").first().text();
 
                 Elements specs = card.getElementsByClass("thirteencol");
                 String year = specs.get(0).text();
@@ -43,25 +45,17 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
                 String linkContents = card.select("a").html();
                 String imageId;
                 try {
-                    imageId = linkContents.substring(linkContents.indexOf(".jpg") - 5,
+                    imageId = linkContents.substring(
+                            linkContents.indexOf(".jpg") - 5,
                             linkContents.indexOf(".jpg"));
                 } catch (StringIndexOutOfBoundsException e) {
                     imageId = "";
                 }
 
-
-                ParsedCar car = new ParsedCar();
-                car.setTitleAndMake(title);
-                car.setYear(year);
-                car.setCoverImage(imageId);
-                car.setPrice(price);
-                car.setColor(color);
-                car.setMileage(mileage);
-                car.setFuelAndTrans(fuelAndTrans);
-                car.setLocation(location);
+                CarFromKahn car = new CarFromKahn(
+                        modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location);
                 carList.add(car);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,14 +63,21 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<ParsedCar>> {
     }
 
     @Override
-    protected void onPostExecute(List<ParsedCar> carList) {
+    protected void onPostExecute(final List<CarFromKahn> carList) {
         super.onPostExecute(carList);
-        ParseObject.pinAllInBackground(carList, new SaveCallback() {
+        ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    MainActivity a = (MainActivity) MainActivity.getContext();
-                    a.mCarsAdapter.loadObjects();
+                    ParseObject.pinAllInBackground(carList, new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                MainActivity a = (MainActivity) MainActivity.getContext();
+                                a.mCarsAdapter.loadObjects();
+                            }
+                        }
+                    });
                 }
             }
         });

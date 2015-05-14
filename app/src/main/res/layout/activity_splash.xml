@@ -4,4 +4,4 @@
            android:layout_height="match_parent"
            android:src="@drawable/splash_background"
            android:scaleType="centerCrop"
-           tools:context="com.mobanic.SplashActivity"/>
+           tools:context="com.mobanic.activities.SplashActivity"/>

@@ -9,14 +9,14 @@ import com.mobanic.views.RatioImageView;
 import com.parse.ParseQueryAdapter;
 import com.squareup.picasso.Picasso;
 
-public class CarsAdapter extends ParseQueryAdapter<ParsedCar> {
+public class CarsAdapter extends ParseQueryAdapter<CarFromKahn> {
 
-    public CarsAdapter(Context context, QueryFactory<ParsedCar> queryFactory) {
+    public CarsAdapter(Context context, QueryFactory<CarFromKahn> queryFactory) {
         super(context, queryFactory);
     }
 
     @Override
-    public View getItemView(ParsedCar car, View v, ViewGroup parent) {
+    public View getItemView(CarFromKahn car, View v, ViewGroup parent) {
         if (v == null) {
             v = View.inflate(getContext(), R.layout.list_item_car, null);
         }
