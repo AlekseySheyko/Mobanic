@@ -43,6 +43,10 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 String price = specs.get(6).text();
 
                 String linkContents = card.select("a").html();
+                boolean isLeftHanded = false;
+                if (linkContents.contains("LHDBack")) {
+                    isLeftHanded = true;
+                }
                 String imageId;
                 try {
                     imageId = linkContents.substring(
@@ -53,7 +57,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 }
 
                 CarFromKahn car = new CarFromKahn(
-                        modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location);
+                        modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
                 carList.add(car);
             }
         } catch (IOException e) {

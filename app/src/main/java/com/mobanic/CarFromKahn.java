@@ -20,7 +20,7 @@ public class CarFromKahn extends ParseObject {
     public CarFromKahn() {
     }
 
-    public CarFromKahn(String header, String year, String imageId, String price, String color, String mileage, String fuelAndTrans, String location) {
+    public CarFromKahn(String header, String year, String imageId, String price, String color, String mileage, String fuelAndTrans, String location, boolean isLeftHanded) {
         setTitleAndMake(header);
         setYear(year);
         setCoverImage(imageId);
@@ -29,6 +29,7 @@ public class CarFromKahn extends ParseObject {
         setMileage(mileage);
         setFuelAndTrans(fuelAndTrans);
         setLocation(location);
+        setLeftHanded(isLeftHanded);
     }
 
     public String getMake() {
@@ -141,6 +142,14 @@ public class CarFromKahn extends ParseObject {
 
     public void setLocation(String location) {
         put("location", location);
+    }
+
+    public void setLeftHanded(boolean isLeftHanded) {
+        put("isLeftHanded", isLeftHanded);
+    }
+
+    public boolean isLeftHanded() {
+        return getBoolean("isLeftHanded");
     }
 
     public String formatPrice(int price) {

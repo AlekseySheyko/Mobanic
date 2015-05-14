@@ -26,15 +26,18 @@ public class CarsAdapter extends ParseQueryAdapter<CarFromKahn> {
         ((TextView) v.findViewById(R.id.price)).setText(car.getFormattedPrice());
 
         RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-        // TODO Fix sharpen eges in placeholder image
         Picasso.with(getContext()).load(car.getCoverImage()).fit().centerCrop().into(imageView);
 
+        if (car.isLeftHanded()) {
+            v.findViewById(R.id.leftHanded).setVisibility(View.VISIBLE);
+        } else {
+            v.findViewById(R.id.leftHanded).setVisibility(View.GONE);
+        }
         if (car.getFormattedPrice().equals("Under offer")) {
             v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
         } else {
             v.findViewById(R.id.sold).setVisibility(View.GONE);
         }
-        // TODO Possibly show separate black label for left-hand vehicles
         return v;
     }
 }
