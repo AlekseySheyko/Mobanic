@@ -27,6 +27,7 @@ import com.mobanic.views.RatioImageView;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -264,6 +265,7 @@ public class DetailActivity extends AppCompatActivity {
     }
     private void setGalleryImages() {
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
+        flipper.startFlipping();
         flipper.setInAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
                 android.R.anim.fade_in));
         flipper.setOutAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
@@ -278,7 +280,7 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         flipper.removeAllViews();
-        for (String url : mGalleryImageUrls) {
+        for (final String url : mGalleryImageUrls) {
             RatioImageView imageView = (RatioImageView) View.inflate(
                     DetailActivity.this,
                     R.layout.gallery_image,
@@ -287,7 +289,18 @@ public class DetailActivity extends AppCompatActivity {
                     .load(url)
                     .fit()
                     .centerCrop()
-                    .into(imageView);
+                    .into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            if (url == mGalleryImageUrls.get(0)) {
+                                flipper.startFlipping();
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                        }
+                    });
             flipper.addView(imageView);
         }
         if (mGalleryImageUrls.size() == 1) {
