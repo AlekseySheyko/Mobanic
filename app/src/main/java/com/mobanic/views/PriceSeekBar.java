@@ -621,7 +621,9 @@ public class PriceSeekBar<T extends Number> extends ImageView {
     public void setItems(List<CarFromKahn> carList) {
         List<Integer> prices = new ArrayList<>();
         for (CarFromKahn car : carList) {
-            prices.add(car.getPrice());
+            if (car.getPrice() != -1) {
+                prices.add(car.getPrice());
+            }
         }
         try {
             setRangeValues(Collections.min(prices) / 1000, Collections.max(prices) / 1000 + 1);

@@ -74,16 +74,17 @@ public class CarFromKahn extends ParseObject {
                         .replace("2.4 TDCI XS 110", "Range Rover Defender").replace("Sport  SE Tech", "Range Rover Discovery Sport")
                         .replace("2.2 SD4", "Range Rover Discovery").replace("Evoque", "Range Rover Evoque")
                         .replace("Range Rover Range Rover", "Range Rover").replace("Vogue", "Range Rover Vogue")
-                        .replace("LWB", "Range Rover Vogue")
+                        .replace("LWB", "Range Rover Vogue").replace("Discovery Sport", "Sport")
+                        .replace("Defender Pick Up", "Defender")
                         .trim();
             }
         }
-        put("make", make.replace("Range Rover", "Land Rover").replace("Discovery", "Lang Rover").replace("Defender", "Land Rover"));
+        put("make", make.replace("Range Rover", "Land Rover").replace("Discovery", "Land Rover").replace("Defender", "Land Rover"));
         put("model", model);
     }
 
     public String getFormattedPrice() {
-        if (getInt("price") == 0) {
+        if (getPrice() == -1) {
             return "Under offer";
         } else if (getInt("price") == 1) {
             return "POA";
@@ -102,9 +103,9 @@ public class CarFromKahn extends ParseObject {
                     priceStr.replace(".00", "").replaceAll("\\D+", ""));
             put("price", price);
         } else if (priceStr.contains("on Application")) {
-            put("price", 1);
+            put("price", -1);
         } else {
-            put("price", 0);
+            put("price", -1);
         }
     }
 
