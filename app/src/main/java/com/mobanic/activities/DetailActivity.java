@@ -241,6 +241,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private class DownloadSpecsTask extends AsyncTask<Void, Void, Boolean> {
 
+        // TODO Then execute global downloading task (load and parse separate url for each car id)
         private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
 
         @Override
@@ -252,10 +253,13 @@ public class DetailActivity extends AppCompatActivity {
                 for (Element image : images) {
                     if (image.attr("src").contains("imgMedium")) {
                         String imageUrl = image.attr("src")
-                                .replace("../", "https://kahndesign.com/")
+                                .replace("../", "https://www.kahndesign.com/")
                                 .replace("imgMedium", "imgLarge");
                         mGalleryImageUrls.add(imageUrl);
                     }
+                }
+                if (mGalleryImageUrls.get(0).equals(mCar.getCoverImageUrl())) {
+                    mGalleryImageUrls.remove(0);
                 }
 
                 Elements features = doc.select("#specList");
