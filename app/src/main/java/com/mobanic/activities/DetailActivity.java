@@ -136,8 +136,7 @@ public class DetailActivity extends AppCompatActivity {
                 ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
                 ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
                 ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-                ((TextView) findViewById(R.id.mileage)).setText(
-                        NumberFormat.getNumberInstance(Locale.UK).format(mCar.getInt("mileage")));
+                ((TextView) findViewById(R.id.mileage)).setText(mCar.getString("mileage"));
                 ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
                 ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
                 TextView locationTextView = (TextView) findViewById(R.id.location);
@@ -341,7 +340,8 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 }
 
-                mCar.put("mileage", mileage);
+                mCar.put("mileage",
+                        NumberFormat.getNumberInstance(Locale.UK).format(Integer.parseInt(mileage.replaceAll(",", "").trim())));
                 mCar.put("previousOwners", prevOwners);
                 mCar.put("engine", engine);
                 mCar.put("galleryImages", mGalleryImageUrls);
@@ -410,7 +410,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getString("mileage"));
+        String mileage = mCar.getString("mileage");
+        if (mileage == null) {
+            mileage = NumberFormat.getNumberInstance(Locale.UK).format(mCar.getInt("mileage"));
+        }
+        ((TextView) findViewById(R.id.mileage)).setText(mileage);
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         int engine = mCar.getInt("engine");
         if (engine == 0) {
