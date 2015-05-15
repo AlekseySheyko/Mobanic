@@ -25,9 +25,12 @@ import android.widget.ViewFlipper;
 
 import com.mobanic.R;
 import com.mobanic.model.CarFromKahn;
+import com.mobanic.model.CarFromMobanic;
 import com.mobanic.views.RatioImageView;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -41,14 +44,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class DetailActivity extends AppCompatActivity {
 
-    private CarFromKahn mCar;
-    private int mCarId;
+    private ParseObject mCar;
+    private String mCarId;
     private int mCarPosition;
 
     private Intent mShareIntent;
@@ -63,10 +68,10 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if (getIntent() != null) {
-            mCarId = getIntent().getIntExtra("car_id", -1);
+            mCarId = getIntent().getStringExtra("car_id");
             mCarPosition = getIntent().getIntExtra("car_position", -1);
         } else if (savedInstanceState != null) {
-            mCarId = savedInstanceState.getInt("car_id");
+            mCarId = savedInstanceState.getString("car_id");
             mCarPosition = savedInstanceState.getInt("car_position");
         }
 
@@ -86,24 +91,33 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putInt("car_id", mCarId);
+        outState.putString("car_id", mCarId);
         outState.putInt("car_position", mCarPosition);
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
     private void updateCarDetails() {
-        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
-        query.fromLocalDatastore();
-        query.whereEqualTo("id", mCarId);
-        query.getFirstInBackground(new GetCallback<CarFromKahn>() {
+        ParseQuery query;
+        if (mCarId.length() == 10) {
+            query = ParseQuery.getQuery(CarFromMobanic.class);
+        } else {
+            query = ParseQuery.getQuery(CarFromKahn.class);
+            query.fromLocalDatastore();
+        }
+        if (mCarId.length() == 10) {
+            query.whereEqualTo("objectId", mCarId);
+        } else {
+            query.whereEqualTo("id", Integer.parseInt(mCarId));
+        }
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(CarFromKahn car, ParseException e) {
+            public void done(ParseObject car, ParseException e) {
                 if (e != null) {
                     Toast.makeText(DetailActivity.this, e.getMessage(),
                             Toast.LENGTH_SHORT).show();
                     finish();
                     return;
-                } else if (car.isSold()) {
+                } else if (car.getBoolean("isSold")) {
                     Toast.makeText(DetailActivity.this, getString(R.string.sold),
                             Toast.LENGTH_SHORT).show();
                     finish();
@@ -111,8 +125,8 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 mCar = car;
 
-                String make = car.getMake();
-                String model = car.getModel();
+                String make = car.getString("make");
+                String model = car.getString("model");
 
                 String title = make + " " + model;
                 if (title.length() > 20) {
@@ -120,40 +134,70 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 getSupportActionBar().setTitle(make);
 
-                ((TextView) findViewById(R.id.make)).setText(mCar.getMake());
-                ((TextView) findViewById(R.id.model)).setText(mCar.getModel());
-                ((TextView) findViewById(R.id.year)).setText(mCar.getYear() + "");
-                ((TextView) findViewById(R.id.mileage)).setText(mCar.getMileage());
-                ((TextView) findViewById(R.id.fuelType)).setText(mCar.getFuelType());
-                ((TextView) findViewById(R.id.color)).setText(mCar.getColor());
+                ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
+                ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
+                ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
+                ((TextView) findViewById(R.id.mileage)).setText(
+                        NumberFormat.getNumberInstance(Locale.UK).format(mCar.getInt("mileage")));
+                ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
+                ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
                 TextView locationTextView = (TextView) findViewById(R.id.location);
-                locationTextView.setText(mCar.getLocation());
+                locationTextView.setText(mCar.getString("location"));
                 locationTextView.setPaintFlags(locationTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 locationTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        showOnMap(mCar.getLocation());
+                        showOnMap(mCar.getString("location"));
                     }
                 });
 
                 setCoverImage();
 
-                if (mCar.getEngine().length() > 4) {
-                    mGalleryImageUrls = mCar.getGalleryImages();
-                    mFeatureList = mCar.getFeatures();
-                    setGalleryImages();
-                    fillOutSpecs();
-                    fillOutFeatures();
-                } else {
-                    mGalleryImageUrls = new ArrayList<>();
-                    mFeatureList = new ArrayList<>();
-                    new DownloadSpecsTask().execute();
-                }
+                populateGalleryList();
 
-                String url = mCar.getCoverImageUrl();
+                String url = car.getString("coverImage");
+                if (url == null) {
+                    url = car.getParseFile("coverImage").getUrl();
+                }
                 new SetShareIntentTask().execute(title, url);
             }
         });
+    }
+
+    private void populateGalleryList() {
+        String engineStr = NumberFormat.getNumberInstance(Locale.UK)
+                .format(mCar.getInt("engine")) + "\u2009" + "cc";
+        if (engineStr.length() > 4) {
+            mGalleryImageUrls = mCar.getList("galleryImages");
+            if (mGalleryImageUrls == null) {
+                mGalleryImageUrls = new ArrayList<>();
+                ParseQuery<ParseObject> query = mCar.getRelation("galleryImage").getQuery();
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> images, ParseException e) {
+                        if (e == null && images.size() > 0) {
+                            for (ParseObject image : images) {
+                                String url = image.getParseFile("image").getUrl();
+                                mGalleryImageUrls.add(url);
+                                populateGalleryList();
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            mFeatureList = mCar.getList("features");
+            setGalleryImages();
+            fillOutSpecs();
+            fillOutFeatures();
+        } else {
+            mGalleryImageUrls = new ArrayList<>();
+            mFeatureList = new ArrayList<>();
+
+            if (mCarId.length() < 10) {
+                new DownloadSpecsTask().execute();
+            }
+        }
     }
 
     private class SetShareIntentTask extends AsyncTask<String, Void, Intent> {
@@ -209,7 +253,10 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setCoverImage() {
-        String url = mCar.getCoverImageUrl();
+        String url = mCar.getString("coverImage");
+        if (url == null) {
+            url = mCar.getParseFile("coverImage").getUrl();
+        }
 
         RatioImageView imageView = (RatioImageView) findViewById(R.id.image);
         Picasso.with(this).load(url).fit().centerCrop().into(imageView);
@@ -260,7 +307,11 @@ public class DetailActivity extends AppCompatActivity {
                         mGalleryImageUrls.add(imageUrl);
                     }
                 }
-                if (mGalleryImageUrls.get(0).equals(mCar.getCoverImageUrl())) {
+                String imageUrl = mCar.getString("coverImage");
+                if (imageUrl == null) {
+                    imageUrl = mCar.getParseFile("coverImage").getUrl();
+                }
+                if (mGalleryImageUrls.size() > 0 && mGalleryImageUrls.get(0).equals(imageUrl)) {
                     mGalleryImageUrls.remove(0);
                 }
 
@@ -287,11 +338,11 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 }
 
-                mCar.setMileage(mileage);
-                mCar.setPrevOwners(prevOwners);
-                mCar.setEngine(engine);
-                mCar.setGalleryImages(mGalleryImageUrls);
-                mCar.setFeatures(mFeatureList);
+                mCar.put("mileage", mileage);
+                mCar.put("previousOwners", prevOwners);
+                mCar.put("engine", engine);
+                mCar.put("galleryImages", mGalleryImageUrls);
+                mCar.put("features", mFeatureList);
                 mCar.pinInBackground();
 
             } catch (IOException e) {
@@ -367,9 +418,13 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getPreviousOwners() + "");
-        ((TextView) findViewById(R.id.engine)).setText(mCar.getEngine());
-        ((TextView) findViewById(R.id.transmission)).setText(mCar.getTransType());
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getString("previousOwners") + "");
+        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
+        String transType = mCar.getString("transType");
+        if (transType == null) {
+            transType = mCar.getString("transmission");
+        }
+        ((TextView) findViewById(R.id.transmission)).setText(transType);
     }
 
     public void showOnMap(String location) {

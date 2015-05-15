@@ -1,6 +1,7 @@
 package com.mobanic.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +11,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.mobanic.CarsAdapter;
@@ -74,17 +77,21 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
         lv.setEmptyView(findViewById(R.id.error));
-//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                CarFromKahn car = mCarsAdapter.getItem(position);
-//
-//                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-//                i.putExtra("car_id", car.getId());
-//                i.putExtra("car_position", position + 1);
-//                startActivity(i);
-//            }
-//        });
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                ParseObject car = mCarsAdapter.getItem(position);
+
+                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                String carId = car.getInt("id") + "";
+                if (carId.equals("0")) {
+                    carId = car.getObjectId();
+                }
+                i.putExtra("car_id", carId);
+                i.putExtra("car_position", position + 1);
+                startActivity(i);
+            }
+        });
 
         PriceSeekBar bar = (PriceSeekBar) findViewById(R.id.price_seekbar);
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
@@ -93,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice).apply();
-//                mCarsAdapter.loadObjects();
+                mCarsAdapter.loadCars();
             }
         });
     }

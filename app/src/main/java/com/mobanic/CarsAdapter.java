@@ -66,7 +66,8 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
         ((TextView) convertView.findViewById(R.id.make)).setText(car.getString("make"));
         ((TextView) convertView.findViewById(R.id.model)).setText(car.getString("model"));
-        ((TextView) convertView.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
+        ((TextView) convertView.findViewById(R.id.price)).setText(
+                getFormattedPrice(car.getInt("price")));
 
         RatioImageView imageView = (RatioImageView) convertView.findViewById(R.id.image);
         String coverImageUrl = car.getString("coverImage");
@@ -86,6 +87,16 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
             convertView.findViewById(R.id.sold).setVisibility(View.GONE);
         }
         return convertView;
+    }
+
+    public String getFormattedPrice(int price) {
+        if (price == -1) {
+            return "Under offer";
+        } else if (price == 1) {
+            return "POA";
+        } else {
+            return formatPrice(price);
+        }
     }
 
     public String formatPrice(int price) {
