@@ -17,6 +17,8 @@ import com.squareup.picasso.Picasso;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,6 +26,7 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
     private ParseQuery<ParseObject> mMobanicQuery;
     private ParseQuery<ParseObject> mCahnQuery;
+    private List<ParseObject> mCarList;
 
     public CarsAdapter(Context context, ParseQuery<ParseObject> mobanicQuery, ParseQuery<ParseObject> cahnQuery) {
         super(context, 0, new ArrayList<ParseObject>());
@@ -39,15 +42,20 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
     public void loadCars(ParseQuery<ParseObject> mobanicQuery, ParseQuery<ParseObject> cahnQuery) {
         clear();
+        mCarList = new ArrayList<>();
         if (mobanicQuery == null) {
             mMobanicQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> carList, ParseException e) {
                     if (carList.size() > 0) {
-                        addAll(carList);
-                    } else {
-                        // TODO Load Mobanic cars from network
-                        // (previously return local storage)
+                        mCarList.addAll(carList);
+                        Collections.sort(mCarList, new Comparator<ParseObject>() {
+                            @Override
+                            public int compare(ParseObject parseObject, ParseObject t1) {
+                                return parseObject.getString("make").compareTo(t1.getString("make"));
+                            }
+                        });
+                        addAll(mCarList);
                     }
                 }
             });
@@ -55,7 +63,14 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
             mobanicQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> carList, ParseException e) {
-                    addAll(carList);
+                    mCarList.addAll(carList);
+                    Collections.sort(mCarList, new Comparator<ParseObject>() {
+                        @Override
+                        public int compare(ParseObject parseObject, ParseObject t1) {
+                            return parseObject.getString("make").compareTo(t1.getString("make"));
+                        }
+                    });
+                    addAll(mCarList);
                 }
             });
         }
@@ -64,8 +79,16 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
                 @Override
                 public void done(List<ParseObject> carList, ParseException e) {
                     if (carList.size() > 0) {
-                        addAll(carList);
-                        ((MainActivity) getContext()).updateSearch(carList);
+                        mCarList.addAll(carList);
+                        Collections.sort(mCarList, new Comparator<ParseObject>() {
+                            @Override
+                            public int compare(ParseObject parseObject, ParseObject t1) {
+                                return parseObject.getString("make").compareTo(t1.getString("make"));
+                            }
+                        });
+                        addAll(mCarList);
+
+                        ((MainActivity) getContext()).updateSearch(mCarList);
                     } else {
                         new DownloadCarsTask().execute();
                     }
@@ -75,7 +98,14 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
             cahnQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> carList, ParseException e) {
-                    addAll(carList);
+                    mCarList.addAll(carList);
+                    Collections.sort(mCarList, new Comparator<ParseObject>() {
+                        @Override
+                        public int compare(ParseObject parseObject, ParseObject t1) {
+                            return parseObject.getString("make").compareTo(t1.getString("make"));
+                        }
+                    });
+                    addAll(mCarList);
                 }
             });
         }

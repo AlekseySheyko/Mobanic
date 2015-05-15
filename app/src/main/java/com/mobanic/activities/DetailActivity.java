@@ -291,8 +291,6 @@ public class DetailActivity extends AppCompatActivity {
 
     private class DownloadSpecsTask extends AsyncTask<Void, Void, Boolean> {
 
-        // TODO Then execute global downloading task (load and parse separate url for each car id)
-        // TODO Implement periodical updates for Cahn's cars
         private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
 
         @Override

@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
             @Override
             public void onPriceChanged(PriceSeekBar bar, Integer minPrice, Integer maxPrice) {
+                // TODO Fix search by price
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice).apply();
