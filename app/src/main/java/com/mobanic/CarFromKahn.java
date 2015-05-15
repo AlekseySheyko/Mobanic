@@ -153,7 +153,6 @@ public class CarFromKahn extends ParseObject {
     }
 
     public void setMileage(String mileageStr) {
-        // TODO Return original engine string if do not contain "cc"
         int mileage = Integer.parseInt(
                 mileageStr.replaceAll(",", ""));
         put("mileage", mileage);

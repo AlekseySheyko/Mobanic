@@ -120,6 +120,11 @@ public class DetailActivity extends AppCompatActivity {
                     title = model;
                 }
                 getSupportActionBar().setTitle(make);
+                
+                ((TextView) findViewById(R.id.make)).setText(mCar.getMake());
+                ((TextView) findViewById(R.id.model)).setText(mCar.getModel());
+                ((TextView) findViewById(R.id.year)).setText(mCar.getYear() + "");
+                ((TextView) findViewById(R.id.mileage)).setText(mCar.getMileage());
 
                 setCoverImage();
 
@@ -333,10 +338,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.make)).setText(mCar.getMake());
-        ((TextView) findViewById(R.id.model)).setText(mCar.getModel());
-        ((TextView) findViewById(R.id.year)).setText(mCar.getYear() + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getMileage());
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getPreviousOwners() + "");
         ((TextView) findViewById(R.id.engine)).setText(mCar.getEngine());
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getTransType());

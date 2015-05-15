@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // TODO: Pass all pinned details to the next page
                 CarFromKahn car = mCarsAdapter.getItem(position);
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
@@ -211,8 +210,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         super.onStop();
         mSharedPrefs.edit().clear().apply();
     }
-
-    // TODO Add menu button to manually refresh car listing
 
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
