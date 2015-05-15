@@ -86,7 +86,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                             public void done(ParseException e) {
                                 if (e == null) {
                                     MainActivity a = (MainActivity) MainActivity.getContext();
-//TODO                                    a.mCarsAdapter.loadObjects();
+                                    a.mCarsAdapter.loadCars();
                                 }
                             }
                         });

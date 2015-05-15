@@ -22,17 +22,39 @@ import java.util.Locale;
 
 public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
+    private ParseQuery<ParseObject> mMobanicQuery;
+    private ParseQuery<ParseObject> mCahnQuery;
+
     public CarsAdapter(Context context, ParseQuery<ParseObject> mobanicQuery, ParseQuery<ParseObject> cahnQuery) {
         super(context, 0, new ArrayList<ParseObject>());
+        mMobanicQuery = mobanicQuery;
+        mCahnQuery = cahnQuery;
 
-        FindCallback<ParseObject> cb = new FindCallback<ParseObject>() {
+        loadCars();
+    }
+
+    public void loadCars() {
+        mMobanicQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> carList, ParseException e) {
-                addAll(carList);
+                if (carList.size() > 0) {
+                    addAll(carList);
+                } else {
+                    // TODO Load Mobanic cars from network
+                    // (previously return local storage)
+                }
             }
-        };
-        mobanicQuery.findInBackground(cb);
-        cahnQuery.findInBackground(cb);
+        });
+        mCahnQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> carList, ParseException e) {
+                if (carList.size() > 0) {
+                    addAll(carList);
+                } else {
+                    new DownloadCarsTask().execute();
+                }
+            }
+        });
     }
 
     @Override
