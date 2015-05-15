@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mobanic.CarsAdapter;
 import com.mobanic.R;
@@ -81,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 ParseObject car = mCarsAdapter.getItem(position);
+                if (car.getBoolean("isSold")) {
+                    Toast.makeText(MainActivity.this, getString(R.string.sold),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
                 String carId = car.getInt("id") + "";

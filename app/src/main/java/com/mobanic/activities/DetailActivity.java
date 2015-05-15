@@ -410,6 +410,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getString("mileage"));
         ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
         int engine = mCar.getInt("engine");
         if (engine == 0) {
