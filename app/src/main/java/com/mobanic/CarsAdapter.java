@@ -6,10 +6,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -42,20 +44,24 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
         ((TextView) convertView.findViewById(R.id.make)).setText(car.getString("make"));
         ((TextView) convertView.findViewById(R.id.model)).setText(car.getString("model"));
         ((TextView) convertView.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
-//
-//        RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-//        Picasso.with(getContext()).load(car.getCoverImageUrl()).fit().centerCrop().into(imageView);
-//
+
+        RatioImageView imageView = (RatioImageView) convertView.findViewById(R.id.image);
+        String coverImageUrl = car.getString("coverImage");
+        if (coverImageUrl == null) {
+            coverImageUrl = car.getParseFile("coverImage").getUrl();
+        }
+        Picasso.with(getContext()).load(coverImageUrl).fit().centerCrop().into(imageView);
+
         if (car.getBoolean("isLeftHanded")) {
             convertView.findViewById(R.id.leftHanded).setVisibility(View.VISIBLE);
         } else {
             convertView.findViewById(R.id.leftHanded).setVisibility(View.GONE);
         }
-//        if (car.isSold()) {
-//            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
-//        } else {
-//            v.findViewById(R.id.sold).setVisibility(View.GONE);
-//        }
+        if (car.getBoolean("isSold")) {
+            convertView.findViewById(R.id.sold).setVisibility(View.VISIBLE);
+        } else {
+            convertView.findViewById(R.id.sold).setVisibility(View.GONE);
+        }
         return convertView;
     }
 
