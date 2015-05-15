@@ -67,7 +67,15 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
                     Collections.sort(mCarList, new Comparator<ParseObject>() {
                         @Override
                         public int compare(ParseObject parseObject, ParseObject t1) {
-                            return parseObject.getString("make").compareTo(t1.getString("make"));
+                            String make1 = parseObject.getString("make");
+                            String make2 = t1.getString("make");
+                            String model1 = parseObject.getString("model");
+                            String model2 = t1.getString("model");
+                            if (make1.compareTo(make2) != 0) {
+                                return make1.compareTo(make2);
+                            } else {
+                                return model1.compareTo(model2);
+                            }
                         }
                     });
                     addAll(mCarList);
