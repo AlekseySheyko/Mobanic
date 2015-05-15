@@ -173,6 +173,8 @@
                     <TextView
                         android:id="@+id/location"
                         style="@style/SpecsValue"
+                        android:clickable="true"
+                        android:textColor="#2980b9"
                         tools:text="UK"/>
 
                 </LinearLayout>

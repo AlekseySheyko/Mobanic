@@ -3,6 +3,7 @@ package com.mobanic.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -341,8 +342,26 @@ public class DetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.transmission)).setText(mCar.getTransType());
         ((TextView) findViewById(R.id.fuelType)).setText(mCar.getFuelType());
         ((TextView) findViewById(R.id.color)).setText(mCar.getColor());
-        // TODO Add link to Google Maps on specific location
-        ((TextView) findViewById(R.id.location)).setText(mCar.getLocation());
+        TextView locationTextView = (TextView) findViewById(R.id.location);
+        locationTextView.setText(mCar.getLocation());
+        locationTextView.setPaintFlags(locationTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        locationTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showOnMap(mCar.getLocation());
+            }
+        });
+    }
+
+    public void showOnMap(String location) {
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + location);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        } else {
+            Toast.makeText(this, "Install Google Maps to see the map", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fillOutFeatures() {
