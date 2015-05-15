@@ -244,10 +244,16 @@ public class DetailActivity extends AppCompatActivity {
                 int prevOwners = Integer.parseInt(specs.get(7).text().substring(2));
                 int engine;
                 try {
-                    engine = Integer.parseInt(specs.get(2).text().substring(0, specs.get(2).text()
-                            .indexOf("cc")).substring(2));
+                    String engineStr = specs.get(2).text();
+                    engine = Integer.parseInt(engineStr.substring(0, engineStr
+                            .toLowerCase().indexOf("cc")).substring(2).trim());
                 } catch (StringIndexOutOfBoundsException e) {
-                    engine = -1;
+                    String engineStr = specs.get(2).text().split(": ")[0].substring(2);
+                    if (!engineStr.contains(".")) {
+                        engine = Integer.parseInt(engineStr.trim());
+                    } else {
+                        engine = Integer.parseInt(engineStr.split("\\.")[0]) * 1000;
+                    }
                 }
 
                 mCar.setMileage(mileage);
@@ -278,6 +284,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
     }
+
     private void setGalleryImages() {
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
         flipper.startFlipping();
