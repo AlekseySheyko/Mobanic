@@ -1,5 +1,6 @@
 package com.mobanic.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -215,5 +217,20 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         return sContext;
     }
 
-    // TODO Restore push notifications
+    public static class PushReceiver extends BroadcastReceiver {
+
+        private static final String TAG = PushReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Receive update");
+            try {
+                MainActivity a = (MainActivity) MainActivity.getContext();
+//                a.mForcedNetwork = true;
+                a.mCarsAdapter.loadCars();
+            } catch (NullPointerException e) {
+                Log.w(TAG, "Can't get activity context to update content");
+            }
+        }
+    }
 }
