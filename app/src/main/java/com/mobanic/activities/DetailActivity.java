@@ -196,10 +196,10 @@ public class DetailActivity extends AppCompatActivity {
                 fillOutFeatures();
             }
             mFeatureList = new ArrayList<>();
+        }
 
-            if (mCarId.length() < 10) {
-                new DownloadSpecsTask().execute();
-            }
+        if (mCarId.length() < 10) {
+            new DownloadSpecsTask().execute();
         }
     }
 
@@ -358,7 +358,7 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-            findViewById(R.id.spinner).setVisibility(View.GONE);
+//            findViewById(R.id.spinner).setVisibility(View.GONE);
 
             if (success) {
                 setGalleryImages();
@@ -410,8 +410,12 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getString("previousOwners") + "");
-        ((TextView) findViewById(R.id.engine)).setText(mCar.getString("engine"));
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getInt("previousOwners") + "");
+        int engine = mCar.getInt("engine");
+        if (engine == 0) {
+            engine = Integer.parseInt(mCar.getString("engine").replace("cc", ""));
+        }
+        ((TextView) findViewById(R.id.engine)).setText(NumberFormat.getNumberInstance(Locale.UK).format(engine) + "\u2009" + "cc");
         String transType = mCar.getString("transType");
         if (transType == null) {
             transType = mCar.getString("transmission");
