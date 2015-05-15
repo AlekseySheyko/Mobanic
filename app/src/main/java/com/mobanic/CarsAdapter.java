@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.mobanic.activities.MainActivity;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -74,6 +75,7 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
     @Override
     public void addAll(Collection<? extends ParseObject> collection) {
         // TODO Sort all items by make and model
+        ((MainActivity) getContext()).findViewById(R.id.spinner).setVisibility(View.GONE);
         super.addAll(collection);
     }
 }
