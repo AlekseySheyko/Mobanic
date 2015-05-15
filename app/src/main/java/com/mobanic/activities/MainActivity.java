@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mCarsAdapter = new CarsAdapter(this, getQueryFactory());
-        mCarsAdapter.setAutoload(false);
         mCarsAdapter.setPaginationEnabled(false);
         mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<CarFromKahn>() {
             @Override
@@ -99,8 +98,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 mCarsAdapter.loadObjects();
             }
         });
-
-        mCarsAdapter.loadObjects();
     }
 
     private void setupActionBar() {
