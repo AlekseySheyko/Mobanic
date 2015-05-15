@@ -169,8 +169,13 @@ public class DetailActivity extends AppCompatActivity {
                 .format(mCar.getInt("engine")) + "\u2009" + "cc";
         if (engineStr.length() > 4) {
             mGalleryImageUrls = mCar.getList("galleryImages");
-            if (mGalleryImageUrls == null) {
-                mGalleryImageUrls = new ArrayList<>();
+            mFeatureList = mCar.getList("features");
+            setGalleryImages();
+            fillOutSpecs();
+            fillOutFeatures();
+        } else {
+            mGalleryImageUrls = new ArrayList<>();
+            if (mCarId.length() == 10) {
                 ParseQuery<ParseObject> query = mCar.getRelation("galleryImage").getQuery();
                 query.findInBackground(new FindCallback<ParseObject>() {
                     @Override
@@ -179,19 +184,18 @@ public class DetailActivity extends AppCompatActivity {
                             for (ParseObject image : images) {
                                 String url = image.getParseFile("image").getUrl();
                                 mGalleryImageUrls.add(url);
-                                populateGalleryList();
                             }
+                            setGalleryImages();
+                        } else {
+                            findViewById(R.id.gallery_header).setVisibility(View.GONE);
+                            findViewById(R.id.gallery_placeholder).setVisibility(View.GONE);
+                            findViewById(R.id.spinner).setVisibility(View.GONE);
                         }
                     }
                 });
-                return;
+                fillOutSpecs();
+                fillOutFeatures();
             }
-            mFeatureList = mCar.getList("features");
-            setGalleryImages();
-            fillOutSpecs();
-            fillOutFeatures();
-        } else {
-            mGalleryImageUrls = new ArrayList<>();
             mFeatureList = new ArrayList<>();
 
             if (mCarId.length() < 10) {
