@@ -16,15 +16,15 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"/>
 
-        <ProgressBar
-            android:id="@+id/spinner"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="170dp"
-            android:background="#303030"
-            tools:visibility="gone"/>
+        <!--TODO<ProgressBar-->
+            <!--android:id="@+id/spinner"-->
+            <!--style="?android:attr/progressBarStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_marginTop="170dp"-->
+            <!--android:background="#303030"-->
+            <!--tools:visibility="gone"/>-->
 
         <ListView
             android:id="@+id/cars_listview"

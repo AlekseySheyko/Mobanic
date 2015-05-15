@@ -3,42 +3,71 @@ package com.mobanic;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.mobanic.model.CarFromKahn;
-import com.mobanic.views.RatioImageView;
-import com.parse.ParseQueryAdapter;
-import com.squareup.picasso.Picasso;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
-public class CarsAdapter extends ParseQueryAdapter<CarFromKahn> {
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
-    public CarsAdapter(Context context, QueryFactory<CarFromKahn> queryFactory) {
-        super(context, queryFactory);
+public class CarsAdapter extends ArrayAdapter<ParseObject> {
+
+    public CarsAdapter(Context context, ParseQuery<ParseObject> mobanicQuery, ParseQuery<ParseObject> cahnQuery) {
+        super(context, 0, new ArrayList<ParseObject>());
+
+        FindCallback<ParseObject> cb = new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> carList, ParseException e) {
+                addAll(carList);
+            }
+        };
+        mobanicQuery.findInBackground(cb);
+        cahnQuery.findInBackground(cb);
     }
 
     @Override
-    public View getItemView(CarFromKahn car, View v, ViewGroup parent) {
-        if (v == null) {
-            v = View.inflate(getContext(), R.layout.list_item_car, null);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = View.inflate(getContext(), R.layout.list_item_car, null);
         }
+        ParseObject car = getItem(position);
 
-        ((TextView) v.findViewById(R.id.make)).setText(car.getMake());
-        ((TextView) v.findViewById(R.id.model)).setText(car.getModel());
-        ((TextView) v.findViewById(R.id.price)).setText(car.getFormattedPrice());
-
-        RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
-        Picasso.with(getContext()).load(car.getCoverImageUrl()).fit().centerCrop().into(imageView);
-
-        if (car.isLeftHanded()) {
-            v.findViewById(R.id.leftHanded).setVisibility(View.VISIBLE);
+        ((TextView) convertView.findViewById(R.id.make)).setText(car.getString("make"));
+        ((TextView) convertView.findViewById(R.id.model)).setText(car.getString("model"));
+        ((TextView) convertView.findViewById(R.id.price)).setText(formatPrice(car.getInt("price")));
+//
+//        RatioImageView imageView = (RatioImageView) v.findViewById(R.id.image);
+//        Picasso.with(getContext()).load(car.getCoverImageUrl()).fit().centerCrop().into(imageView);
+//
+        if (car.getBoolean("isLeftHanded")) {
+            convertView.findViewById(R.id.leftHanded).setVisibility(View.VISIBLE);
         } else {
-            v.findViewById(R.id.leftHanded).setVisibility(View.GONE);
+            convertView.findViewById(R.id.leftHanded).setVisibility(View.GONE);
         }
-        if (car.isSold()) {
-            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
-        } else {
-            v.findViewById(R.id.sold).setVisibility(View.GONE);
-        }
-        return v;
+//        if (car.isSold()) {
+//            v.findViewById(R.id.sold).setVisibility(View.VISIBLE);
+//        } else {
+//            v.findViewById(R.id.sold).setVisibility(View.GONE);
+//        }
+        return convertView;
+    }
+
+    public String formatPrice(int price) {
+        NumberFormat f = NumberFormat.getCurrencyInstance(Locale.UK);
+        f.setMaximumFractionDigits(0);
+        return f.format(price);
+    }
+
+    @Override
+    public void addAll(Collection<? extends ParseObject> collection) {
+        // TODO Sort all items by make and model
+        super.addAll(collection);
     }
 }
