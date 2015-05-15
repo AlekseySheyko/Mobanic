@@ -222,4 +222,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
     public static Context getContext() {
         return sContext;
     }
+
+    // TODO Restore push notifications
 }

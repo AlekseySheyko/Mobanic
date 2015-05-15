@@ -164,11 +164,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void populateGalleryList() {
+        mFeatureList = mCar.getList("features");
         String engineStr = NumberFormat.getNumberInstance(Locale.UK)
                 .format(mCar.getInt("engine")) + "\u2009" + "cc";
         if (engineStr.length() > 4) {
             mGalleryImageUrls = mCar.getList("galleryImages");
-            mFeatureList = mCar.getList("features");
             setGalleryImages();
             fillOutSpecs();
             fillOutFeatures();
