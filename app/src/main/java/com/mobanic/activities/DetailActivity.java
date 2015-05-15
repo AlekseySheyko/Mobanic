@@ -3,6 +3,7 @@ package com.mobanic.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -310,7 +311,9 @@ public class DetailActivity extends AppCompatActivity {
                 fillOutFeatures();
             } else {
                 findViewById(R.id.error).setVisibility(View.VISIBLE);
-                findViewById(R.id.previousOwners).setVisibility(View.GONE);
+                TextView engineTextView = (TextView) findViewById(R.id.engine);
+                engineTextView.setText("Connection failed");
+                engineTextView.setTextColor(Color.parseColor("#FF9B0000"));
             }
         }
 

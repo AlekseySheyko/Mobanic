@@ -41,6 +41,7 @@ public class ContactActivity extends ActionBarActivity {
     private String mMake;
     private String mModel;
     private int mPosition;
+    private int mId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class ContactActivity extends ActionBarActivity {
                 mMake = car.getMake();
                 mModel = car.getModel();
                 mPosition = carPosition;
+                mId = car.getId();
             }
         });
 
@@ -101,9 +103,15 @@ public class ContactActivity extends ActionBarActivity {
         String message = mMessageEditText.getText().toString() + "\n\n"
                 + "Name: " + name + "\n"
                 + "Email: " + emailAddress + "\n"
-                + "Phone: " + "+" + phone + "\n"
-                // TODO: Attach url when car is from kahn's site
-                + "About: " + mMake + " " + mModel + ", #" + mPosition;
+                + "Phone: " + "+" + phone + "\n";
+
+        if (mId == 0) {
+            message = message + "About: " + mMake + " " + mModel + ", #" + mPosition;
+        } else {
+            message = message + "About: " + mMake + " " + mModel + "\n"
+                    + "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=" + mId;
+        }
+
         String subject = mSubjectSpinner.getSelectedItem().toString();
 
         if (name.isEmpty()) {
