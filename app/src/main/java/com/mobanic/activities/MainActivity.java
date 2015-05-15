@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.mobanic.CarFromKahn;
+import com.mobanic.model.CarFromKahn;
 import com.mobanic.CarsAdapter;
 import com.mobanic.DownloadCarsTask;
 import com.mobanic.R;

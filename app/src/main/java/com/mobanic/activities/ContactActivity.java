@@ -18,7 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mobanic.CarFromKahn;
+import com.mobanic.model.CarFromKahn;
 import com.mobanic.CustomEmailClient;
 import com.mobanic.R;
 import com.parse.GetCallback;

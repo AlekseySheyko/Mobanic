@@ -1,9 +1,10 @@
-package com.mobanic;
+package com.mobanic.model;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 @ParseClassName("CarFromKahn")
@@ -230,5 +231,21 @@ public class CarFromKahn extends ParseObject {
         NumberFormat f = NumberFormat.getCurrencyInstance(Locale.UK);
         f.setMaximumFractionDigits(0);
         return f.format(price);
+    }
+
+    public List<String> getGalleryImages() {
+        return getList("galleryImages");
+    }
+
+    public void setGalleryImages(List<String> galleryImages) {
+        put("galleryImages", galleryImages);
+    }
+
+    public List<String> getFeatures() {
+        return getList("features");
+    }
+
+    public void setFeatures(List<String> features) {
+        put("features", features);
     }
 }

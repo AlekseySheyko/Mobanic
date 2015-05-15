@@ -2,6 +2,8 @@ package com.mobanic;
 
 import android.app.Application;
 
+import com.mobanic.model.CarFromKahn;
+import com.mobanic.model.CarFromMobanic;
 import com.parse.Parse;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseInstallation;

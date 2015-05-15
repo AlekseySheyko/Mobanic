@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
-import com.mobanic.CarFromKahn;
+import com.mobanic.model.CarFromKahn;
 import com.mobanic.R;
 
 import java.math.BigDecimal;

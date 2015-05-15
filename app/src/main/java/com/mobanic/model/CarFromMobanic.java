@@ -1,13 +1,12 @@
-package com.mobanic;
+package com.mobanic.model;
 
 import com.parse.ParseClassName;
-import com.parse.ParseObject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 @ParseClassName("Car")
-public class CarFromMobanic extends ParseObject {
+public class CarFromMobanic extends Car {
 
     public CarFromMobanic() {
     }

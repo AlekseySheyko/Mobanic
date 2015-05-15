@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.mobanic.activities.MainActivity;
+import com.mobanic.model.CarFromKahn;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;

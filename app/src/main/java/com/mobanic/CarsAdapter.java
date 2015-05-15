@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.mobanic.model.CarFromKahn;
 import com.mobanic.views.RatioImageView;
 import com.parse.ParseQueryAdapter;
 import com.squareup.picasso.Picasso;

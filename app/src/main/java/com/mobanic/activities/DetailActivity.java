@@ -22,8 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.mobanic.CarFromKahn;
 import com.mobanic.R;
+import com.mobanic.model.CarFromKahn;
 import com.mobanic.views.RatioImageView;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -41,6 +41,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class DetailActivity extends AppCompatActivity {
@@ -52,8 +53,8 @@ public class DetailActivity extends AppCompatActivity {
     private Intent mShareIntent;
     private Uri mImageUri;
 
-    private ArrayList<String> mGalleryImageUrls;
-    private ArrayList<String> mFeatureList;
+    private List<String> mGalleryImageUrls;
+    private List<String> mFeatureList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,9 +110,6 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 mCar = car;
 
-                // TODO Pin downloaded details to retrieve from local database later
-                new DownloadSpecsTask().execute();
-
                 String make = car.getMake();
                 String model = car.getModel();
 
@@ -138,6 +136,18 @@ public class DetailActivity extends AppCompatActivity {
                 });
 
                 setCoverImage();
+
+                if (mCar.getEngine().length() > 4) {
+                    mGalleryImageUrls = mCar.getGalleryImages();
+                    mFeatureList = mCar.getFeatures();
+                    setGalleryImages();
+                    fillOutSpecs();
+                    fillOutFeatures();
+                } else {
+                    mGalleryImageUrls = new ArrayList<>();
+                    mFeatureList = new ArrayList<>();
+                    new DownloadSpecsTask().execute();
+                }
 
                 String url = mCar.getCoverImageUrl();
                 new SetShareIntentTask().execute(title, url);
@@ -236,8 +246,6 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             String url = BASE_URL + mCarId;
-            mGalleryImageUrls = new ArrayList<>();
-            mFeatureList = new ArrayList<>();
             try {
                 Document doc = Jsoup.connect(url).timeout(10 * 1000).get();
                 Elements images = doc.select("[src*=.jpg]");
@@ -276,6 +284,8 @@ public class DetailActivity extends AppCompatActivity {
                 mCar.setMileage(mileage);
                 mCar.setPrevOwners(prevOwners);
                 mCar.setEngine(engine);
+                mCar.setGalleryImages(mGalleryImageUrls);
+                mCar.setFeatures(mFeatureList);
                 mCar.pinInBackground();
 
             } catch (IOException e) {
