@@ -32,7 +32,6 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -401,18 +400,7 @@ public class DetailActivity extends AppCompatActivity {
                     .load(url)
                     .fit()
                     .centerCrop()
-                    .into(imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            if (url == mGalleryImageUrls.get(0)) {
-                                flipper.startFlipping();
-                            }
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
+                    .into(imageView);
             flipper.addView(imageView);
         }
         if (mGalleryImageUrls.size() == 1) {
