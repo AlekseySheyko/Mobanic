@@ -102,7 +102,8 @@
                     <TextView
                         android:id="@+id/previousOwners"
                         style="@style/SpecsValue"
-                        tools:text="1"/>
+                        tools:text="1"
+                        android:text="Loading..."/>
 
                 </LinearLayout>
 
@@ -116,8 +117,7 @@
                     <TextView
                         android:id="@+id/engine"
                         style="@style/SpecsValue"
-                        tools:text="3000cc"
-                        android:text="Loading..."/>
+                        tools:text="3000cc"/>
 
                 </LinearLayout>
 

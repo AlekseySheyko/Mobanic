@@ -54,26 +54,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         mCarsAdapter = new CarsAdapter(this,
                 getQuery(CarFromMobanic.class),
                 getQuery(CarFromKahn.class));
-//        mCarsAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<CarFromKahn>() {
-//            @Override
-//            public void onLoading() {
-//                findViewById(R.id.spinner).setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onLoaded(List<CarFromKahn> carList, Exception e) {
-//                if (carList.size() == 0) {
-//                    new DownloadCarsTask().execute();
-//                    return;
-//                }
-//                findViewById(R.id.spinner).setVisibility(View.GONE);
-//                if (e == null) {
-//                    updateSearchPanel(carList);
-//                }
-//                mMakesUpdated = false;
-//                mModelsUpdated = false;
-//            }
-//        });
 
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
@@ -109,6 +89,12 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 mCarsAdapter.loadCars();
             }
         });
+    }
+
+    public void updateSearch(List<ParseObject> carList) {
+        updateSearchPanel(carList);
+        mMakesUpdated = false;
+        mModelsUpdated = false;
     }
 
     private void setupActionBar() {
@@ -171,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         return query;
     }
 
-    public void updateSearchPanel(List<CarFromKahn> carList) {
+    public void updateSearchPanel(List<ParseObject> carList) {
         if (mInitialStart) {
             ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
         }
@@ -202,13 +188,13 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             mModelsUpdated = true;
         }
         mSharedPrefs.edit().putStringSet(key, values).apply();
-//        mCarsAdapter.loadObjects();
+        mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
     }
 
     @Override
     public void onAgeSelected(int maxAge) {
         mSharedPrefs.edit().putInt("maxAge", maxAge).apply();
-//        mCarsAdapter.loadObjects();
+        mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
     }
 
     @Override

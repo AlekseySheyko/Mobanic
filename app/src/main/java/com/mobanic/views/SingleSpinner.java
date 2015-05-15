@@ -11,8 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.mobanic.model.CarFromKahn;
 import com.mobanic.R;
+import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,15 +55,15 @@ public class SingleSpinner extends Spinner {
         setAdapter(mAdapter);
     }
 
-    public void setItems(List<CarFromKahn> carList) {
+    public void setItems(List<ParseObject> carList) {
         mAgeSet = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String s, String t1) {
                 return extractDigits(s) - extractDigits(t1);
             }
         });
-        for (CarFromKahn car : carList) {
-            mAgeSet.add(car.getAgeCategory());
+        for (ParseObject car : carList) {
+            mAgeSet.add(getAgeCategory(car));
         }
         mAgeList = new ArrayList<>();
         for (String age : mAgeSet) {
@@ -78,6 +78,17 @@ public class SingleSpinner extends Spinner {
         setSelection(mAdapter.getCount());
 
         mSelectedValue = mAgeSet.size();
+    }
+
+    private String getAgeCategory(ParseObject car) {
+        int age = 2015 - car.getInt("year");
+        if (age <= 1) {
+            return "Up to 1 year old";
+        } else if (age <= 10) {
+            return "Up to " + age + " years old";
+        } else {
+            return "Over 10 years old";
+        }
     }
 
     @Override

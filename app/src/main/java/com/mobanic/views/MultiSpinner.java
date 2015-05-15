@@ -12,8 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.mobanic.model.CarFromKahn;
 import com.mobanic.R;
+import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,10 +57,11 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener 
         setAdapter(mAdapter);
     }
 
-    public void setItems(List<CarFromKahn> carList) {
+    public void setItems(List<ParseObject> carList) {
         mChoices = new TreeSet<>();
-        for (CarFromKahn car : carList) {
-            mChoices.add(car.getValueForKey(mSearchKey));
+        for (ParseObject car : carList) {
+            mChoices.add(car.getString(mSearchKey.toLowerCase().replace("colour", "color")
+                    .replace("fuel type", "fuelType").replace("transmission", "transType")));
         }
         mCheckboxes = new boolean[mChoices.size()];
 

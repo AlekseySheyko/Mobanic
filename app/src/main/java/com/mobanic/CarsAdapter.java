@@ -34,27 +34,51 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
     }
 
     public void loadCars() {
-        mMobanicQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> carList, ParseException e) {
-                if (carList.size() > 0) {
-                    addAll(carList);
-                } else {
-                    // TODO Load Mobanic cars from network
-                    // (previously return local storage)
+        loadCars(null, null);
+    }
+
+    public void loadCars(ParseQuery<ParseObject> mobanicQuery, ParseQuery<ParseObject> cahnQuery) {
+        clear();
+        if (mobanicQuery == null) {
+            mMobanicQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> carList, ParseException e) {
+                    if (carList.size() > 0) {
+                        addAll(carList);
+                    } else {
+                        // TODO Load Mobanic cars from network
+                        // (previously return local storage)
+                    }
                 }
-            }
-        });
-        mCahnQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> carList, ParseException e) {
-                if (carList.size() > 0) {
+            });
+        } else {
+            mobanicQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> carList, ParseException e) {
                     addAll(carList);
-                } else {
-                    new DownloadCarsTask().execute();
                 }
-            }
-        });
+            });
+        }
+        if (cahnQuery == null) {
+            mCahnQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> carList, ParseException e) {
+                    if (carList.size() > 0) {
+                        addAll(carList);
+                        ((MainActivity) getContext()).updateSearch(carList);
+                    } else {
+                        new DownloadCarsTask().execute();
+                    }
+                }
+            });
+        } else {
+            cahnQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> carList, ParseException e) {
+                    addAll(carList);
+                }
+            });
+        }
     }
 
     @Override
