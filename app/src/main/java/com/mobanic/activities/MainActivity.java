@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
                 int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
+                // TODO Combine queries for cars both from Cahn and Mobanic
                 ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
                 query.orderByDescending("createdAt");
                 query.fromLocalDatastore();
