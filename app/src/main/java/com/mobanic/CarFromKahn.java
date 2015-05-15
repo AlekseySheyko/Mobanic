@@ -148,8 +148,8 @@ public class CarFromKahn extends ParseObject {
         put("color", color);
     }
 
-    public int getMileage() {
-        return getInt("Mileage");
+    public String getMileage() {
+        return NumberFormat.getNumberInstance(Locale.UK).format(getInt("mileage"));
     }
 
     public void setMileage(String mileageStr) {
@@ -164,6 +164,14 @@ public class CarFromKahn extends ParseObject {
 
     public void setPrevOwners(int previousOwners) {
         put("previousOwners", previousOwners);
+    }
+
+    public String getEngine() {
+        return getInt("engine") + "cc";
+    }
+
+    public void setEngine(int engine) {
+        put("engine", engine);
     }
 
     public String getFuelType() {

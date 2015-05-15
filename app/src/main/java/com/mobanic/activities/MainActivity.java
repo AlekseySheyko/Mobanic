@@ -212,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         mSharedPrefs.edit().clear().apply();
     }
 
+    // TODO Add menu button to manually refresh car listing
+
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();

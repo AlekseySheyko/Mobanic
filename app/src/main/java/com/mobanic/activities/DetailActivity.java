@@ -108,6 +108,7 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 mCar = car;
 
+                // TODO Pin downloaded details to retrieve from local database later
                 new DownloadSpecsTask().execute();
 
                 String make = car.getMake();
@@ -120,7 +121,6 @@ public class DetailActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(make);
 
                 setCoverImage();
-                fillOutSpecs();
 
                 String url = mCar.getCoverImageUrl();
                 new SetShareIntentTask().execute(title, url);
@@ -237,10 +237,23 @@ public class DetailActivity extends AppCompatActivity {
                 for (Element feature : features) {
                     mFeatureList.add(feature.text());
                 }
-                mFeatureList.remove(mFeatureList.size()-1);
-                for (String spec : mFeatureList) {
-                    Log.d("Download", spec);
+                mFeatureList.remove(mFeatureList.size() - 1);
+
+                Elements specs = doc.select(".fivecol");
+                String mileage = specs.get(4).text().substring(2);
+                int prevOwners = Integer.parseInt(specs.get(7).text().substring(2));
+                int engine;
+                try {
+                    engine = Integer.parseInt(specs.get(2).text().substring(0, specs.get(2).text()
+                            .indexOf("cc")).substring(2));
+                } catch (StringIndexOutOfBoundsException e) {
+                    engine = -1;
                 }
+
+                mCar.setMileage(mileage);
+                mCar.setPrevOwners(prevOwners);
+                mCar.setEngine(engine);
+                mCar.pinInBackground();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -256,9 +269,11 @@ public class DetailActivity extends AppCompatActivity {
 
             if (success) {
                 setGalleryImages();
+                fillOutSpecs();
                 fillOutFeatures();
             } else {
                 findViewById(R.id.error).setVisibility(View.VISIBLE);
+                findViewById(R.id.make).setVisibility(View.GONE);
             }
         }
 
@@ -310,17 +325,17 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
-        ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
-        ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
-        ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
-        ((TextView) findViewById(R.id.mileage)).setText(mCar.getInt("mileage") + "");
-        ((TextView) findViewById(R.id.previousOwners)).setText("Loading...");
-        ((TextView) findViewById(R.id.engine)).setText("Loading...");
-        ((TextView) findViewById(R.id.transmission)).setText("Loading...");
-        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getString("fuelType"));
-        ((TextView) findViewById(R.id.color)).setText(mCar.getString("color"));
+        ((TextView) findViewById(R.id.make)).setText(mCar.getMake());
+        ((TextView) findViewById(R.id.model)).setText(mCar.getModel());
+        ((TextView) findViewById(R.id.year)).setText(mCar.getYear() + "");
+        ((TextView) findViewById(R.id.mileage)).setText(mCar.getMileage());
+        ((TextView) findViewById(R.id.previousOwners)).setText(mCar.getPreviousOwners() + "");
+        ((TextView) findViewById(R.id.engine)).setText(mCar.getEngine());
+        ((TextView) findViewById(R.id.transmission)).setText(mCar.getTransType());
+        ((TextView) findViewById(R.id.fuelType)).setText(mCar.getFuelType());
+        ((TextView) findViewById(R.id.color)).setText(mCar.getColor());
         // TODO Add link to Google Maps on specific location
-        ((TextView) findViewById(R.id.location)).setText(mCar.getString("location"));
+        ((TextView) findViewById(R.id.location)).setText(mCar.getLocation());
     }
 
     private void fillOutFeatures() {

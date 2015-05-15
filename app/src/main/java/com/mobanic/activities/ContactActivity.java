@@ -18,11 +18,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobanic.CarFromKahn;
 import com.mobanic.CustomEmailClient;
 import com.mobanic.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
@@ -50,13 +50,13 @@ public class ContactActivity extends ActionBarActivity {
         String carId = getIntent().getStringExtra("car_id");
         final int carPosition = getIntent().getIntExtra("car_position", -1);
 
-        ParseQuery<ParseObject> query = new ParseQuery<>("CarFromMobanic");
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-        query.getInBackground(carId, new GetCallback<ParseObject>() {
+        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
+        query.fromLocalDatastore();
+        query.getInBackground(carId, new GetCallback<CarFromKahn>() {
             @Override
-            public void done(ParseObject car, ParseException e) {
-                mMake = car.getString("make");
-                mModel = car.getString("model");
+            public void done(CarFromKahn car, ParseException e) {
+                mMake = car.getMake();
+                mModel = car.getModel();
                 mPosition = carPosition;
             }
         });
