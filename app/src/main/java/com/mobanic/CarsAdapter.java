@@ -169,7 +169,6 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
 
     @Override
     public void addAll(Collection<? extends ParseObject> collection) {
-        // TODO Sort all items by make and model
         ((MainActivity) getContext()).findViewById(R.id.spinner).setVisibility(View.GONE);
         super.addAll(collection);
     }

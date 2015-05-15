@@ -85,11 +85,10 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         bar.setOnPriceChangeListener(new PriceSeekBar.OnPriceChangeListener<Integer>() {
             @Override
             public void onPriceChanged(PriceSeekBar bar, Integer minPrice, Integer maxPrice) {
-                // TODO Fix search by price
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice).apply();
-                mCarsAdapter.loadCars();
+                mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
             }
         });
     }
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             try {
                 MainActivity a = (MainActivity) MainActivity.getContext();
 //                a.mForcedNetwork = true;
-                a.mCarsAdapter.loadCars();
+                a.mCarsAdapter.loadCars(a.getQuery(CarFromMobanic.class), a.getQuery(CarFromKahn.class));
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }
