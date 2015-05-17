@@ -117,14 +117,14 @@ public class CarParsed extends ParseObject {
     }
 
     public String getCoverImageUrl() {
-        return getString("coverImageUrl");
+        return getString("coverImage");
     }
 
     public void setCoverImage(String imageId) {
         if (!imageId.isEmpty()) {
-            put("coverImageUrl", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
+            put("coverImage", "https://www.kahndesign.com/imgLarge/" + imageId + ".jpg");
         } else {
-            put("coverImageUrl", "https://www.kahndesign.com/images/AwaitingImage.png");
+            put("coverImage", "https://www.kahndesign.com/images/AwaitingImage.png");
         }
     }
 

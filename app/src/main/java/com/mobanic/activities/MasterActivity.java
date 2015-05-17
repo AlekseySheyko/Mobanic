@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
@@ -110,7 +112,10 @@ public class MasterActivity extends AppCompatActivity
     public void refreshCarList() {
         mCarsAdapter.clear();
         executeQueryForClass(CarMobanic.class);
-        executeQueryForClass(CarParsed.class);
+        if (!mForceNetwork) {
+            executeQueryForClass(CarParsed.class);
+        }
+        mForceNetwork = false;
     }
 
     private int mQueryCounter;
@@ -197,7 +202,6 @@ public class MasterActivity extends AppCompatActivity
         mInitialStart = false;
         mMakesUpdated = false;
         mModelsUpdated = false;
-        mForceNetwork = false;
     }
 
     @Override
@@ -225,6 +229,12 @@ public class MasterActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mSharedPrefs.edit().clear().apply();
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     private static Context sContext;

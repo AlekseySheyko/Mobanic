@@ -42,7 +42,7 @@ public class CarsAdapter extends ArrayAdapter<ParseObject> {
             String url = car.getParseFile("coverImage").getUrl();
             Picasso.with(getContext()).load(url).fit().centerCrop().into(imageView);
         } else {
-            String url = car.getString("coverImageUrl");
+            String url = car.getString("coverImage");
             Picasso.with(getContext()).load(url).fit().centerCrop().into(imageView);
         }
 
