@@ -18,8 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mobanic.model.CarFromKahn;
-import com.mobanic.CustomEmailClient;
+import com.mobanic.model.CarParsed;
+import com.mobanic.model.EmailClient;
 import com.mobanic.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -51,11 +51,11 @@ public class ContactActivity extends ActionBarActivity {
         String carId = getIntent().getStringExtra("car_id");
         final int carPosition = getIntent().getIntExtra("car_position", -1);
 
-        ParseQuery<CarFromKahn> query = ParseQuery.getQuery(CarFromKahn.class);
+        ParseQuery<CarParsed> query = ParseQuery.getQuery(CarParsed.class);
         query.fromLocalDatastore();
-        query.getInBackground(carId, new GetCallback<CarFromKahn>() {
+        query.getInBackground(carId, new GetCallback<CarParsed>() {
             @Override
-            public void done(CarFromKahn car, ParseException e) {
+            public void done(CarParsed car, ParseException e) {
                 mMake = car.getMake();
                 mModel = car.getModel();
                 mPosition = carPosition;
@@ -144,7 +144,7 @@ public class ContactActivity extends ActionBarActivity {
             String subject = strings[1];
             String message = strings[2];
 
-            CustomEmailClient m = new CustomEmailClient("mobanic.user@gmail.com", "mob12345");
+            EmailClient m = new EmailClient("mobanic.user@gmail.com", "mob12345");
 
             String[] toArr = {MOBANIC_EMAIL_ADDRESS};
             m.setTo(toArr);
@@ -167,7 +167,7 @@ public class ContactActivity extends ActionBarActivity {
             Toast.makeText(ContactActivity.this,
                     "Thanks, we'll be in touch shortly!", Toast.LENGTH_LONG).show();
             startActivity(new Intent(ContactActivity.this,
-                    MainActivity.class));
+                    MasterActivity.class));
         }
     }
 

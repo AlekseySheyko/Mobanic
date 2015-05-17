@@ -80,12 +80,12 @@
                 android:paddingTop="16dp"
                 android:showDividers="middle">
 
-                <com.mobanic.views.MultiSpinner
+                <com.mobanic.views.SpinnerMultiple
                     android:id="@+id/make_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Make"/>
 
-                <com.mobanic.views.MultiSpinner
+                <com.mobanic.views.SpinnerMultiple
                     android:id="@+id/model_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Model"/>
@@ -94,22 +94,22 @@
                     android:id="@+id/price_seekbar"
                     style="@style/SearchSeekBar"/>
 
-                <com.mobanic.views.SingleSpinner
+                <com.mobanic.views.SpinnerSingle
                     android:id="@+id/age_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Age"/>
 
-                <com.mobanic.views.MultiSpinner
+                <com.mobanic.views.SpinnerMultiple
                     android:id="@+id/colour_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Colour"/>
 
-                <com.mobanic.views.MultiSpinner
+                <com.mobanic.views.SpinnerMultiple
                     android:id="@+id/fuel_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Fuel Type"/>
 
-                <com.mobanic.views.MultiSpinner
+                <com.mobanic.views.SpinnerMultiple
                     android:id="@+id/trans_spinner"
                     style="@style/DrawerListItem"
                     custom:searchKey="Transmission"/>

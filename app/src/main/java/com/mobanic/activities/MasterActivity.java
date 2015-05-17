@@ -18,45 +18,41 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.mobanic.CarsAdapter;
 import com.mobanic.R;
-import com.mobanic.model.CarFromKahn;
-import com.mobanic.model.CarFromMobanic;
-import com.mobanic.views.MultiSpinner;
+import com.mobanic.adapters.CarsAdapter;
+import com.mobanic.model.CarParsed;
+import com.mobanic.model.CarMobanic;
 import com.mobanic.views.PriceSeekBar;
-import com.mobanic.views.SingleSpinner;
+import com.mobanic.views.SpinnerMultiple;
+import com.mobanic.views.SpinnerSingle;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.List;
 import java.util.Set;
 
-import static com.mobanic.views.MultiSpinner.MultipleFiltersListener;
-import static com.mobanic.views.SingleSpinner.AgeFilterListener;
-
-public class MainActivity extends AppCompatActivity implements MultipleFiltersListener,
-        AgeFilterListener {
+public class MasterActivity extends AppCompatActivity
+        implements SpinnerSingle.ChoiceListener, SpinnerMultiple.ChoiceListener {
 
     public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mInitialStart = true;
-    private boolean mMakesUpdated;
-    private boolean mModelsUpdated;
+    private boolean mMakesUpdated = false;
+    private boolean mModelsUpdated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Add button to open search
-        setupActionBar();
+        setupActionBar(); // adds button to open search
 
+
+        mCarsAdapter = new CarsAdapter(this,
+                getQuery(CarMobanic.class),
+                getQuery(CarParsed.class));
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mCarsAdapter = new CarsAdapter(this,
-                getQuery(CarFromMobanic.class),
-                getQuery(CarFromKahn.class));
-
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
         lv.setEmptyView(findViewById(R.id.error));
@@ -65,12 +61,12 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 ParseObject car = mCarsAdapter.getItem(position);
                 if (car.getBoolean("isSold")) {
-                    Toast.makeText(MainActivity.this, getString(R.string.sold),
+                    Toast.makeText(MasterActivity.this, getString(R.string.sold),
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                Intent i = new Intent(MasterActivity.this, DetailActivity.class);
                 String carId = car.getInt("id") + "";
                 if (carId.equals("0")) {
                     carId = car.getObjectId();
@@ -88,9 +84,11 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice).apply();
-                mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
+                mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
             }
         });
+
+        sContext = this;
     }
 
     public void updateSearch(List<ParseObject> carList) {
@@ -112,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
                 R.string.drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
-
-        sContext = this;
     }
 
     public ParseQuery<ParseObject> getQuery(Class parseClass) {
@@ -128,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
         query.orderByDescending("createdAt");
-        if (parseClass.equals(CarFromKahn.class)) {
+        if (parseClass.equals(CarParsed.class)) {
             query.fromLocalDatastore();
         }
 
@@ -161,17 +157,17 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
 
     public void updateSearchPanel(List<ParseObject> carList) {
         if (mInitialStart) {
-            ((MultiSpinner) findViewById(R.id.make_spinner)).setItems(carList);
+            ((SpinnerMultiple) findViewById(R.id.make_spinner)).setItems(carList);
         }
         if (mInitialStart || mMakesUpdated) {
-            ((MultiSpinner) findViewById(R.id.model_spinner)).setItems(carList);
+            ((SpinnerMultiple) findViewById(R.id.model_spinner)).setItems(carList);
         }
         if (mInitialStart || mMakesUpdated || mModelsUpdated) {
             ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
-            ((SingleSpinner) findViewById(R.id.age_spinner)).setItems(carList);
-            ((MultiSpinner) findViewById(R.id.colour_spinner)).setItems(carList);
-            ((MultiSpinner) findViewById(R.id.trans_spinner)).setItems(carList);
-            ((MultiSpinner) findViewById(R.id.fuel_spinner)).setItems(carList);
+            ((SpinnerSingle) findViewById(R.id.age_spinner)).setItems(carList);
+            ((SpinnerMultiple) findViewById(R.id.colour_spinner)).setItems(carList);
+            ((SpinnerMultiple) findViewById(R.id.trans_spinner)).setItems(carList);
+            ((SpinnerMultiple) findViewById(R.id.fuel_spinner)).setItems(carList);
         }
         mInitialStart = false;
     }
@@ -190,13 +186,13 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
             mModelsUpdated = true;
         }
         mSharedPrefs.edit().putStringSet(key, values).apply();
-        mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
+        mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
     }
 
     @Override
     public void onAgeSelected(int maxAge) {
         mSharedPrefs.edit().putInt("maxAge", maxAge).apply();
-        mCarsAdapter.loadCars(getQuery(CarFromMobanic.class), getQuery(CarFromKahn.class));
+        mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
     }
 
     @Override
@@ -225,9 +221,9 @@ public class MainActivity extends AppCompatActivity implements MultipleFiltersLi
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Receive update");
             try {
-                MainActivity a = (MainActivity) MainActivity.getContext();
+                MasterActivity a = (MasterActivity) MasterActivity.getContext();
 //                a.mForcedNetwork = true;
-                a.mCarsAdapter.loadCars(a.getQuery(CarFromMobanic.class), a.getQuery(CarFromKahn.class));
+                a.mCarsAdapter.loadCars(a.getQuery(CarMobanic.class), a.getQuery(CarParsed.class));
             } catch (NullPointerException e) {
                 Log.w(TAG, "Can't get activity context to update content");
             }

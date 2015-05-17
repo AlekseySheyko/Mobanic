@@ -1,14 +1,16 @@
 package com.mobanic.model;
 
 import com.parse.ParseClassName;
+import com.parse.ParseObject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-@ParseClassName("Car")
-public class CarFromMobanic extends Car {
+@ParseClassName("CarMobanic")
+public class CarMobanic extends ParseObject {
 
-    public CarFromMobanic() {
+    public CarMobanic() {
+        // Empty constructor, will download ready cars from cloud
     }
 
     public String getMake() {

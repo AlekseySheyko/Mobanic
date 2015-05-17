@@ -3,6 +3,7 @@ package com.mobanic.views;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
@@ -15,21 +16,22 @@ import com.mobanic.R;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SingleSpinner extends Spinner {
+public class SpinnerMultiple extends Spinner implements OnMultiChoiceClickListener {
 
-    private AgeFilterListener mListener;
+    private static final String TAG = SpinnerMultiple.class.getSimpleName();
+
+    private ChoiceListener mListener;
     private ArrayAdapter<String> mAdapter;
-    private Set<String> mAgeSet;
-    private ArrayList<String> mAgeList;
-    private int mSelectedValue;
+    private Set<String> mChoices;
+    private boolean[] mCheckboxes;
     private String mSearchKey;
 
-    public SingleSpinner(Context context, AttributeSet attrs) {
+    public SpinnerMultiple(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (isInEditMode()) return;
 
@@ -44,7 +46,7 @@ public class SingleSpinner extends Spinner {
             a.recycle();
         }
 
-        mListener = (AgeFilterListener) context;
+        mListener = (ChoiceListener) context;
 
         mAdapter = new ArrayAdapter<>(
                 getContext(),
@@ -56,39 +58,24 @@ public class SingleSpinner extends Spinner {
     }
 
     public void setItems(List<ParseObject> carList) {
-        mAgeSet = new TreeSet<>(new Comparator<String>() {
-            @Override
-            public int compare(String s, String t1) {
-                return extractDigits(s) - extractDigits(t1);
-            }
-        });
+        mChoices = new TreeSet<>();
         for (ParseObject car : carList) {
-            mAgeSet.add(getAgeCategory(car));
+            mChoices.add(car.getString(mSearchKey.toLowerCase().replace("colour", "color")
+                    .replace("fuel type", "fuelType").replace("transmission", "transType")));
         }
-        mAgeList = new ArrayList<>();
-        for (String age : mAgeSet) {
-            mAgeList.add(age);
-        }
+        mCheckboxes = new boolean[mChoices.size()];
 
         mAdapter.clear();
-        mAdapter.addAll(mAgeSet);
+        mAdapter.addAll(mChoices);
         mAdapter.add(mSearchKey);
         mAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
 
         setSelection(mAdapter.getCount());
-
-        mSelectedValue = mAgeSet.size();
     }
 
-    private String getAgeCategory(ParseObject car) {
-        int age = 2015 - car.getInt("year");
-        if (age <= 1) {
-            return "Up to 1 year old";
-        } else if (age <= 10) {
-            return "Up to " + age + " years old";
-        } else {
-            return "Over 10 years old";
-        }
+    @Override
+    public void onClick(DialogInterface dialog, int position, boolean isChecked) {
+        mCheckboxes[position] = isChecked;
     }
 
     @Override
@@ -97,24 +84,19 @@ public class SingleSpinner extends Spinner {
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> makes = sharedPrefs.getStringSet("Make", null);
 
-        if (mAgeSet == null || mAgeSet.size() == 0) {
+        if (mChoices == null || mChoices.size() == 0) {
             Toast.makeText(getContext(), "No cars to choose from", Toast.LENGTH_SHORT).show();
-        } else if (makes == null || makes.size() == 0) {
+        } else if (!mSearchKey.equals("Make") && (makes == null || makes.size() == 0)) {
             Toast.makeText(getContext(), "Select make first", Toast.LENGTH_SHORT).show();
         } else {
-            CharSequence[] choices = mAgeSet.toArray(
-                    new CharSequence[mAgeSet.size()]);
+            CharSequence[] choices = mChoices.toArray(
+                    new CharSequence[mChoices.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setSingleChoiceItems(choices, mSelectedValue, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int position) {
-                    mSelectedValue = position;
-                }
-            });
+            builder.setMultiChoiceItems(choices, mCheckboxes, this);
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialog, int which) {
                     updateSelectedItems();
                 }
             });
@@ -124,19 +106,33 @@ public class SingleSpinner extends Spinner {
     }
 
     private void updateSelectedItems() {
-        String ageStr = mAgeList.get(mSelectedValue);
+        String shownValue = null;
 
+        Set<String> selectedItems = new HashSet<>();
+        for (int i = 0; i < mCheckboxes.length; i++) {
+            if (mCheckboxes[i]) {
+                shownValue = mAdapter.getItem(i);
+                selectedItems.add(shownValue);
+            }
+        }
         mAdapter.clear();
-        mAdapter.add(ageStr);
+        mAdapter.addAll(mChoices);
+        if (selectedItems.size() == 0) {
+            mAdapter.add(mSearchKey);
+        } else if (selectedItems.size() == 1) {
+            mAdapter.add(shownValue);
+        } else {
+            if (!mSearchKey.contains("Trans")) {
+                mAdapter.add(selectedItems.size() + " " + mSearchKey.toLowerCase() + "s");
+            } else {
+                mAdapter.add(selectedItems.size() + " trans. types");
+            }
+        }
 
-        mListener.onAgeSelected(extractDigits(ageStr));
+        mListener.onFilterSet(mSearchKey, selectedItems);
     }
 
-    public interface AgeFilterListener {
-        void onAgeSelected(int maxAge);
-    }
-
-    private int extractDigits(String s) {
-        return Integer.parseInt(s.replaceAll("\\D+", ""));
+    public interface ChoiceListener {
+        void onFilterSet(String filterKey, Set<String> selectedItems);
     }
 }

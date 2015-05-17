@@ -24,8 +24,8 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.mobanic.R;
-import com.mobanic.model.CarFromKahn;
-import com.mobanic.model.CarFromMobanic;
+import com.mobanic.model.CarParsed;
+import com.mobanic.model.CarMobanic;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -98,9 +98,9 @@ public class DetailActivity extends AppCompatActivity {
     private void updateCarDetails() {
         ParseQuery query;
         if (mCarId.length() == 10) {
-            query = ParseQuery.getQuery(CarFromMobanic.class);
+            query = ParseQuery.getQuery(CarMobanic.class);
         } else {
-            query = ParseQuery.getQuery(CarFromKahn.class);
+            query = ParseQuery.getQuery(CarParsed.class);
             query.fromLocalDatastore();
         }
         if (mCarId.length() == 10) {

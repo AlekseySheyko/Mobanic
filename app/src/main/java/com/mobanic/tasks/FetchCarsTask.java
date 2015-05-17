@@ -1,11 +1,13 @@
-package com.mobanic;
+package com.mobanic.tasks;
 
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mobanic.activities.MainActivity;
-import com.mobanic.model.CarFromKahn;
+import com.mobanic.model.CarParsed;
+import com.mobanic.model.CarMobanic;
+import com.mobanic.R;
+import com.mobanic.activities.MasterActivity;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -20,14 +22,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
+public class FetchCarsTask extends AsyncTask<Void, Void, List<CarParsed>> {
 
-    private static final String TAG = DownloadCarsTask.class.getSimpleName();
+    private static final String TAG = FetchCarsTask.class.getSimpleName();
     private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available.php";
 
     @Override
-    protected List<CarFromKahn> doInBackground(Void... voids) {
-        List<CarFromKahn> carList = null;
+    protected List<CarParsed> doInBackground(Void... voids) {
+        List<CarParsed> carList = null;
         try {
             carList = new ArrayList<>();
 
@@ -62,7 +64,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 int id = Integer.parseInt(
                         href.substring(href.indexOf("?i=") + 3, href.indexOf("&css")));
 
-                CarFromKahn car = new CarFromKahn(
+                CarParsed car = new CarParsed(
                         id, modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
                 carList.add(car);
             }
@@ -74,7 +76,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
     }
 
     @Override
-    protected void onPostExecute(final List<CarFromKahn> carList) {
+    protected void onPostExecute(final List<CarParsed> carList) {
         super.onPostExecute(carList);
         if (carList != null) {
             ParseObject.unpinAllInBackground(carList, new DeleteCallback() {
@@ -85,8 +87,10 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
-                                    MainActivity a = (MainActivity) MainActivity.getContext();
-                                    a.mCarsAdapter.loadCars();
+                                    MasterActivity a = (MasterActivity) MasterActivity.getContext();
+                                    a.mCarsAdapter.loadCars(
+                                            a.getQuery(CarMobanic.class),
+                                            a.getQuery(CarParsed.class));
                                 }
                             }
                         });
@@ -94,7 +98,7 @@ public class DownloadCarsTask extends AsyncTask<Void, Void, List<CarFromKahn>> {
                 }
             });
         } else {
-            MainActivity a = (MainActivity) MainActivity.getContext();
+            MasterActivity a = (MasterActivity) MasterActivity.getContext();
             TextView emptyText = (TextView) a.findViewById(R.id.error);
             emptyText.setText(a.getString(R.string.error));
             a.findViewById(R.id.spinner).setVisibility(View.GONE);

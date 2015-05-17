@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
-import com.mobanic.model.CarFromKahn;
+import com.mobanic.model.CarParsed;
 import com.mobanic.R;
 import com.parse.ParseObject;
 
@@ -619,7 +619,7 @@ public class PriceSeekBar<T extends Number> extends ImageView {
         }
     }
 
-    public void setItems(List<CarFromKahn> carList) {
+    public void setItems(List<CarParsed> carList) {
         List<Integer> prices = new ArrayList<>();
         for (ParseObject car : carList) {
             if (car.getInt("price") != -1) {

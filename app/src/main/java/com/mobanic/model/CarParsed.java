@@ -7,8 +7,8 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-@ParseClassName("CarFromKahn")
-public class CarFromKahn extends ParseObject {
+@ParseClassName("CarParsed")
+public class CarParsed extends ParseObject {
 
     private String[] mPossibleMakes = new String[]{
             "Aston Martin", "BMW", "Bentley",
@@ -18,11 +18,12 @@ public class CarFromKahn extends ParseObject {
             "Porsche", "Rolls Royce"
     };
 
-    public CarFromKahn() {
+    public CarParsed() {
     }
 
-    public CarFromKahn(int id, String header, String year, String imageId, String price, String color, String mileage, String fuelAndTrans, String location, boolean isLeftHanded) {
-        setId(id);
+    public CarParsed(int id, String header, String year, String imageId, String price, String color,
+                     String mileage, String fuelAndTrans, String location, boolean isLeftHanded) {
+        put("id", id);
         setTitleAndMake(header);
         setYear(year);
         setCoverImage(imageId);
@@ -36,10 +37,6 @@ public class CarFromKahn extends ParseObject {
 
     public int getId() {
         return getInt("id");
-    }
-
-    public void setId(int id) {
-        put("id", id);
     }
 
     public String getMake() {
