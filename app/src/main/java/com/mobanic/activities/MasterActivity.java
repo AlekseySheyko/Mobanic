@@ -35,8 +35,9 @@ public class MasterActivity extends AppCompatActivity
     public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
     private boolean mInitialStart = true;
-    private boolean mMakesUpdated = false;
-    private boolean mModelsUpdated = false;
+    private boolean mMakesUpdated;
+    private boolean mModelsUpdated;
+    private boolean mForceNetwork;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +127,9 @@ public class MasterActivity extends AppCompatActivity
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
+        if (!mForceNetwork || parseClass.getSimpleName().equals("CarParsed")) {
+            query.fromLocalDatastore();
+        }
         if (makes != null && makes.size() > 0) {
             query.whereContainedIn("make", makes);
         }
@@ -150,7 +154,9 @@ public class MasterActivity extends AppCompatActivity
         if (transTypes != null && transTypes.size() > 0) {
             query.whereContainedIn("transType", transTypes);
         }
-        return query.find();
+        List<ParseObject> carList = query.find();
+        ParseObject.pinAllInBackground(carList);
+        return carList;
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
@@ -170,6 +176,7 @@ public class MasterActivity extends AppCompatActivity
         mInitialStart = false;
         mMakesUpdated = false;
         mModelsUpdated = false;
+        mForceNetwork = false;
     }
 
     @Override
@@ -210,6 +217,7 @@ public class MasterActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             MasterActivity a = (MasterActivity) MasterActivity.getContext();
+            a.mForceNetwork = true;
             a.refreshCarList();
         }
     }
