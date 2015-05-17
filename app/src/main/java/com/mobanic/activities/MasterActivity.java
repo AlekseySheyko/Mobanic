@@ -22,6 +22,7 @@ import com.mobanic.model.CarParsed;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -106,17 +107,14 @@ public class MasterActivity extends AppCompatActivity
     }
 
     public void refreshCarList() {
-        try {
-            mCarsAdapter.clear();
-            mCarsAdapter.addAll(executeQueryForClass(CarMobanic.class));
-            mCarsAdapter.addAll(executeQueryForClass(CarParsed.class));
-            updateSearchPanel(mCarsAdapter.getItems());
-        } catch (ParseException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        mCarsAdapter.clear();
+        executeQueryForClass(CarMobanic.class);
+        executeQueryForClass(CarParsed.class);
     }
 
-    public List<ParseObject> executeQueryForClass(Class parseClass) throws ParseException {
+    private int mQueryCounter;
+
+    public void executeQueryForClass(final Class parseClass) {
         Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         Set<String> models = mSharedPrefs.getStringSet("Model", null);
         Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
@@ -154,9 +152,28 @@ public class MasterActivity extends AppCompatActivity
         if (transTypes != null && transTypes.size() > 0) {
             query.whereContainedIn("transType", transTypes);
         }
-        List<ParseObject> carList = query.find();
-        ParseObject.pinAllInBackground(carList);
-        return carList;
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> carList, ParseException e) {
+                if (e == null) {
+                    ParseObject.pinAllInBackground(carList);
+                    mCarsAdapter.addAll(carList);
+                    mQueryCounter++;
+                    if (mQueryCounter == 1) {
+                        findViewById(R.id.spinner).setVisibility(View.GONE);
+                    } else if (mQueryCounter == 2) {
+                        updateSearchPanel(mCarsAdapter.getItems());
+                        mQueryCounter = 0;
+                    }
+                    if (parseClass.getSimpleName().equals("CarMobanic") && carList.size() == 0) {
+                        mForceNetwork = true;
+                        refreshCarList();
+                    }
+                } else {
+                    Toast.makeText(MasterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
