@@ -165,6 +165,7 @@ public class MasterActivity extends AppCompatActivity
                 if (e == null) {
                     ParseObject.pinAllInBackground(carList);
                     mCarsAdapter.addAll(carList);
+                    // TODO Sort all items in adapter
                     mQueryCounter++;
                     if (mQueryCounter == 2) { // last query was executed
                         findViewById(R.id.spinner).setVisibility(View.GONE);
