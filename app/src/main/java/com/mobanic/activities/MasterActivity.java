@@ -19,6 +19,7 @@ import com.mobanic.R;
 import com.mobanic.adapters.CarsAdapter;
 import com.mobanic.model.CarMobanic;
 import com.mobanic.model.CarParsed;
+import com.mobanic.tasks.FetchCarsTask;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
@@ -159,15 +160,18 @@ public class MasterActivity extends AppCompatActivity
                     ParseObject.pinAllInBackground(carList);
                     mCarsAdapter.addAll(carList);
                     mQueryCounter++;
-                    if (mQueryCounter == 1) {
+                    if (mQueryCounter == 2) { // last query was executed
                         findViewById(R.id.spinner).setVisibility(View.GONE);
-                    } else if (mQueryCounter == 2) {
                         updateSearchPanel(mCarsAdapter.getItems());
                         mQueryCounter = 0;
                     }
-                    if (parseClass.getSimpleName().equals("CarMobanic") && carList.size() == 0) {
-                        mForceNetwork = true;
-                        refreshCarList();
+                    if (carList.size() == 0) {
+                        if (parseClass.getSimpleName().equals("CarMobanic")) {
+                            mForceNetwork = true;
+                            refreshCarList();
+                        } else if (parseClass.getSimpleName().equals("CarParsed")) {
+                            new FetchCarsTask().execute();
+                        }
                     }
                 } else {
                     Toast.makeText(MasterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
