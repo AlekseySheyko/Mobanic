@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -171,11 +172,14 @@ public class MasterActivity extends AppCompatActivity
                         mQueryCounter = 0;
                     }
                     if (carList.size() == 0) {
-                        if (parseClass.getSimpleName().equals("CarMobanic")) {
+                        // TODO Update search panel on initial launch
+                        if (parseClass.getSimpleName().equals("CarMobanic") && mInitialStart) {
                             mForceNetwork = true;
                             refreshCarList();
+                            Log.d("MasterActivity", "Rfrsh cz Mobanic");
                         } else if (parseClass.getSimpleName().equals("CarParsed")) {
                             new FetchCarsTask().execute();
+                            Log.d("MasterActivity", "Rfrsh cz Cahn");
                         }
                     }
                 } else {
