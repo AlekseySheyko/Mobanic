@@ -26,6 +26,7 @@ import com.mobanic.tasks.FetchCarsTask;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -161,28 +162,35 @@ public class MasterActivity extends AppCompatActivity
         }
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> carList, ParseException e) {
+            public void done(final List<ParseObject> carList, ParseException e) {
                 if (e == null) {
-                    ParseObject.pinAllInBackground(carList);
-                    mCarsAdapter.addAll(carList);
-                    // TODO Sort all items in adapter
-                    mQueryCounter++;
-                    if (mQueryCounter == 2) { // last query was executed
-                        findViewById(R.id.spinner).setVisibility(View.GONE);
-                        updateSearchPanel(mCarsAdapter.getItems());
-                        mQueryCounter = 0;
-                    }
-                    if (carList.size() == 0) {
-                        // TODO Update search panel on initial launch
-                        if (parseClass.getSimpleName().equals("CarMobanic") && mInitialStart) {
-                            mForceNetwork = true;
-                            refreshCarList();
-                            Log.d("MasterActivity", "Rfrsh cz Mobanic");
-                        } else if (parseClass.getSimpleName().equals("CarParsed")) {
-                            new FetchCarsTask().execute();
-                            Log.d("MasterActivity", "Rfrsh cz Cahn");
+                    ParseObject.unpinAllInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                ParseObject.pinAllInBackground(carList);
+                                mCarsAdapter.addAll(carList);
+                                // TODO Sort all items in adapter
+                                mQueryCounter++;
+                                if (mQueryCounter == 2) { // last query was executed
+                                    findViewById(R.id.spinner).setVisibility(View.GONE);
+                                    updateSearchPanel(mCarsAdapter.getItems());
+                                    mQueryCounter = 0;
+                                }
+                                if (carList.size() == 0) {
+                                    // TODO Update search panel on initial launch
+                                    if (parseClass.getSimpleName().equals("CarMobanic") && mInitialStart) {
+                                        mForceNetwork = true;
+                                        refreshCarList();
+                                        Log.d("MasterActivity", "Rfrsh cz Mobanic");
+                                    } else if (parseClass.getSimpleName().equals("CarParsed")) {
+                                        new FetchCarsTask().execute();
+                                        Log.d("MasterActivity", "Rfrsh cz Cahn");
+                                    }
+                                }
+                            }
                         }
-                    }
+                    });
                 } else {
                     Toast.makeText(MasterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                 }
