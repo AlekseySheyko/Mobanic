@@ -4,15 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -20,11 +17,12 @@ import android.widget.Toast;
 
 import com.mobanic.R;
 import com.mobanic.adapters.CarsAdapter;
-import com.mobanic.model.CarParsed;
 import com.mobanic.model.CarMobanic;
+import com.mobanic.model.CarParsed;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -48,11 +46,8 @@ public class MasterActivity extends AppCompatActivity
         setupActionBar(); // adds button to open search
 
 
-        mCarsAdapter = new CarsAdapter(this,
-                getQuery(CarMobanic.class),
-                getQuery(CarParsed.class));
+        mCarsAdapter = new CarsAdapter(this);
 
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         ListView lv = (ListView) findViewById(R.id.cars_listview);
         lv.setAdapter(mCarsAdapter);
         lv.setEmptyView(findViewById(R.id.error));
@@ -84,17 +79,14 @@ public class MasterActivity extends AppCompatActivity
                 mSharedPrefs.edit()
                         .putInt("minPrice", minPrice)
                         .putInt("maxPrice", maxPrice).apply();
-                mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
+                refreshCarList();
             }
         });
 
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sContext = this;
-    }
 
-    public void updateSearch(List<ParseObject> carList) {
-        updateSearchPanel(carList);
-        mMakesUpdated = false;
-        mModelsUpdated = false;
+        refreshCarList();
     }
 
     private void setupActionBar() {
@@ -112,7 +104,18 @@ public class MasterActivity extends AppCompatActivity
         toggle.syncState();
     }
 
-    public ParseQuery<ParseObject> getQuery(Class parseClass) {
+    public void refreshCarList() {
+        try {
+            mCarsAdapter.clear();
+            mCarsAdapter.addAll(executeQueryForClass(CarMobanic.class));
+            mCarsAdapter.addAll(executeQueryForClass(CarParsed.class));
+            updateSearchPanel(mCarsAdapter.getItems());
+        } catch (ParseException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public List<ParseObject> executeQueryForClass(Class parseClass) throws ParseException {
         Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         Set<String> models = mSharedPrefs.getStringSet("Model", null);
         Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
@@ -123,11 +126,6 @@ public class MasterActivity extends AppCompatActivity
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
-        query.orderByDescending("createdAt");
-        if (parseClass.equals(CarParsed.class)) {
-            query.fromLocalDatastore();
-        }
-
         if (makes != null && makes.size() > 0) {
             query.whereContainedIn("make", makes);
         }
@@ -152,7 +150,7 @@ public class MasterActivity extends AppCompatActivity
         if (transTypes != null && transTypes.size() > 0) {
             query.whereContainedIn("transType", transTypes);
         }
-        return query;
+        return query.find();
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
@@ -170,41 +168,35 @@ public class MasterActivity extends AppCompatActivity
             ((SpinnerMultiple) findViewById(R.id.fuel_spinner)).setItems(carList);
         }
         mInitialStart = false;
+        mMakesUpdated = false;
+        mModelsUpdated = false;
     }
 
     @Override
     public void onFilterSet(String key, Set<String> values) {
         if (key.equals("Make")) {
             mMakesUpdated = true;
-            mSharedPrefs.edit().clear().apply();
+            mSharedPrefs.edit().clear();
         } else if (key.equals("Model")) {
-            Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-            mSharedPrefs.edit()
-                    .clear()
-                    .putStringSet("Make", makes)
-                    .apply();
             mModelsUpdated = true;
+            Set<String> makes = mSharedPrefs.getStringSet("Make", null);
+            mSharedPrefs.edit().clear();
+            mSharedPrefs.edit().putStringSet("Make", makes);
         }
         mSharedPrefs.edit().putStringSet(key, values).apply();
-        mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
+        refreshCarList();
     }
 
     @Override
     public void onAgeSelected(int maxAge) {
         mSharedPrefs.edit().putInt("maxAge", maxAge).apply();
-        mCarsAdapter.loadCars(getQuery(CarMobanic.class), getQuery(CarParsed.class));
+        refreshCarList();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mSharedPrefs.edit().clear().apply();
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 
     private static Context sContext;
@@ -215,18 +207,10 @@ public class MasterActivity extends AppCompatActivity
 
     public static class PushReceiver extends BroadcastReceiver {
 
-        private static final String TAG = PushReceiver.class.getSimpleName();
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Receive update");
-            try {
-                MasterActivity a = (MasterActivity) MasterActivity.getContext();
-//                a.mForcedNetwork = true;
-                a.mCarsAdapter.loadCars(a.getQuery(CarMobanic.class), a.getQuery(CarParsed.class));
-            } catch (NullPointerException e) {
-                Log.w(TAG, "Can't get activity context to update content");
-            }
+            MasterActivity a = (MasterActivity) MasterActivity.getContext();
+            a.refreshCarList();
         }
     }
 }

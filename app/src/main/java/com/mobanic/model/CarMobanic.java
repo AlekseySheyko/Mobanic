@@ -6,7 +6,7 @@ import com.parse.ParseObject;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-@ParseClassName("CarMobanic")
+@ParseClassName("Car")
 public class CarMobanic extends ParseObject {
 
     public CarMobanic() {

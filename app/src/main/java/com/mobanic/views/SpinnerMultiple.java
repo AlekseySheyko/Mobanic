@@ -60,8 +60,13 @@ public class SpinnerMultiple extends Spinner implements OnMultiChoiceClickListen
     public void setItems(List<ParseObject> carList) {
         mChoices = new TreeSet<>();
         for (ParseObject car : carList) {
-            mChoices.add(car.getString(mSearchKey.toLowerCase().replace("colour", "color")
-                    .replace("fuel type", "fuelType").replace("transmission", "transType")));
+            String key = mSearchKey.toLowerCase()
+                    .replace("colour", "color")
+                    .replace("fuel type", "fuelType");
+            if (car.getClassName().equals("CarParsed")) {
+                key = key.replace("transmission", "transType");
+            }
+            mChoices.add(car.getString(key));
         }
         mCheckboxes = new boolean[mChoices.size()];
 
