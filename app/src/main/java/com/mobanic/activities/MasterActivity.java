@@ -127,6 +127,7 @@ public class MasterActivity extends AppCompatActivity
                 }
                 if (getCarsForClass(CarParsed.class).size() == 0) {
                     new FetchCarsTask().execute();
+                    return null;
                 }
                 carList.addAll(getCarsForClass(CarMobanic.class));
                 carList.addAll(getCarsForClass(CarParsed.class));
@@ -141,9 +142,11 @@ public class MasterActivity extends AppCompatActivity
             if (carList != null) {
                 mCarsAdapter.clear();
                 mCarsAdapter.addAll(carList);
-//                mCarsAdapter.sort(mComparator);
+                mCarsAdapter.sort(mComparator);
                 updateSearchPanel(carList);
                 mInitialStart = false;
+            } else {
+                mInitialStart = true;
             }
             findViewById(R.id.spinner).setVisibility(View.GONE);
         }
