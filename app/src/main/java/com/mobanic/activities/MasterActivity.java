@@ -26,7 +26,6 @@ import com.mobanic.tasks.FetchCarsTask;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -38,9 +37,10 @@ import java.util.Set;
 public class MasterActivity extends AppCompatActivity
         implements SpinnerSingle.ChoiceListener, SpinnerMultiple.ChoiceListener {
 
+    private static final String TAG = MasterActivity.class.getSimpleName();
     public CarsAdapter mCarsAdapter;
     private SharedPreferences mSharedPrefs;
-    private boolean mInitialStart = true;
+    public boolean initialStart = true;
     private boolean mMakesUpdated;
     private boolean mModelsUpdated;
     private boolean mForceNetwork;
@@ -164,55 +164,45 @@ public class MasterActivity extends AppCompatActivity
             @Override
             public void done(final List<ParseObject> carList, ParseException e) {
                 if (e == null) {
-                    ParseObject.unpinAllInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                ParseObject.pinAllInBackground(carList);
-                                mCarsAdapter.addAll(carList);
-                                // TODO Sort all items in adapter
-                                mQueryCounter++;
-                                if (mQueryCounter == 2) { // last query was executed
-                                    findViewById(R.id.spinner).setVisibility(View.GONE);
-                                    updateSearchPanel(mCarsAdapter.getItems());
-                                    mQueryCounter = 0;
-                                }
-                                if (carList.size() == 0) {
-                                    // TODO Update search panel on initial launch
-                                    if (parseClass.getSimpleName().equals("CarMobanic") && mInitialStart) {
-                                        mForceNetwork = true;
-                                        refreshCarList();
-                                        Log.d("MasterActivity", "Rfrsh cz Mobanic");
-                                    } else if (parseClass.getSimpleName().equals("CarParsed")) {
-                                        new FetchCarsTask().execute();
-                                        Log.d("MasterActivity", "Rfrsh cz Cahn");
-                                    }
-                                }
-                            }
+                    ParseObject.pinAllInBackground(carList);
+                    mCarsAdapter.addAll(carList);
+                    // TODO Sort all items in adapter
+                    mQueryCounter++;
+                    if (mQueryCounter == 2) { // last query was executed
+                        findViewById(R.id.spinner).setVisibility(View.GONE);
+                        updateSearchPanel(mCarsAdapter.getItems());
+                        mQueryCounter = 0;
+                        initialStart = false;
+                    }
+                    if (carList.size() == 0 && initialStart) {
+                        if (parseClass.getSimpleName().equals("CarMobanic")) {
+                            mForceNetwork = true;
+                            refreshCarList();
+                            Log.d(TAG, "Rfrsh cz Mobanic");
+                        } else if (parseClass.getSimpleName().equals("CarParsed")) {
+                            new FetchCarsTask().execute();
+                            Log.d(TAG, "Rfrsh cz Cahn");
                         }
-                    });
-                } else {
-                    Toast.makeText(MasterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
-        if (mInitialStart) {
+        if (initialStart) {
             ((SpinnerMultiple) findViewById(R.id.make_spinner)).setItems(carList);
         }
-        if (mInitialStart || mMakesUpdated) {
+        if (initialStart || mMakesUpdated) {
             ((SpinnerMultiple) findViewById(R.id.model_spinner)).setItems(carList);
         }
-        if (mInitialStart || mMakesUpdated || mModelsUpdated) {
+        if (initialStart || mMakesUpdated || mModelsUpdated) {
             ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
             ((SpinnerSingle) findViewById(R.id.age_spinner)).setItems(carList);
             ((SpinnerMultiple) findViewById(R.id.colour_spinner)).setItems(carList);
             ((SpinnerMultiple) findViewById(R.id.trans_spinner)).setItems(carList);
             ((SpinnerMultiple) findViewById(R.id.fuel_spinner)).setItems(carList);
         }
-        mInitialStart = false;
         mMakesUpdated = false;
         mModelsUpdated = false;
     }
