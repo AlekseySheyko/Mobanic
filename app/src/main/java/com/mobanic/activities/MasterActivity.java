@@ -38,7 +38,7 @@ public class MasterActivity extends AppCompatActivity
         implements SpinnerSingle.ChoiceListener, SpinnerMultiple.ChoiceListener {
 
     private static final String TAG = MasterActivity.class.getSimpleName();
-    public CarsAdapter mCarsAdapter;
+    public CarsAdapter carsAdapter;
     private SharedPreferences mSharedPrefs;
     public boolean initialStart = true;
     private boolean mMakesUpdated;
@@ -53,15 +53,15 @@ public class MasterActivity extends AppCompatActivity
         setupActionBar(); // adds button to open search
 
 
-        mCarsAdapter = new CarsAdapter(this);
+        carsAdapter = new CarsAdapter(this);
 
         ListView lv = (ListView) findViewById(R.id.cars_listview);
-        lv.setAdapter(mCarsAdapter);
+        lv.setAdapter(carsAdapter);
         lv.setEmptyView(findViewById(R.id.error));
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                ParseObject car = mCarsAdapter.getItem(position);
+                ParseObject car = carsAdapter.getItem(position);
                 if (car.getBoolean("isSold")) {
                     Toast.makeText(MasterActivity.this, getString(R.string.sold),
                             Toast.LENGTH_SHORT).show();
@@ -112,7 +112,7 @@ public class MasterActivity extends AppCompatActivity
     }
 
     public void refreshCarList() {
-        mCarsAdapter.clear();
+        carsAdapter.clear();
         executeQueryForClass(CarMobanic.class);
         if (!mForceNetwork) {
             executeQueryForClass(CarParsed.class);
@@ -120,7 +120,7 @@ public class MasterActivity extends AppCompatActivity
         mForceNetwork = false;
     }
 
-    private int mQueryCounter;
+    public int queryCounter;
 
     public void executeQueryForClass(final Class parseClass) {
         Set<String> makes = mSharedPrefs.getStringSet("Make", null);
@@ -132,7 +132,7 @@ public class MasterActivity extends AppCompatActivity
         int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
         if (!mForceNetwork || parseClass.getSimpleName().equals("CarParsed")) {
             query.fromLocalDatastore();
         }
@@ -165,22 +165,27 @@ public class MasterActivity extends AppCompatActivity
             public void done(final List<ParseObject> carList, ParseException e) {
                 if (e == null) {
                     ParseObject.pinAllInBackground(carList);
-                    mCarsAdapter.addAll(carList);
+                    carsAdapter.addAll(carList);
                     // TODO Sort all items in adapter
-                    mQueryCounter++;
-                    if (mQueryCounter == 2) { // last query was executed
+                    queryCounter++;
+                    if (queryCounter == 2 || queryCounter == 4) { // last query was executed
                         findViewById(R.id.spinner).setVisibility(View.GONE);
-                        updateSearchPanel(mCarsAdapter.getItems());
-                        mQueryCounter = 0;
+                        updateSearchPanel(carsAdapter.getItems());
+                        Log.d(TAG, "Update search. Counter = " + queryCounter + ", size: "
+                                + carsAdapter.getItems().size());
+                        if (queryCounter == 4) {
+                            initialStart = false;
+                        }
+                        queryCounter = 0;
                     }
                     if (carList.size() == 0 && initialStart) {
                         if (parseClass.getSimpleName().equals("CarMobanic")) {
                             mForceNetwork = true;
                             refreshCarList();
-                            Log.d(TAG, "Rfrsh cz Mobanic");
+//                            Log.d(TAG, "Rfrsh cz Mobanic");
                         } else if (parseClass.getSimpleName().equals("CarParsed")) {
                             new FetchCarsTask().execute();
-                            Log.d(TAG, "Rfrsh cz Cahn");
+//                            Log.d(TAG, "Rfrsh cz Cahn");
                         }
                     }
                 }
