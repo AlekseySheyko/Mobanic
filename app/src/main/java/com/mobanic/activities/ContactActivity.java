@@ -18,11 +18,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobanic.model.CarMobanic;
 import com.mobanic.model.CarParsed;
 import com.mobanic.model.EmailClient;
 import com.mobanic.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
@@ -51,15 +53,29 @@ public class ContactActivity extends ActionBarActivity {
         String carId = getIntent().getStringExtra("car_id");
         final int carPosition = getIntent().getIntExtra("car_position", -1);
 
-        ParseQuery<CarParsed> query = ParseQuery.getQuery(CarParsed.class);
+        ParseQuery query;
+        if (carId.length() == 10) {
+            query = ParseQuery.getQuery(CarMobanic.class);
+        } else {
+            query = ParseQuery.getQuery(CarParsed.class);
+        }
         query.fromLocalDatastore();
-        query.getInBackground(carId, new GetCallback<CarParsed>() {
+        if (carId.length() == 10) {
+            query.whereEqualTo("objectId", carId);
+        } else {
+            query.whereEqualTo("id", Integer.parseInt(carId));
+        }
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(CarParsed car, ParseException e) {
-                mMake = car.getMake();
-                mModel = car.getModel();
-                mPosition = carPosition;
-                mId = car.getId();
+            public void done(ParseObject car, ParseException e) {
+                if (e == null) {
+                    mMake = car.getString("make");
+                    mModel = car.getString("model");
+                    mPosition = carPosition;
+                    mId = car.getInt("id");
+                } else {
+                    Toast.makeText(ContactActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
