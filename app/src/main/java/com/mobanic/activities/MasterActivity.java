@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,11 +26,12 @@ import com.mobanic.tasks.FetchCarsTask;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -38,12 +39,12 @@ public class MasterActivity extends AppCompatActivity
         implements SpinnerSingle.ChoiceListener, SpinnerMultiple.ChoiceListener {
 
     private static final String TAG = MasterActivity.class.getSimpleName();
-    public CarsAdapter carsAdapter;
-    private SharedPreferences mSharedPrefs;
-    public boolean initialStart = true;
+    private CarsAdapter mCarsAdapter;
+    private boolean mInitialStart = true;
     private boolean mMakesUpdated;
     private boolean mModelsUpdated;
     private boolean mForceNetwork;
+    private SharedPreferences mSharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +54,15 @@ public class MasterActivity extends AppCompatActivity
         setupActionBar(); // adds button to open search
 
 
-        carsAdapter = new CarsAdapter(this);
+        mCarsAdapter = new CarsAdapter(this);
 
         ListView lv = (ListView) findViewById(R.id.cars_listview);
-        lv.setAdapter(carsAdapter);
+        lv.setAdapter(mCarsAdapter);
         lv.setEmptyView(findViewById(R.id.error));
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                ParseObject car = carsAdapter.getItem(position);
+                ParseObject car = mCarsAdapter.getItem(position);
                 if (car.getBoolean("isSold")) {
                     Toast.makeText(MasterActivity.this, getString(R.string.sold),
                             Toast.LENGTH_SHORT).show();
@@ -96,6 +97,10 @@ public class MasterActivity extends AppCompatActivity
         refreshCarList();
     }
 
+    public void refreshCarList() {
+        new RefreshCarsTask().execute();
+    }
+
     private void setupActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,18 +116,41 @@ public class MasterActivity extends AppCompatActivity
         toggle.syncState();
     }
 
-    public void refreshCarList() {
-        carsAdapter.clear();
-        executeQueryForClass(CarMobanic.class);
-        if (!mForceNetwork) {
-            executeQueryForClass(CarParsed.class);
+    private class RefreshCarsTask extends AsyncTask<Void, Void, List<ParseObject>> {
+        @Override
+        protected List<ParseObject> doInBackground(Void... voids) {
+            try {
+                List<ParseObject> carList = new ArrayList<>();
+
+                if (getCarsForClass(CarMobanic.class).size() == 0) {
+                    mForceNetwork = true;
+                }
+                if (getCarsForClass(CarParsed.class).size() == 0) {
+                    new FetchCarsTask().execute();
+                }
+                carList.addAll(getCarsForClass(CarMobanic.class));
+                carList.addAll(getCarsForClass(CarParsed.class));
+                return carList;
+            } catch (ParseException e) {
+                return null;
+            }
         }
-        mForceNetwork = false;
+
+        @Override
+        protected void onPostExecute(List<ParseObject> carList) {
+            if (carList != null) {
+                mCarsAdapter.clear();
+                mCarsAdapter.addAll(carList);
+//                mCarsAdapter.sort(mComparator);
+                updateSearchPanel(carList);
+                mInitialStart = false;
+            }
+            findViewById(R.id.spinner).setVisibility(View.GONE);
+        }
     }
 
-    public int queryCounter;
-
-    public void executeQueryForClass(final Class parseClass) {
+    @SuppressWarnings("unchecked")
+    public List<ParseObject> getCarsForClass(Class parseClass) throws ParseException {
         Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         Set<String> models = mSharedPrefs.getStringSet("Model", null);
         Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
@@ -132,7 +160,7 @@ public class MasterActivity extends AppCompatActivity
         int maxPrice = mSharedPrefs.getInt("maxPrice", -1);
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
         if (!mForceNetwork || parseClass.getSimpleName().equals("CarParsed")) {
             query.fromLocalDatastore();
         }
@@ -160,47 +188,17 @@ public class MasterActivity extends AppCompatActivity
         if (transTypes != null && transTypes.size() > 0) {
             query.whereContainedIn("transType", transTypes);
         }
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(final List<ParseObject> carList, ParseException e) {
-                if (e == null) {
-                    ParseObject.pinAllInBackground(carList);
-                    carsAdapter.addAll(carList);
-                    // TODO Sort all items in adapter
-                    queryCounter++;
-                    if (queryCounter == 2 || queryCounter == 4) { // last query was executed
-                        findViewById(R.id.spinner).setVisibility(View.GONE);
-                        updateSearchPanel(carsAdapter.getItems());
-                        Log.d(TAG, "Update search. Counter = " + queryCounter + ", size: "
-                                + carsAdapter.getItems().size());
-                        if (queryCounter == 4) {
-                            initialStart = false;
-                        }
-                        queryCounter = 0;
-                    }
-                    if (carList.size() == 0 && initialStart) {
-                        if (parseClass.getSimpleName().equals("CarMobanic")) {
-                            mForceNetwork = true;
-                            refreshCarList();
-//                            Log.d(TAG, "Rfrsh cz Mobanic");
-                        } else if (parseClass.getSimpleName().equals("CarParsed")) {
-                            new FetchCarsTask().execute();
-//                            Log.d(TAG, "Rfrsh cz Cahn");
-                        }
-                    }
-                }
-            }
-        });
+        return query.find();
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
-        if (initialStart) {
+        if (mInitialStart) {
             ((SpinnerMultiple) findViewById(R.id.make_spinner)).setItems(carList);
         }
-        if (initialStart || mMakesUpdated) {
+        if (mInitialStart || mMakesUpdated) {
             ((SpinnerMultiple) findViewById(R.id.model_spinner)).setItems(carList);
         }
-        if (initialStart || mMakesUpdated || mModelsUpdated) {
+        if (mInitialStart || mMakesUpdated || mModelsUpdated) {
             ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
             ((SpinnerSingle) findViewById(R.id.age_spinner)).setItems(carList);
             ((SpinnerMultiple) findViewById(R.id.colour_spinner)).setItems(carList);
@@ -209,10 +207,12 @@ public class MasterActivity extends AppCompatActivity
         }
         mMakesUpdated = false;
         mModelsUpdated = false;
+        mForceNetwork = false;
     }
 
     @Override
     public void onFilterSet(String key, Set<String> values) {
+        // TODO: Reset all spinner when model set (now do not refreshes while setting Kia)
         if (key.equals("Make")) {
             mMakesUpdated = true;
             mSharedPrefs.edit().clear();
@@ -243,6 +243,21 @@ public class MasterActivity extends AppCompatActivity
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
+
+    private Comparator<ParseObject> mComparator = new Comparator<ParseObject>() {
+        @Override
+        public int compare(ParseObject parseObject, ParseObject t1) {
+            String make1 = parseObject.getString("make");
+            String make2 = t1.getString("make");
+            String model1 = parseObject.getString("model");
+            String model2 = t1.getString("model");
+            if (make1.compareTo(make2) != 0) {
+                return make1.compareTo(make2);
+            } else {
+                return model1.compareTo(model2);
+            }
+        }
+    };
 
     private static Context sContext;
 
