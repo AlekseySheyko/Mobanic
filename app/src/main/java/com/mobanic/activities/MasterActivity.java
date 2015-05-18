@@ -215,15 +215,14 @@ public class MasterActivity extends AppCompatActivity
 
     @Override
     public void onFilterSet(String key, Set<String> values) {
-        // TODO: Reset all spinner when model set (now do not refreshes while setting Kia)
         if (key.equals("Make")) {
             mMakesUpdated = true;
-            mSharedPrefs.edit().clear();
+            mSharedPrefs.edit().clear().apply();
         } else if (key.equals("Model")) {
             mModelsUpdated = true;
             Set<String> makes = mSharedPrefs.getStringSet("Make", null);
-            mSharedPrefs.edit().clear();
-            mSharedPrefs.edit().putStringSet("Make", makes);
+            mSharedPrefs.edit().clear().apply();
+            mSharedPrefs.edit().putStringSet("Make", makes).apply();
         }
         mSharedPrefs.edit().putStringSet(key, values).apply();
         refreshCarList();
