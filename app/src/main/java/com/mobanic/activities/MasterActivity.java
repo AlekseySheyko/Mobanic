@@ -122,10 +122,10 @@ public class MasterActivity extends AppCompatActivity
             try {
                 List<ParseObject> carList = new ArrayList<>();
 
-                if (getCarsForClass(CarMobanic.class).size() == 0) {
+                if (getCarsForClass(CarMobanic.class).size() == 0 && mInitialStart) {
                     mForceNetwork = true;
                 }
-                if (getCarsForClass(CarParsed.class).size() == 0) {
+                if (getCarsForClass(CarParsed.class).size() == 0 && mInitialStart) {
                     new FetchCarsTask().execute();
                     return null;
                 }
@@ -145,10 +145,10 @@ public class MasterActivity extends AppCompatActivity
                 mCarsAdapter.sort(mComparator);
                 updateSearchPanel(carList);
                 mInitialStart = false;
+                findViewById(R.id.spinner).setVisibility(View.GONE);
             } else {
                 mInitialStart = true;
             }
-            findViewById(R.id.spinner).setVisibility(View.GONE);
         }
     }
 
