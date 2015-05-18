@@ -78,11 +78,9 @@ public class FetchCarsTask extends AsyncTask<Void, Void, List<CarParsed>> {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        // TODO: Force addAll, sort, initialStart = true inside native refreshCarList method
                         MasterActivity a = (MasterActivity) MasterActivity.getContext();
-                        a.mCarsAdapter.addAll(carList);
-                        a.initialStart = true;
-                        a.updateSearchPanel(a.mCarsAdapter.getItems());
+                        a.refreshCarList();
+                        a.initialStart = false;
                     }
                 }
             });

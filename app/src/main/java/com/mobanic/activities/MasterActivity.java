@@ -172,7 +172,6 @@ public class MasterActivity extends AppCompatActivity
                         findViewById(R.id.spinner).setVisibility(View.GONE);
                         updateSearchPanel(mCarsAdapter.getItems());
                         mQueryCounter = 0;
-                        initialStart = false;
                     }
                     if (carList.size() == 0 && initialStart) {
                         if (parseClass.getSimpleName().equals("CarMobanic")) {
