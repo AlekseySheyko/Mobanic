@@ -79,6 +79,7 @@ public class FetchCarsTask extends AsyncTask<Void, Void, List<CarParsed>> {
                 public void done(ParseException e) {
                     if (e == null) {
                         MasterActivity a = (MasterActivity) MasterActivity.getContext();
+                        a.initialStart = true;
                         a.refreshCarList();
                     }
                 }

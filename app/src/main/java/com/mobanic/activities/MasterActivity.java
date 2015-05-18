@@ -40,7 +40,7 @@ public class MasterActivity extends AppCompatActivity
 
     private static final String TAG = MasterActivity.class.getSimpleName();
     private CarsAdapter mCarsAdapter;
-    private boolean mInitialStart = true;
+    public boolean initialStart = true;
     private boolean mMakesUpdated;
     private boolean mModelsUpdated;
     private boolean mForceNetwork;
@@ -120,17 +120,18 @@ public class MasterActivity extends AppCompatActivity
         @Override
         protected List<ParseObject> doInBackground(Void... voids) {
             try {
+                if (initialStart) {
+                    if (executeQueryForClass(CarMobanic.class).size() == 0) {
+                        mForceNetwork = true;
+                    }
+                    if (executeQueryForClass(CarParsed.class).size() == 0) {
+                        new FetchCarsTask().execute();
+                        return null;
+                    }
+                }
                 List<ParseObject> carList = new ArrayList<>();
-
-                if (getCarsForClass(CarMobanic.class).size() == 0 && mInitialStart) {
-                    mForceNetwork = true;
-                }
-                if (getCarsForClass(CarParsed.class).size() == 0 && mInitialStart) {
-                    new FetchCarsTask().execute();
-                    return null;
-                }
-                carList.addAll(getCarsForClass(CarMobanic.class));
-                carList.addAll(getCarsForClass(CarParsed.class));
+                carList.addAll(executeQueryForClass(CarMobanic.class));
+                carList.addAll(executeQueryForClass(CarParsed.class));
                 return carList;
             } catch (ParseException e) {
                 return null;
@@ -140,20 +141,19 @@ public class MasterActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(List<ParseObject> carList) {
             if (carList != null) {
+                ParseObject.pinAllInBackground(carList);
                 mCarsAdapter.clear();
                 mCarsAdapter.addAll(carList);
                 mCarsAdapter.sort(mComparator);
                 updateSearchPanel(carList);
-                mInitialStart = false;
+                initialStart = false;
                 findViewById(R.id.spinner).setVisibility(View.GONE);
-            } else {
-                mInitialStart = true;
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<ParseObject> getCarsForClass(Class parseClass) throws ParseException {
+    public List<ParseObject> executeQueryForClass(Class parseClass) throws ParseException {
         Set<String> makes = mSharedPrefs.getStringSet("Make", null);
         Set<String> models = mSharedPrefs.getStringSet("Model", null);
         Set<String> colors = mSharedPrefs.getStringSet("Colour", null);
@@ -195,13 +195,13 @@ public class MasterActivity extends AppCompatActivity
     }
 
     public void updateSearchPanel(List<ParseObject> carList) {
-        if (mInitialStart) {
+        if (initialStart) {
             ((SpinnerMultiple) findViewById(R.id.make_spinner)).setItems(carList);
         }
-        if (mInitialStart || mMakesUpdated) {
+        if (initialStart || mMakesUpdated) {
             ((SpinnerMultiple) findViewById(R.id.model_spinner)).setItems(carList);
         }
-        if (mInitialStart || mMakesUpdated || mModelsUpdated) {
+        if (initialStart || mMakesUpdated || mModelsUpdated) {
             ((PriceSeekBar) findViewById(R.id.price_seekbar)).setItems(carList);
             ((SpinnerSingle) findViewById(R.id.age_spinner)).setItems(carList);
             ((SpinnerMultiple) findViewById(R.id.colour_spinner)).setItems(carList);
