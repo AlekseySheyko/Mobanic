@@ -51,6 +51,9 @@ public class MasterActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TODO Remove
+        new FetchCarsTask().execute();
+
         setupActionBar(); // adds button to open search
 
 

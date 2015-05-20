@@ -10,18 +10,16 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobanic.R;
 import com.mobanic.model.CarMobanic;
 import com.mobanic.model.CarParsed;
 import com.mobanic.model.EmailClient;
-import com.mobanic.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -36,7 +34,7 @@ public class ContactActivity extends ActionBarActivity {
     private EditText mEmailEditText;
     private EditText mPhoneEditText;
     private EditText mMessageEditText;
-    protected Spinner mSubjectSpinner;
+//    protected Spinner mSubjectSpinner;
 
     private SharedPreferences mSharedPrefs;
 
@@ -85,19 +83,19 @@ public class ContactActivity extends ActionBarActivity {
         mEmailEditText = (EditText) findViewById(R.id.email);
         mPhoneEditText = (EditText) findViewById(R.id.phone);
         mMessageEditText = (EditText) findViewById(R.id.message);
-        mSubjectSpinner = (Spinner) findViewById(R.id.subject);
+//        mSubjectSpinner = (Spinner) findViewById(R.id.subject);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.subjects, android.R.layout.simple_list_item_1);
-        mSubjectSpinner.setAdapter(adapter);
+//        mSubjectSpinner.setAdapter(adapter);
 
-        View spinnerIcon = findViewById(R.id.spinner_icon);
-        spinnerIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSubjectSpinner.performClick();
-            }
-        });
+//        View spinnerIcon = findViewById(R.id.spinner_icon);
+//        spinnerIcon.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mSubjectSpinner.performClick();
+//            }
+//        });
 
         mMessageEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -128,7 +126,8 @@ public class ContactActivity extends ActionBarActivity {
                     + "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=" + mId;
         }
 
-        String subject = mSubjectSpinner.getSelectedItem().toString();
+//        String subject = mSubjectSpinner.getSelectedItem().toString();
+        String subject = "General enquiry";
 
         if (name.isEmpty()) {
             showError(mNameEditText);

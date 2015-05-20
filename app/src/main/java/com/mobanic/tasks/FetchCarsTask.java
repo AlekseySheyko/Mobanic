@@ -24,10 +24,11 @@ public class FetchCarsTask extends AsyncTask<Void, Void, List<CarParsed>> {
 
     @Override
     protected List<CarParsed> doInBackground(Void... voids) {
-        List<CarParsed> carList = null;
+        List<CarParsed> carList;
         try {
             carList = new ArrayList<>();
 
+            // TODO Get request takes too much time (~5 sec) to load
             Document doc = Jsoup.connect(BASE_URL).timeout(15 * 1000).get();
             Elements cards = doc.select("#ajax-content-container .centre")
                     .not(".midGreyText");
