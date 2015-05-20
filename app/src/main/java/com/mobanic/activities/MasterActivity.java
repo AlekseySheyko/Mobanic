@@ -22,7 +22,6 @@ import com.mobanic.R;
 import com.mobanic.adapters.CarsAdapter;
 import com.mobanic.model.CarMobanic;
 import com.mobanic.model.CarParsed;
-import com.mobanic.tasks.FetchCarsTask;
 import com.mobanic.views.PriceSeekBar;
 import com.mobanic.views.SpinnerMultiple;
 import com.mobanic.views.SpinnerSingle;
@@ -50,9 +49,6 @@ public class MasterActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // TODO Remove
-        new FetchCarsTask().execute();
 
         setupActionBar(); // adds button to open search
 
@@ -124,12 +120,9 @@ public class MasterActivity extends AppCompatActivity
         protected List<ParseObject> doInBackground(Void... voids) {
             try {
                 if (initialStart) {
-                    if (executeQueryForClass(CarMobanic.class).size() == 0) {
+                    if (executeQueryForClass(CarMobanic.class).size() == 0
+                            || executeQueryForClass(CarParsed.class).size() == 0) {
                         mForceNetwork = true;
-                    }
-                    if (executeQueryForClass(CarParsed.class).size() == 0) {
-                        new FetchCarsTask().execute();
-                        return null;
                     }
                 }
                 List<ParseObject> carList = new ArrayList<>();
@@ -167,7 +160,7 @@ public class MasterActivity extends AppCompatActivity
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
-        if (!mForceNetwork || parseClass.getSimpleName().equals("CarParsed")) {
+        if (!isOnline()) {
             query.fromLocalDatastore();
         }
         if (makes != null && makes.size() > 0) {
