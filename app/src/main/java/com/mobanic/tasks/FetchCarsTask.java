@@ -59,7 +59,6 @@ public class FetchCarsTask extends AsyncTask<Void, Void, List<CarParsed>> {
                 int id = Integer.parseInt(
                         href.substring(href.indexOf("?i=") + 3, href.indexOf("&css")));
 
-                // TODO Why last two cars wasn't added
                 CarParsed car = new CarParsed(
                         id, modelAndMake, year, imageId, price, color, mileage, fuelAndTrans, location, isLeftHanded);
                 carList.add(car);

@@ -139,7 +139,13 @@ public class MasterActivity extends AppCompatActivity
             if (carList != null) {
                 ParseObject.pinAllInBackground(carList);
                 mCarsAdapter.clear();
-                mCarsAdapter.addAll(carList);
+                for (int i = 0; i < 100; i++) {
+                    try {
+                        mCarsAdapter.add(carList.get(i));
+                    } catch (IndexOutOfBoundsException e) {
+                        break;
+                    }
+                }
                 mCarsAdapter.sort(mComparator);
                 updateSearchPanel(carList);
                 initialStart = false;
@@ -160,7 +166,8 @@ public class MasterActivity extends AppCompatActivity
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
-        if (!isOnline()) {
+        query.setLimit(300);
+        if (!(mForceNetwork || (initialStart && isWifi()))) {
             query.fromLocalDatastore();
         }
         if (makes != null && makes.size() > 0) {
@@ -240,6 +247,14 @@ public class MasterActivity extends AppCompatActivity
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    private boolean isWifi() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo wimax = cm.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
+        return (wifi != null && wifi.isConnected())
+                || (wimax != null && wimax.isConnected());
     }
 
     private Comparator<ParseObject> mComparator = new Comparator<ParseObject>() {
