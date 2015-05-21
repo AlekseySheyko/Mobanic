@@ -119,7 +119,7 @@ public class MasterActivity extends AppCompatActivity
         @Override
         protected List<ParseObject> doInBackground(Void... voids) {
             try {
-                if (initialStart && isOnline()) {
+                if (initialStart) {
                     if (executeQueryForClass(CarMobanic.class).size() == 0
                             || executeQueryForClass(CarParsed.class).size() == 0) {
                         mForceNetwork = true;

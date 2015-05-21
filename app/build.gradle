@@ -42,8 +42,8 @@ buildscript {
 }
 
 parse {
-    applicationId "CA2CrEP0v1V4NgRciMU0nh9gJiJLgGHgeq7PWiRT"
-    masterKey "idevqgr6QiHtdIFIjd2pitlrOq98SbH4MtkQgZ55"
+    applicationId "asQfJUeEXdJnbfvG2iefkvjhVpcmIq2GnOp5x5P2"
+    masterKey "f6d4Oc0w9RfHUdppa0ZKKWardqRxDEoRTshjzJWG"
     // This makes it automatic. Otherwise you would have to run e.g. gradlew parseUploadSymbolsRelease.
     uploadSymbols true
 }
