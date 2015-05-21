@@ -3,7 +3,6 @@ package com.mobanic.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,14 +23,15 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.mobanic.R;
-import com.mobanic.model.CarParsed;
 import com.mobanic.model.CarMobanic;
+import com.mobanic.model.CarParsed;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -101,8 +101,8 @@ public class DetailActivity extends AppCompatActivity {
             query = ParseQuery.getQuery(CarMobanic.class);
         } else {
             query = ParseQuery.getQuery(CarParsed.class);
-            query.fromLocalDatastore();
         }
+        query.fromLocalDatastore();
         if (mCarId.length() == 10) {
             query.whereEqualTo("objectId", mCarId);
         } else {
@@ -154,7 +154,7 @@ public class DetailActivity extends AppCompatActivity {
                 populateGalleryList();
 
                 String url = car.getString("coverImage");
-                if (url == null) {
+                if (url == null && car.getParseFile("coverImage") != null) {
                     url = car.getParseFile("coverImage").getUrl();
                 }
                 new SetShareIntentTask().execute(title, url);
@@ -198,7 +198,9 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         if (mCarId.length() < 10) {
-            new DownloadSpecsTask().execute();
+            setGalleryImages();
+            fillOutSpecs();
+            fillOutFeatures();
         }
     }
 
@@ -319,7 +321,9 @@ public class DetailActivity extends AppCompatActivity {
                 for (Element feature : features) {
                     mFeatureList.add(feature.text());
                 }
-                mFeatureList.remove(mFeatureList.size() - 1);
+                if (mFeatureList.size() > 0) {
+                    mFeatureList.remove(mFeatureList.size() - 1);
+                }
 
                 Elements specs = doc.select(".fivecol");
                 String mileage = specs.get(4).text().substring(2);
@@ -339,14 +343,21 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
                 mCar.put("mileage",
-                        NumberFormat.getNumberInstance(Locale.UK).format(Integer.parseInt(mileage.replaceAll(",", "").trim())));
+                        Integer.parseInt(mileage.replaceAll(",", "").trim()));
                 mCar.put("previousOwners", prevOwners);
                 mCar.put("engine", engine);
                 mCar.put("galleryImages", mGalleryImageUrls);
                 mCar.put("features", mFeatureList);
-                mCar.pinInBackground();
+                mCar.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e("DetailActivity", e.getMessage());
+                        }
+                    }
+                });
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
@@ -362,11 +373,6 @@ public class DetailActivity extends AppCompatActivity {
                 setGalleryImages();
                 fillOutSpecs();
                 fillOutFeatures();
-            } else {
-                findViewById(R.id.error).setVisibility(View.VISIBLE);
-                TextView engineTextView = (TextView) findViewById(R.id.engine);
-                engineTextView.setText("Connection failed");
-                engineTextView.setTextColor(Color.parseColor("#FF9B0000"));
             }
         }
 
@@ -389,7 +395,10 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         flipper.removeAllViews();
-        for (final String url : mGalleryImageUrls) {
+
+        if (mGalleryImageUrls == null) return;
+
+        for (String url : mGalleryImageUrls) {
             RatioImageView imageView = (RatioImageView) View.inflate(
                     DetailActivity.this,
                     R.layout.gallery_image,

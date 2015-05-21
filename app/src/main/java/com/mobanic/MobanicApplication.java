@@ -19,7 +19,7 @@ public class MobanicApplication extends Application {
         ParseCrashReporting.enable(this);
         ParseObject.registerSubclass(CarMobanic.class);
         ParseObject.registerSubclass(CarParsed.class);
-        Parse.initialize(this, "asQfJUeEXdJnbfvG2iefkvjhVpcmIq2GnOp5x5P2", "rsHyNBGIAmo7eFIUfmjvAm5kOMrwlMCDz7d5El6Z");
+        Parse.initialize(this, "CA2CrEP0v1V4NgRciMU0nh9gJiJLgGHgeq7PWiRT", "u2OdF2BdvIH3uGZhM0VdN09WSLkyiUJy7B4NDhWF");
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 }
