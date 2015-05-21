@@ -3,7 +3,6 @@ package com.mobanic.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,8 +23,8 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.mobanic.R;
-import com.mobanic.model.CarParsed;
 import com.mobanic.model.CarMobanic;
+import com.mobanic.model.CarParsed;
 import com.mobanic.views.RatioImageView;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -33,11 +32,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,8 +95,8 @@ public class DetailActivity extends AppCompatActivity {
             query = ParseQuery.getQuery(CarMobanic.class);
         } else {
             query = ParseQuery.getQuery(CarParsed.class);
-            query.fromLocalDatastore();
         }
+        query.fromLocalDatastore();
         if (mCarId.length() == 10) {
             query.whereEqualTo("objectId", mCarId);
         } else {
@@ -154,7 +148,7 @@ public class DetailActivity extends AppCompatActivity {
                 populateGalleryList();
 
                 String url = car.getString("coverImage");
-                if (url == null) {
+                if (url == null && car.getParseFile("coverImage") != null) {
                     url = car.getParseFile("coverImage").getUrl();
                 }
                 new SetShareIntentTask().execute(title, url);
@@ -198,7 +192,9 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         if (mCarId.length() < 10) {
-            new DownloadSpecsTask().execute();
+            setGalleryImages();
+            fillOutSpecs();
+            fillOutFeatures();
         }
     }
 
@@ -229,7 +225,7 @@ public class DetailActivity extends AppCompatActivity {
             mShareIntent = new Intent();
             mShareIntent.setAction(Intent.ACTION_SEND);
             mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
-            mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - mobanic.com");
+            mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - https://goo.gl/P2BUBs");
             mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - mobanic.com");
             mShareIntent.putExtra(Intent.EXTRA_STREAM, mImageUri);
             mShareIntent.setType("text/plain");
@@ -287,89 +283,6 @@ public class DetailActivity extends AppCompatActivity {
                 return (true);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private class DownloadSpecsTask extends AsyncTask<Void, Void, Boolean> {
-
-        private static final String BASE_URL = "http://www.kahndesign.com/automobiles/automobiles_available_detail.php?i=";
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            String url = BASE_URL + mCarId;
-            try {
-                Document doc = Jsoup.connect(url).timeout(10 * 1000).get();
-                Elements images = doc.select("[src*=.jpg]");
-                for (Element image : images) {
-                    if (image.attr("src").contains("imgMedium")) {
-                        String imageUrl = image.attr("src")
-                                .replace("../", "https://www.kahndesign.com/")
-                                .replace("imgMedium", "imgLarge");
-                        mGalleryImageUrls.add(imageUrl);
-                    }
-                }
-                String imageUrl = mCar.getString("coverImage");
-                if (imageUrl == null) {
-                    imageUrl = mCar.getParseFile("coverImage").getUrl();
-                }
-                if (mGalleryImageUrls.size() > 0 && mGalleryImageUrls.get(0).equals(imageUrl)) {
-                    mGalleryImageUrls.remove(0);
-                }
-
-                Elements features = doc.select("#specList");
-                for (Element feature : features) {
-                    mFeatureList.add(feature.text());
-                }
-                mFeatureList.remove(mFeatureList.size() - 1);
-
-                Elements specs = doc.select(".fivecol");
-                String mileage = specs.get(4).text().substring(2);
-                int prevOwners = Integer.parseInt(specs.get(7).text().substring(2));
-                int engine;
-                try {
-                    String engineStr = specs.get(2).text();
-                    engine = Integer.parseInt(engineStr.substring(0, engineStr
-                            .toLowerCase().indexOf("cc")).substring(2).trim());
-                } catch (StringIndexOutOfBoundsException e) {
-                    String engineStr = specs.get(2).text().split(": ")[0].substring(2);
-                    if (!engineStr.contains(".")) {
-                        engine = Integer.parseInt(engineStr.trim());
-                    } else {
-                        engine = Integer.parseInt(engineStr.split("\\.")[0]) * 1000;
-                    }
-                }
-
-                mCar.put("mileage",
-                        NumberFormat.getNumberInstance(Locale.UK).format(Integer.parseInt(mileage.replaceAll(",", "").trim())));
-                mCar.put("previousOwners", prevOwners);
-                mCar.put("engine", engine);
-                mCar.put("galleryImages", mGalleryImageUrls);
-                mCar.put("features", mFeatureList);
-                mCar.pinInBackground();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
-//            findViewById(R.id.spinner).setVisibility(View.GONE);
-
-            if (success) {
-                setGalleryImages();
-                fillOutSpecs();
-                fillOutFeatures();
-            } else {
-                findViewById(R.id.error).setVisibility(View.VISIBLE);
-                TextView engineTextView = (TextView) findViewById(R.id.engine);
-                engineTextView.setText("Connection failed");
-                engineTextView.setTextColor(Color.parseColor("#FF9B0000"));
-            }
-        }
-
     }
 
     private void setGalleryImages() {
