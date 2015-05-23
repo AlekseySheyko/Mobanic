@@ -1,6 +1,7 @@
 package com.mobanic.activities;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
@@ -58,6 +59,11 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getResources().getConfiguration().orientation == 2) { // landscape
+            getSupportActionBar().hide();
+        }
+
         setContentView(R.layout.activity_detail);
 
         if (getIntent() != null) {
@@ -71,15 +77,17 @@ public class DetailActivity extends AppCompatActivity {
 
         updateCarDetails();
 
-        findViewById(R.id.fab_contact).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(DetailActivity.this, ContactActivity.class);
-                i.putExtra("car_id", mCarId);
-                i.putExtra("car_position", mCarPosition);
-                startActivity(i);
-            }
-        });
+        if (findViewById(R.id.fab_contact) != null) {
+            findViewById(R.id.fab_contact).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(DetailActivity.this, ContactActivity.class);
+                    i.putExtra("car_id", mCarId);
+                    i.putExtra("car_position", mCarPosition);
+                    startActivity(i);
+                }
+            });
+        }
     }
 
     @Override
@@ -127,6 +135,10 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 getSupportActionBar().setTitle(make);
 
+                populateGalleryList();
+
+                if (findViewById(R.id.make) == null) return;
+
                 ((TextView) findViewById(R.id.make)).setText(mCar.getString("make"));
                 ((TextView) findViewById(R.id.model)).setText(mCar.getString("model"));
                 ((TextView) findViewById(R.id.year)).setText(mCar.getInt("year") + "");
@@ -144,8 +156,6 @@ public class DetailActivity extends AppCompatActivity {
                 });
 
                 setCoverImage();
-
-                populateGalleryList();
 
                 String url = car.getString("coverImage");
                 if (url == null && car.getParseFile("coverImage") != null) {
@@ -226,7 +236,7 @@ public class DetailActivity extends AppCompatActivity {
             mShareIntent.setAction(Intent.ACTION_SEND);
             mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
             mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - https://goo.gl/P2BUBs");
-            mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - mobanic.com");
+            mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - https://goo.gl/P2BUBs");
             mShareIntent.putExtra(Intent.EXTRA_STREAM, mImageUri);
             mShareIntent.setType("text/plain");
             mShareIntent.setType("image/*");
@@ -292,14 +302,24 @@ public class DetailActivity extends AppCompatActivity {
                 android.R.anim.fade_in));
         flipper.setOutAnimation(AnimationUtils.loadAnimation(DetailActivity.this,
                 android.R.anim.fade_out));
-        flipper.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                flipper.stopFlipping();
-                flipper.showNext();
-                flipper.startFlipping();
-            }
-        });
+        if (getResources().getConfiguration().orientation == 2) { // landscape
+            flipper.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+//                    flipper.stopFlipping();
+//                    flipper.showNext();
+//                    flipper.startFlipping();
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+            });
+        } else {
+            flipper.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
+            });
+        }
 
         flipper.removeAllViews();
         for (final String url : mGalleryImageUrls) {
@@ -321,6 +341,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutSpecs() {
+        if (findViewById(R.id.mileage) == null) return;
+
         String mileage = mCar.getString("mileage");
         if (mileage == null) {
             mileage = NumberFormat.getNumberInstance(Locale.UK).format(mCar.getInt("mileage"));
@@ -351,6 +373,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void fillOutFeatures() {
+        if (findViewById(R.id.features_container) == null) return;
+
         LinearLayout featuresContainer = (LinearLayout) findViewById(R.id.features_container);
         if (mFeatureList != null) {
             for (String feature : mFeatureList) {

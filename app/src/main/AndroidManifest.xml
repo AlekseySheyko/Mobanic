@@ -43,8 +43,7 @@
         <activity
             android:name=".activities.DetailActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.MasterActivity"
-            android:screenOrientation="portrait">
+            android:parentActivityName=".activities.MasterActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MasterActivity"/>
