@@ -124,12 +124,12 @@ public class SpinnerSingle extends Spinner {
     }
 
     private void updateSelectedItems() {
-        String ageStr = mAgeList.get(mSelectedValue);
-
-        mAdapter.clear();
-        mAdapter.add(ageStr);
-
-        mListener.onAgeSelected(extractDigits(ageStr));
+        if (mSelectedValue < mAgeList.size()) {
+            String ageStr = mAgeList.get(mSelectedValue);
+            mAdapter.clear();
+            mAdapter.add(ageStr);
+            mListener.onAgeSelected(extractDigits(ageStr));
+        }
     }
 
     public interface ChoiceListener {
