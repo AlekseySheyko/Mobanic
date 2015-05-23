@@ -306,9 +306,6 @@ public class DetailActivity extends AppCompatActivity {
             flipper.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    flipper.stopFlipping();
-//                    flipper.showNext();
-//                    flipper.startFlipping();
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 }
             });

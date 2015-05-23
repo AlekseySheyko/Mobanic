@@ -182,7 +182,7 @@ public class MasterActivity extends AppCompatActivity
         if (maxPrice != -1) {
             query.whereLessThanOrEqualTo("price", maxPrice);
         }
-        if (maxAge != -1) {
+        if (maxAge != -1 && maxAge != 10) {
             query.whereGreaterThanOrEqualTo("year", (2015 - maxAge));
         }
         if (colors != null && colors.size() > 0) {
