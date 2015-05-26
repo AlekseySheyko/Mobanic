@@ -308,7 +308,7 @@ public class DetailActivity extends AppCompatActivity {
             flipper.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    flipper.showNext();
                 }
             });
         } else {
@@ -336,6 +336,19 @@ public class DetailActivity extends AppCompatActivity {
         if (mGalleryImageUrls.size() == 1) {
             flipper.setOnClickListener(null);
             flipper.stopFlipping();
+        }
+    }
+
+    public void closePreview(View view) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getResources().getConfiguration().orientation == 2) { // landscape
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            super.onBackPressed();
         }
     }
 
