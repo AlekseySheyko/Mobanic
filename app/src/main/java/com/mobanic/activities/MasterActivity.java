@@ -37,7 +37,6 @@ import java.util.Set;
 public class MasterActivity extends AppCompatActivity
         implements SpinnerSingle.ChoiceListener, SpinnerMultiple.ChoiceListener {
 
-    private static final String TAG = MasterActivity.class.getSimpleName();
     private CarsAdapter mCarsAdapter;
     public boolean initialStart = true;
     private boolean mMakesUpdated;
@@ -119,15 +118,18 @@ public class MasterActivity extends AppCompatActivity
         @Override
         protected List<ParseObject> doInBackground(Void... voids) {
             try {
-                if (initialStart && isOnline()) {
-                    if (executeQueryForClass(CarMobanic.class).size() == 0
-                            || executeQueryForClass(CarParsed.class).size() == 0) {
+                if (initialStart) {
+                    if (executeQueryForClass(CarParsed.class).size() == 0) {
                         mForceNetwork = true;
                     }
                 }
                 List<ParseObject> carList = new ArrayList<>();
                 carList.addAll(executeQueryForClass(CarMobanic.class));
                 carList.addAll(executeQueryForClass(CarParsed.class));
+                if (mForceNetwork) {
+                    ParseObject.pinAllInBackground(carList);
+                }
+                mForceNetwork = false;
                 return carList;
             } catch (ParseException e) {
                 return null;
@@ -137,7 +139,6 @@ public class MasterActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(List<ParseObject> carList) {
             if (carList != null) {
-                ParseObject.pinAllInBackground(carList);
                 mCarsAdapter.clear();
                 for (int i = 0; i < 100; i++) {
                     try {
@@ -166,8 +167,8 @@ public class MasterActivity extends AppCompatActivity
         int maxAge = mSharedPrefs.getInt("maxAge", -1);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
-        query.setLimit(300);
-        if (!(mForceNetwork || (initialStart && isWifi()))) {
+        query.setLimit(500);
+        if (!mForceNetwork) {
             query.fromLocalDatastore();
         }
         if (makes != null && makes.size() > 0) {
@@ -213,7 +214,6 @@ public class MasterActivity extends AppCompatActivity
         }
         mMakesUpdated = false;
         mModelsUpdated = false;
-        mForceNetwork = false;
     }
 
     @Override
