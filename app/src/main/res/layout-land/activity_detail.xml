@@ -21,6 +21,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0.7"
         android:layout_alignParentRight="true"
         android:padding="8dp"
         android:layout_marginRight="4dp"

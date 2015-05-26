@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -241,20 +239,6 @@ public class MasterActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mSharedPrefs.edit().clear().apply();
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
-    }
-
-    private boolean isWifi() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo wimax = cm.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
-        return (wifi != null && wifi.isConnected())
-                || (wimax != null && wimax.isConnected());
     }
 
     private Comparator<ParseObject> mComparator = new Comparator<ParseObject>() {
