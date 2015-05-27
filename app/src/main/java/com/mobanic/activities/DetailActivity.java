@@ -229,9 +229,11 @@ public class DetailActivity extends AppCompatActivity {
                 Log.e("DetailActivity", "Failed to attach image to share intent");
             }
 
-            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
-            if (imagePath != null) {
-                mImageUri = Uri.parse(imagePath);
+            if (getContentResolver() != null && bitmap != null) {
+                String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
+                if (imagePath != null) {
+                    mImageUri = Uri.parse(imagePath);
+                }
             }
 
             mShareIntent = new Intent();
@@ -239,7 +241,9 @@ public class DetailActivity extends AppCompatActivity {
             mShareIntent.putExtra(Intent.EXTRA_SUBJECT, title + " - Mobanic");
             mShareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this car I found! Care for your own test drive? - https://goo.gl/P2BUBs");
             mShareIntent.putExtra("sms_body", "Check out this car I found! Care for your own test drive? - https://goo.gl/P2BUBs");
-            mShareIntent.putExtra(Intent.EXTRA_STREAM, mImageUri);
+            if (mImageUri != null) {
+                mShareIntent.putExtra(Intent.EXTRA_STREAM, mImageUri);
+            }
             mShareIntent.setType("text/plain");
             mShareIntent.setType("image/*");
 
