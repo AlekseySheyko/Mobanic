@@ -267,8 +267,10 @@ public class MasterActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             MasterActivity a = (MasterActivity) MasterActivity.getContext();
-            a.mForceNetwork = true;
-            a.refreshCarList();
+            if (a != null) {
+                a.mForceNetwork = true;
+                a.refreshCarList();
+            }
         }
     }
 }
